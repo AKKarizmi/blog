@@ -1,10 +1,10 @@
 <!doctype html>
-<html class="no-js" lang="zxx">
+<html class="no-js" lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>FOROZ</title>
-    <meta name="description" content="">
+    <title>FOROZ - Empowering Afghan Youth for a Brighter Future</title>
+    <meta name="description" content="FOROZ is dedicated to empowering Afghan youth through education, mentorship, and opportunities. Together, we build a brighter future for Afghanistan.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
@@ -24,57 +24,49 @@
     <link rel="stylesheet" href="assets/css/slick.css">
     <link rel="stylesheet" href="assets/css/nice-select.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/custom-style.css">
     
 </head>
 
 <body>
-    <!-- ? Preloader Start -->
-    <!-- <div id="preloader-active">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="preloader-circle"></div>
-                <div class="preloader-img pere-text">
-                    <img src="assets/img/logo/loder.png" alt="">
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- Preloader Start -->
+    <!-- Header Start -->
     <header>
-        <!-- Header Start -->
-        <div class="header-area header-transparent">
-            <div class="main-header ">
-                <div class="header-bottom  header-sticky">
+        <div class="header-area-modern">
+            <div class="main-header">
+                <div class="header-bottom header-sticky">
                     <div class="container-fluid">
                         <div class="row align-items-center">
                             <!-- Logo -->
-                            <div class="col-xl-2 col-lg-2">
+                            <div class="col-xl-2 col-lg-2 col-md-3 col-6">
                                 <div class="logo">
-                                    <a href="index.html"><img src="assets/img/logo/logo.png" alt="" height="80"></a>
+                                    <a href="#home" data-testid="logo-link">
+                                        <img src="assets/img/logo/logo.png" alt="FOROZ Logo" height="70">
+                                    </a>
                                 </div>
                             </div>
-                            <div class="col-xl-10 col-lg-10">
+                            <div class="col-xl-10 col-lg-10 col-md-9 col-6">
                                 <div class="menu-wrapper d-flex align-items-center justify-content-end">
                                     <!-- Main-menu -->
                                     <div class="main-menu d-none d-lg-block">
                                         <nav>
                                             <ul id="navigation">                                                                                          
-                                                <li class="active" ><a href="index.html">Home</a></li>
-                                                <li><a href="courses.html">Courses</a></li>
-                                                <li><a href="about.html">About</a></li>
-                                                <li><a href="#">Blog</a>
-                                                    <ul class="submenu">
-                                                        <li><a href="blog.html">Blog</a></li>
-                                                        <li><a href="blog_details.html">Blog Details</a></li>
-                                                        <li><a href="elements.html">Element</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="contact.html">Contact</a></li>
-                                                <!-- Button -->
-                                                <li class="button-header margin-left "><a href="#" class="btn">Join</a></li>
-                                                <li class="button-header"><a href="login.html" class="btn btn3">Log in</a></li>
+                                                <li class="active"><a href="#home" data-testid="nav-home">Home</a></li>
+                                                <li><a href="#mission" data-testid="nav-mission">Mission</a></li>
+                                                <li><a href="#programs" data-testid="nav-programs">Programs</a></li>
+                                                <li><a href="#impact" data-testid="nav-impact">Impact</a></li>
+                                                <li><a href="#team" data-testid="nav-team">Team</a></li>
+                                                <li><a href="#contact" data-testid="nav-contact">Contact</a></li>
                                             </ul>
                                         </nav>
+                                    </div>
+                                    <!-- Header Buttons -->
+                                    <div class="header-action-buttons d-none d-lg-flex">
+                                        <a href="#join-form" class="header-btn-primary" data-testid="join-btn">
+                                            <i class="fas fa-user-plus"></i> Join Us
+                                        </a>
+                                        <a href="#contact" class="header-btn-secondary" data-testid="support-btn">
+                                            <i class="fas fa-heart"></i> Donate
+                                        </a>
                                     </div>
                                 </div>
                             </div> 
@@ -87,448 +79,712 @@
                 </div>
             </div>
         </div>
-        <!-- Header End -->
     </header>
+    <!-- Header End -->
+    
     <main>
     
-        <!--? slider Area Start-->
-        <section class="slider-area ">
-            <div class="slider-active">
-                <!-- Single Slider -->
-                <div class="single-slider slider-height d-flex align-items-center">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-xl-6 col-lg-7 col-md-12">
-                                <div class="hero__caption">
-                                    <h1 data-animation="fadeInLeft" data-delay="0.2s">Unlocking<br> Opportunities</h1>
-                                    <p data-animation="fadeInLeft" data-delay="0.4s">Empowering Afghan youth to unlock their
-                                        potential, Foroz provides services that includes
-                                        both opportunities and education. it’s a lifeline
-                                        of opportunity that enables youth to pursue
-                                        their dreams.</p>
-                                    <a href="#" class="btn hero-btn" data-animation="fadeInLeft" data-delay="0.7s">Join for Now</a>
+        <!-- Hero Section Start -->
+        <section id="home" class="hero-area">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                        <div class="hero__caption" data-testid="hero-section">
+                            <h1 data-animation="fadeInLeft" data-delay="0.2s">Empowering Afghan Youth</h1>
+                            <p data-animation="fadeInLeft" data-delay="0.4s">
+                                FOROZ is dedicated to unlocking opportunities for Afghan youth through education, 
+                                mentorship, and community support. Together, we're building a brighter future 
+                                where every young person can pursue their dreams and reach their full potential.
+                            </p>
+                            <a href="#programs" class="hero-btn" data-animation="fadeInLeft" data-delay="0.7s" data-testid="hero-cta-btn">Explore Our Programs</a>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                        <div class="hero-image" data-animation="fadeIn" data-delay="0.4s">
+                            <img src="assets/img/Foroz.jpeg" alt="Afghan Youth Empowerment">
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </section>
+        <!-- Hero Section End -->
+
+        <!-- Mission Section Start -->
+        <section id="mission" class="section-padding bg-light">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="section-title" data-testid="mission-section">
+                            <h2>Our Mission</h2>
+                            <p>
+                                To empower Afghan youth by providing access to quality education, professional 
+                                development opportunities, and a supportive community that fosters growth, 
+                                innovation, and leadership.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feature-card" data-testid="feature-education">
+                            <div class="feature-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3>Quality Education</h3>
+                            <p>
+                                Providing access to comprehensive educational resources, courses, and learning 
+                                materials that prepare youth for future success in their chosen fields.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feature-card" data-testid="feature-mentorship">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Mentorship Programs</h3>
+                            <p>
+                                Connecting young individuals with experienced mentors who guide, inspire, 
+                                and support them on their journey to personal and professional excellence.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="feature-card" data-testid="feature-community">
+                            <div class="feature-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <h3>Community Building</h3>
+                            <p>
+                                Creating a vibrant, supportive community where Afghan youth can connect, 
+                                collaborate, and grow together toward a shared vision of prosperity.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Mission Section End -->
+
+        <!-- Programs Section Start -->
+        <section id="programs" class="section-padding">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="section-title" data-testid="programs-section">
+                            <h2>Our Programs</h2>
+                            <p>
+                                Discover our comprehensive programs designed to equip Afghan youth with 
+                                the skills, knowledge, and opportunities they need to thrive.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="program-card" data-testid="program-skills">
+                            <div class="program-card-image">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Skills Development Program">
+                                <span class="program-card-badge">Featured</span>
+                            </div>
+                            <div class="program-card-content">
+                                <h3>Skills Development</h3>
+                                <p>
+                                    Comprehensive training programs in technology, business, languages, and 
+                                    professional skills. We offer hands-on learning experiences that prepare 
+                                    youth for modern career opportunities.
+                                </p>
+                                <a href="#contact" class="program-btn" data-testid="skills-learn-more">
+                                    Learn More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="program-card" data-testid="program-leadership">
+                            <div class="program-card-image">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Leadership Training">
+                                <span class="program-card-badge">Popular</span>
+                            </div>
+                            <div class="program-card-content">
+                                <h3>Leadership Training</h3>
+                                <p>
+                                    Developing the next generation of Afghan leaders through workshops, 
+                                    seminars, and practical leadership experiences. Build confidence, 
+                                    communication skills, and strategic thinking.
+                                </p>
+                                <a href="#contact" class="program-btn" data-testid="leadership-learn-more">
+                                    Learn More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="program-card" data-testid="program-career">
+                            <div class="program-card-image">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Career Opportunities">
+                            </div>
+                            <div class="program-card-content">
+                                <h3>Career Opportunities</h3>
+                                <p>
+                                    Connecting talented youth with employment opportunities, internships, 
+                                    and entrepreneurship support. We bridge the gap between education 
+                                    and meaningful careers.
+                                </p>
+                                <a href="#contact" class="program-btn" data-testid="career-learn-more">
+                                    Learn More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 mb-4">
+                        <div class="program-card" data-testid="program-scholarship">
+                            <div class="program-card-image">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Scholarship Programs">
+                            </div>
+                            <div class="program-card-content">
+                                <h3>Scholarship Programs</h3>
+                                <p>
+                                    Financial support and scholarships for deserving students to pursue 
+                                    higher education. We believe financial constraints should never 
+                                    limit potential.
+                                </p>
+                                <a href="#contact" class="program-btn" data-testid="scholarship-learn-more">
+                                    Learn More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Programs Section End -->
+
+        <!-- Impact Stats Section Start -->
+        <section id="impact" class="stats-section" data-testid="impact-section">
+            <div class="container">
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8">
+                        <div class="section-title text-center">
+                            <h2 style="color: #ffffff;">Our Impact</h2>
+                            <p style="color: rgba(255, 255, 255, 0.95);">
+                                Together, we're making a real difference in the lives of Afghan youth
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-testid="stat-youth">
+                            <span class="stat-number">5,000+</span>
+                            <span class="stat-label">Youth Empowered</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-testid="stat-programs">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Programs Delivered</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-testid="stat-mentors">
+                            <span class="stat-number">200+</span>
+                            <span class="stat-label">Expert Mentors</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-card" data-testid="stat-partnerships">
+                            <span class="stat-number">30+</span>
+                            <span class="stat-label">Partner Organizations</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Impact Stats Section End -->
+        <!-- Team Section Start -->
+        <section id="team" class="section-padding bg-light">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="section-title" data-testid="team-section">
+                            <h2>Meet Our Team</h2>
+                            <p>
+                                Dedicated professionals committed to empowering Afghan youth 
+                                and building a brighter future for our community.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="team-card" data-testid="team-member-1">
+                            <div class="team-card-image">
+                                <img src="assets/img/gallery/Team-1.jpg" alt="Abbas Malikzada">
+                            </div>
+                            <div class="team-card-content">
+                                <h4>Mr. Abbas Malikzada</h4>
+                                <span class="role">Founder & Executive Director</span>
+                                <p>
+                                    Visionary leader dedicated to creating opportunities for Afghan youth 
+                                    through education and community development initiatives.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="team-card" data-testid="team-member-2">
+                            <div class="team-card-image">
+                                <img src="assets/img/gallery/Team-2.jpg" alt="Enayatullah Sadiqi">
+                            </div>
+                            <div class="team-card-content">
+                                <h4>Mr. Enayatullah Sadiqi</h4>
+                                <span class="role">Programs Director</span>
+                                <p>
+                                    Experienced educator passionate about developing innovative programs 
+                                    that empower youth through skills training and mentorship.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="team-card" data-testid="team-member-3">
+                            <div class="team-card-image">
+                                <img src="assets/img/gallery/Team-3.jpg" alt="Nasrullah Amini">
+                            </div>
+                            <div class="team-card-content">
+                                <h4>Mr. Nasrullah Amini</h4>
+                                <span class="role">Community Outreach Lead</span>
+                                <p>
+                                    Community advocate focused on building partnerships and connecting 
+                                    youth with opportunities for growth and development.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Team Section End -->
+
+        <!-- Testimonials Section Start -->
+        <section class="section-padding">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="section-title" data-testid="testimonials-section">
+                            <h2>Success Stories</h2>
+                            <p>
+                                Hear from the young individuals whose lives have been transformed 
+                                through FOROZ programs and support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="testimonial-card" data-testid="testimonial-1">
+                            <div class="testimonial-quote">"</div>
+                            <p class="testimonial-text">
+                                FOROZ changed my life. Through their skills development program, I learned 
+                                web development and secured a job with an international company. The mentorship 
+                                and support I received gave me the confidence to pursue my dreams.
+                            </p>
+                            <div class="testimonial-author">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Student">
+                                <div class="testimonial-author-info">
+                                    <h5>Fatima R.</h5>
+                                    <span>Web Developer</span>
                                 </div>
                             </div>
-                            <style>
-                                .img-con {
-                                    height: 450px;
-                                    width: 370px;
-                                    position: relative;
-                                    right: auto;
-                                    left: 30%;
-                                }
-                                .img-con img {
-                                    margin: auto 5px 0 5px;
-                                    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-                                    border-radius: 30px;
-                                }
-                            </style>
-                            <div class="col-xl-6 col-lg-7 col-md-12">
-                                <div class="hero__caption d-flex">
-                                    <div class="img-con" data-animation="fadeIn" data-delay="0.4s">
-                                        <img src="assets/img/Foroz.jpeg" alt="" width="100%">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="testimonial-card" data-testid="testimonial-2">
+                            <div class="testimonial-quote">"</div>
+                            <p class="testimonial-text">
+                                The leadership training program at FOROZ helped me discover my potential. 
+                                I've developed skills in project management and communication that have opened 
+                                doors I never thought possible. I'm now leading community initiatives.
+                            </p>
+                            <div class="testimonial-author">
+                                <img src="assets/img/Afghan_Girls.jpg" alt="Student">
+                                <div class="testimonial-author-info">
+                                    <h5>Ahmed K.</h5>
+                                    <span>Community Leader</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Testimonials Section End -->
+
+        <!-- Call to Action Section Start -->
+        <section id="join" class="cta-section" data-testid="cta-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h2>Join Us in Empowering Afghan Youth</h2>
+                        <p>
+                            Together, we can create a brighter future. Whether you want to participate 
+                            in our programs or support our mission, there's a place for you at FOROZ.
+                        </p>
+                        <div class="cta-buttons">
+                            <a href="#join-form" class="cta-btn-primary" data-testid="cta-join-btn">Join Our Programs</a>
+                            <a href="#contact" class="cta-btn-secondary" data-testid="cta-donate-btn">Support Our Cause</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Call to Action Section End -->
+
+        <!-- Join Us Form Section Start -->
+        <section id="join-form" class="section-padding bg-light" data-testid="join-form-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="section-title">
+                            <h2>Join FOROZ Today</h2>
+                            <p>
+                                Take the first step towards unlocking your potential. Fill out the form below 
+                                and one of our team members will reach out to you within 48 hours.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="join-form-card" data-testid="join-form-card">
+                            <form id="joinForm" class="join-form" data-testid="join-form">
+                                <div class="row">
+                                    <!-- Full Name -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="fullName" class="form-label">
+                                                <i class="fas fa-user"></i> Full Name *
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                id="fullName" 
+                                                name="fullName" 
+                                                placeholder="Enter your full name"
+                                                required
+                                                data-testid="input-full-name">
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">
+                                                <i class="fas fa-envelope"></i> Email Address *
+                                            </label>
+                                            <input 
+                                                type="email" 
+                                                class="form-control" 
+                                                id="email" 
+                                                name="email" 
+                                                placeholder="your.email@example.com"
+                                                required
+                                                data-testid="input-email">
+                                        </div>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="phone" class="form-label">
+                                                <i class="fas fa-phone"></i> Phone Number *
+                                            </label>
+                                            <input 
+                                                type="tel" 
+                                                class="form-control" 
+                                                id="phone" 
+                                                name="phone" 
+                                                placeholder="+93 XXX XXX XXX"
+                                                required
+                                                data-testid="input-phone">
+                                        </div>
+                                    </div>
+
+                                    <!-- Age -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="age" class="form-label">
+                                                <i class="fas fa-birthday-cake"></i> Age *
+                                            </label>
+                                            <input 
+                                                type="number" 
+                                                class="form-control" 
+                                                id="age" 
+                                                name="age" 
+                                                placeholder="Enter your age"
+                                                min="15" 
+                                                max="35"
+                                                required
+                                                data-testid="input-age">
+                                        </div>
+                                    </div>
+
+                                    <!-- City -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="city" class="form-label">
+                                                <i class="fas fa-map-marker-alt"></i> City *
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                id="city" 
+                                                name="city" 
+                                                placeholder="Enter your city"
+                                                required
+                                                data-testid="input-city">
+                                        </div>
+                                    </div>
+
+                                    <!-- Education Level -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-group">
+                                            <label for="education" class="form-label">
+                                                <i class="fas fa-graduation-cap"></i> Education Level *
+                                            </label>
+                                            <select 
+                                                class="form-control" 
+                                                id="education" 
+                                                name="education" 
+                                                required
+                                                data-testid="select-education">
+                                                <option value="">Select your education level</option>
+                                                <option value="high-school">High School</option>
+                                                <option value="undergraduate">Undergraduate</option>
+                                                <option value="graduate">Graduate</option>
+                                                <option value="postgraduate">Postgraduate</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Program Interest -->
+                                    <div class="col-12 mb-4">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-star"></i> Program Interest *
+                                            </label>
+                                            <div class="program-interest-options">
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value="skills-development" 
+                                                        id="program1"
+                                                        name="programInterest"
+                                                        data-testid="checkbox-skills">
+                                                    <label class="form-check-label" for="program1">
+                                                        Skills Development (Technology, Business, Languages)
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value="leadership-training" 
+                                                        id="program2"
+                                                        name="programInterest"
+                                                        data-testid="checkbox-leadership">
+                                                    <label class="form-check-label" for="program2">
+                                                        Leadership Training
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value="career-opportunities" 
+                                                        id="program3"
+                                                        name="programInterest"
+                                                        data-testid="checkbox-career">
+                                                    <label class="form-check-label" for="program3">
+                                                        Career Opportunities & Internships
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value="scholarship" 
+                                                        id="program4"
+                                                        name="programInterest"
+                                                        data-testid="checkbox-scholarship">
+                                                    <label class="form-check-label" for="program4">
+                                                        Scholarship Programs
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value="mentorship" 
+                                                        id="program5"
+                                                        name="programInterest"
+                                                        data-testid="checkbox-mentorship">
+                                                    <label class="form-check-label" for="program5">
+                                                        Mentorship Program
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional Information -->
+                                    <div class="col-12 mb-4">
+                                        <div class="form-group">
+                                            <label for="message" class="form-label">
+                                                <i class="fas fa-comment-alt"></i> Tell Us About Yourself
+                                            </label>
+                                            <textarea 
+                                                class="form-control" 
+                                                id="message" 
+                                                name="message" 
+                                                rows="5"
+                                                placeholder="Share your goals, aspirations, and why you want to join FOROZ..."
+                                                data-testid="textarea-message"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Terms and Conditions -->
+                                    <div class="col-12 mb-4">
+                                        <div class="form-check">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="checkbox" 
+                                                value="" 
+                                                id="termsCheck"
+                                                required
+                                                data-testid="checkbox-terms">
+                                            <label class="form-check-label" for="termsCheck">
+                                                I agree to receive communications from FOROZ and understand that 
+                                                my information will be handled according to the privacy policy. *
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="col-12 text-center">
+                                        <button 
+                                            type="submit" 
+                                            class="submit-btn" 
+                                            data-testid="submit-btn">
+                                            <i class="fas fa-paper-plane"></i> Submit Application
+                                        </button>
+                                        <p class="form-note">* Required fields</p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>          
-                </div>
-            </div>
-        </section>
-        <!-- ? services-area -->
-        
-        <div class="services-area">
-            <div class="container">
-                <div class="row justify-content-sm-center">
-                    <div class="col-lg-4 col-md-6 col-sm-8">
-                        <div class="single-services mb-30">
-                            <!-- <div class="features-icon">
-                                <img src="assets/img/icon/icon1.svg" alt="">
-                            </div> -->
-                            <div class="features-caption">
-                                <h3>Support</h3>
-                                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi suscipit incidunt, praesentium.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-8">
-                        <div class="single-services mb-30">
-                            <!-- <div class="features-icon">
-                                <img src="assets/img/icon/icon2.svg" alt="">
-                            </div> -->
-                            <div class="features-caption">
-                                <h3>Instruct</h3>
-                                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi suscipit incidunt, praesentium.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-8">
-                        <div class="single-services mb-30">
-                            <!-- <div class="features-icon">
-                                <img src="assets/img/icon/icon3.svg" alt="">
-                            </div> -->
-                            <div class="features-caption">
-                                <h3>Stand side by side</h3>
-                                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi suscipit incidunt, praesentium.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </form>
 
-
-        <!-- Courses area start -->
-        <div class="courses-area section-padding40 fix">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 col-lg-8">
-                        <div class="section-tittle text-center mb-55">
-                            <h2>Our Services</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="courses-actives">
-                    <!-- Single -->
-                    <div class="properties pb-20">
-                        <div class="properties__card">
-                            <div class="properties__img overlay1">
-                                <a href="#"><img src="assets/img/Afghan_Girls.jpg" alt=""></a>
+                            <!-- Success Message (Hidden by default) -->
+                            <div id="successMessage" class="success-message" style="display: none;" data-testid="success-message">
+                                <i class="fas fa-check-circle"></i>
+                                <h3>Application Submitted Successfully!</h3>
+                                <p>Thank you for your interest in FOROZ. We'll review your application and contact you within 48 hours.</p>
                             </div>
-                            <div class="properties__caption">
-                                <!-- <p>Empowering Afghan Youths</p> -->
-                                <h3><a href="#">Empowering Afghan Youths</a></h3>
-                                <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
-
-                                </p>
-                                <a href="#" class="border-btn border-btn2">Find out more</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Single -->
-                    <!-- Single -->
-                    <div class="properties pb-20">
-                        <div class="properties__card">
-                            <div class="properties__img overlay1">
-                                <a href="#"><img src="assets/img/Afghan_Girls.jpg" alt=""></a>
-                            </div>
-                            <div class="properties__caption">
-                                <!-- <p>Empowering Afghan Youths</p> -->
-                                <h3><a href="#">Empowering Afghan Youths</a></h3>
-                                <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
-
-                                </p>
-                                <a href="#" class="border-btn border-btn2">Find out more</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Single -->
-                    <!-- Single -->
-                    <div class="properties pb-20">
-                        <div class="properties__card">
-                            <div class="properties__img overlay1">
-                                <a href="#"><img src="assets/img/Afghan_Girls.jpg" alt=""></a>
-                            </div>
-                            <div class="properties__caption">
-                                <!-- <p>Empowering Afghan Youths</p> -->
-                                <h3><a href="#">Empowering Afghan Youths</a></h3>
-                                <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
-
-                                </p>
-                                <a href="#" class="border-btn border-btn2">Find out more</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Single -->
-                    <!-- Single -->
-                    <div class="properties pb-20">
-                        <div class="properties__card">
-                            <div class="properties__img overlay1">
-                                <a href="#"><img src="assets/img/Afghan_Girls.jpg" alt=""></a>
-                            </div>
-                            <div class="properties__caption">
-                                <!-- <p>Empowering Afghan Youths</p> -->
-                                <h3><a href="#">Empowering Afghan Youths</a></h3>
-                                <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
-
-                                </p>
-                                <a href="#" class="border-btn border-btn2">Find out more</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Single -->
-                </div>
-            </div>
-        </div>
-        <!-- Courses area End -->
-
-        <!--? About Area-1 Start -->
-        <section class="about-area1 fix pt-10">
-            <div class="support-wrapper align-items-center">
-                <div class="left-content1">
-                    <!-- <div class="about-icon">
-                        <img src="assets/img/icon/about.svg" alt="">
-                    </div> -->
-                    <!-- section tittle -->
-                    <div class="section-tittle section-tittle2 mb-55">
-                        <div class="front-text">
-                            <h2 class="">Supporting Afghan Youths for a Better Future!</h2>
-                            <!-- <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat, optio enim quibusdam quam maiores nulla obcaecati quod odit, qui omnis cupiditate! Quo molestias sed beatae fugiat aliquid dolorem consectetur et.</p> -->
-                        </div>
-                    </div>
-                    <div class="single-features">
-                        <div class="features-icon">
-                            <img src="assets/img/icon/right-icon.svg" alt="">
-                        </div>
-                        <div class="features-caption">
-                            <p>Techniques to engage effectively with vulnerable children and young people.</p>
-                        </div>
-                    </div>
-                    <div class="single-features">
-                        <div class="features-icon">
-                            <img src="assets/img/icon/right-icon.svg" alt="">
-                        </div>
-                        <div class="features-caption">
-                            <p>Join millions of people from around the world  learning together.</p>
-                        </div>
-                    </div>
-
-                    <div class="single-features">
-                        <div class="features-icon">
-                            <img src="assets/img/icon/right-icon.svg" alt="">
-                        </div>
-                        <div class="features-caption">
-                            <p>Join millions of people from around the world learning together. Online learning is as easy and natural.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="right-content1">
-                    <!-- img -->
-                    <div class="right-img">
-                        <img src="assets/img/gallery/about.png" alt="">
-
-                        <div class="left-img">
-                            <img src="assets/img/Afghan_Girls.jpg" alt="" style="border-radius: 30px; width: 90%;">
-                            <!-- <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=up68UAfH0d0"><i class="fas fa-play"></i></a> -->
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- About Area End -->
-    
-        <!--? Team -->
-        <section class="team-area section-padding40 fix">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 col-lg-8">
-                        <div class="section-tittle text-center mb-55">
-                            <h2>Community experts</h2>
-                        </div>
-                    </div>
-                </div>
-                <style>
-                    .cat-icon img {
-                        height: 250px;
-                        border-radius: 40px;
-                        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
-                    }
-                </style>
-                <div class="team-active">
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-1.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Abbas Malikzada</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-2.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Enayatullah Sadiqi</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-3.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Nasrullah Amini</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-1.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Abbas Malikzada</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-2.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Enayatullah Sadiqi</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                    <div class="single-cat text-center">
-                        <div class="cat-icon">
-                            <img src="assets/img/gallery/Team-3.jpg" alt="">
-                        </div>
-                        <div class="cat-cap">
-                            <h5><a href="services.html">Mr. Nasrullah Amini</a></h5>
-                            <p>I am here!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Services End -->
-
-        <br>
-        
-        <!--? About Area-3 Start -->
-        <section class="about-area3 fix">
-            <div class="support-wrapper align-items-center">
-                <div class="right-content3">
-                    <!-- img -->
-                    <div class="right-img" style="padding: 100px;">
-                        <img src="assets/img/Logo-H.svg" alt="">
-                    </div>
-                </div>
-                <div class="left-content3">
-                    <!-- section tittle -->
-                    <div class="section-tittle section-tittle2 mb-20">
-                        <div class="front-text">
-                            <h2 class="">About FOROZ</h2>
-                        </div>
-                    </div>
-                    <div class="single-features">
-                        <div class="features-caption">
-                            <p>
-                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maxime, repellendus praesentium. Laboriosam blanditiis sequi harum nesciunt maiores unde veritatis eaque, magni doloribus autem vero tenetur labore natus quam deleniti deserunt.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="single-features">
-                        <div class="features-icon">
-                            <img src="assets/img/icon/right-icon.svg" alt="">
-                        </div>
-                        <div class="features-caption">
-                            <p>
-                                High Quality Services
-                            </p>
-                        </div>
-                    </div>
-                    <div class="single-features">
-                        <div class="features-icon">
-                            <img src="assets/img/icon/right-icon.svg" alt="">
-                        </div>
-                        <div class="features-caption">
-                            <p>
-                                Strong Community
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- About Area End -->
+        <!-- Join Us Form Section End -->
 
     </main>
-    <footer>
-     <div class="footer-wrappper footer-bg">
-        <!-- Footer Start-->
-        <div class="footer-area footer-padding">
+    
+    <!-- Footer Start -->
+    <footer id="contact">
+        <div class="footer-content">
             <div class="container">
-                <div class="row justify-content-between">
-                    <div class="col-xl-4 col-lg-5 col-md-4 col-sm-6">
-                        <div class="single-footer-caption mb-50">
-                            <div class="single-footer-caption mb-30">
-                                <!-- logo -->
-                                <div class="footer-logo mb-25">
-                                    <a href="index.html"><img src="assets/img/Logo-H.svg" alt="" height="100"></a>
-                                </div>
-                                <div class="footer-tittle">
-                                    <div class="footer-pera">
-                                        <p>Together Toward a Bright Future!</p>
-                                    </div>
-                                </div>
-                                <!-- social -->
-                                <div class="footer-social">
-                                    <a href="#"><i class="fab fa-twitter"></i></a>
-                                    <a href="https://bit.ly/sai4ull"><i class="fab fa-facebook-f"></i></a>
-                                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="footer-brand" data-testid="footer-brand">
+                            <img src="assets/img/Logo-H.svg" alt="FOROZ Logo" height="80" style="margin-bottom: 20px;">
+                            <h3>FOROZ</h3>
+                            <p>
+                                Empowering Afghan youth through education, mentorship, and community 
+                                support. Together, we build a brighter future.
+                            </p>
+                            <div class="footer-social">
+                                <a href="https://twitter.com/foroz" target="_blank" data-testid="social-twitter"><i class="fab fa-twitter"></i></a>
+                                <a href="https://facebook.com/foroz" target="_blank" data-testid="social-facebook"><i class="fab fa-facebook-f"></i></a>
+                                <a href="https://instagram.com/foroz" target="_blank" data-testid="social-instagram"><i class="fab fa-instagram"></i></a>
+                                <a href="https://linkedin.com/company/foroz" target="_blank" data-testid="social-linkedin"><i class="fab fa-linkedin-in"></i></a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-5">
-                        <div class="single-footer-caption mb-50">
-                            <div class="footer-tittle">
-                                <h4>Quick Links</h4>
-                                <ul>
-                                    <li><a href="#">Need Something</a></li>
-                                </ul>
-                            </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <div class="footer-links" data-testid="footer-quick-links">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="#home">Home</a></li>
+                                <li><a href="#mission">Our Mission</a></li>
+                                <li><a href="#programs">Programs</a></li>
+                                <li><a href="#impact">Impact</a></li>
+                                <li><a href="#team">Team</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6">
-                        <div class="single-footer-caption mb-50">
-                            <div class="footer-tittle">
-                                <h4>Support</h4>
-                                <ul>
-                                    <li><a href="#">Need Something</a></li>
-                                </ul>
-                            </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <div class="footer-links" data-testid="footer-programs">
+                            <h4>Programs</h4>
+                            <ul>
+                                <li><a href="#programs">Skills Development</a></li>
+                                <li><a href="#programs">Leadership Training</a></li>
+                                <li><a href="#programs">Career Opportunities</a></li>
+                                <li><a href="#programs">Scholarships</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-footer-caption mb-50">
-                            <div class="footer-tittle">
-                                <h4>Community</h4>
-                                <ul>
-                                    <li><a href="#">Need Something</a></li>
-                                </ul>
-                            </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <div class="footer-links" data-testid="footer-support">
+                            <h4>Get Involved</h4>
+                            <ul>
+                                <li><a href="#join">Join Programs</a></li>
+                                <li><a href="#join">Become a Mentor</a></li>
+                                <li><a href="#join">Partner With Us</a></li>
+                                <li><a href="#join">Donate</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <div class="footer-links" data-testid="footer-contact">
+                            <h4>Contact</h4>
+                            <ul>
+                                <li><a href="mailto:info@foroz.org">info@foroz.org</a></li>
+                                <li><a href="tel:+93xxxxxxxxx">+93 (XXX) XXX-XXXX</a></li>
+                                <li><a href="#contact">Contact Form</a></li>
+                                <li><a href="#location">Location</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- footer-bottom area -->
-        <div class="footer-bottom-area">
+        <div class="footer-bottom">
             <div class="container">
-                <div class="footer-border">
-                    <div class="row d-flex align-items-center">
-                        <div class="col-xl-12 ">
-                            <div class="footer-copy-right text-center">
-                                <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | FOROZ Community</a>
-                                  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <!-- Footer End-->
-      </div>
-  </footer> 
-  <!-- Scroll Up -->
-  <div id="back-top" >
-    <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
-</div>
+                <p data-testid="copyright">
+                    Copyright &copy; <script>document.write(new Date().getFullYear());</script> FOROZ. All rights reserved. 
+                    Empowering Afghan Youth for a Brighter Future.
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer End -->
+    
+    <!-- Scroll Up -->
+    <div id="back-top">
+        <a title="Go to Top" href="#" data-testid="back-to-top"><i class="fas fa-level-up-alt"></i></a>
+    </div>
 
 <!-- JS here -->
 <script src="./assets/js/vendor/modernizr-3.5.0.min.js"></script>
