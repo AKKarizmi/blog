@@ -5,11 +5,11 @@ const withLeadingSlash = (value: string) =>
   value.startsWith('/') ? value : `/${value}`;
 
 export const API_ORIGIN = trimTrailingSlash(
-  import.meta.env.VITE_API_ORIGIN || 'https://foroz.me/'
+  import.meta.env.VITE_API_ORIGIN || 'https://foroz.me'
 );
 
 export const API_BASE_URL = trimTrailingSlash(
-  import.meta.env.VITE_API_BASE_URL || `${API_ORIGIN}/api`
+  import.meta.env.VITE_API_BASE_URL || '/api'
 );
 
 export const buildApiUrl = (path: string) => {
