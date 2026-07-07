@@ -1,19 +1,9 @@
 import { motion } from 'framer-motion';
 import { CalendarIcon, MapPinIcon, ArrowRightIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { fetchJson, extractArray, resolveAssetUrl } from '../services/api';
+import { useState } from 'react';
+import { useForozData } from '../context/ForozDataContext';
+import type { EventData } from '../context/ForozDataContext';
 import type { SyntheticEvent } from 'react';
-
-interface EventData {
-  id: string | number;
-  title: string;
-  short_description: string;
-  description: string;
-  image: string;
-  date: string;
-  link?: string;
-  registration_link?: string;
-}
 
 const formatEventDate = (isoDate: string): string => {
   if (!isoDate) {
@@ -33,28 +23,9 @@ const formatEventDate = (isoDate: string): string => {
 };
 
 export function EventsSection() {
-  const [events, setEvents] = useState<EventData[]>([]);
+  const { events } = useForozData();
   const [selectedItem, setSelectedItem] = useState<EventData | null>(null);
   const hasEvents = events.length > 0;
-
-  useEffect(() => {
-    fetchJson<unknown>('/events/')
-      .then((payload) => {
-        const items = extractArray<any>(payload);
-        const mapped = items.map((item, index) => ({
-          id: item.id || index,
-          title: item.title || 'Upcoming Event',
-          short_description: item.short_description || item.summary || '',
-          description: item.description || '',
-          image: resolveAssetUrl(item.image),
-          date: item.date || item.publishDate || '',
-          link: item.registration_link || item.link || undefined,
-          registration_link: item.registration_link || item.link || undefined,
-        }));
-        setEvents(mapped);
-      })
-      .catch((err) => console.error('Failed to fetch events:', err));
-  }, []);
 
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     event.currentTarget.src = '/static/fallback.webp';

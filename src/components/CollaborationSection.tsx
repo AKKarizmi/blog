@@ -1,41 +1,14 @@
 import { motion } from 'framer-motion';
 import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { fetchJson, extractArray, resolveAssetUrl } from '../services/api';
+import { useState } from 'react';
+import { useForozData } from '../context/ForozDataContext';
+import type { CollaborationData } from '../context/ForozDataContext';
 import type { SyntheticEvent } from 'react';
 
-interface CollaborationData {
-  id: string | number;
-  title: string;
-  date: string;
-  short_description: string;
-  image: string;
-  description: string;
-  link?: string;
-}
-
 export function CollaborationSection() {
-  const [collaborations, setCollaborations] = useState<CollaborationData[]>([]);
+  const { collaborations } = useForozData();
   const [selectedItem, setSelectedItem] = useState<CollaborationData | null>(null);
   const hasCollaborations = collaborations.length > 0;
-
-  useEffect(() => {
-    fetchJson<unknown>('/collaborations/')
-      .then((payload) => {
-        const items = extractArray<any>(payload);
-        const mapped = items.map((item, index) => ({
-          id: item.id || index,
-          title: item.title || 'Collaboration',
-          short_description: item.short_description || '',
-          description: item.description || '',
-          image: resolveAssetUrl(item.image),
-          date: item.date || '',
-          link: item.website || item.link || undefined,
-        }));
-        setCollaborations(mapped);
-      })
-      .catch((err) => console.error('Failed to fetch collaborations:', err));
-  }, []);
 
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     event.currentTarget.src = '/static/fallback.webp';

@@ -5,7 +5,8 @@ const withLeadingSlash = (value: string) =>
   value.startsWith('/') ? value : `/${value}`;
 
 export const API_ORIGIN = trimTrailingSlash(
-  import.meta.env.VITE_API_ORIGIN || 'https://foroz.me'
+  // import.meta.env.VITE_API_ORIGIN || 'https://foroz.me'
+  import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000'
 );
 
 export const API_BASE_URL = trimTrailingSlash(
@@ -17,7 +18,7 @@ export const buildApiUrl = (path: string) => {
     return path;
   }
 
-  return `${API_BASE_URL}${withLeadingSlash(path)}`;
+  return `${API_ORIGIN}${API_BASE_URL}${withLeadingSlash(path)}`;
 };
 
 export const isRecord = (value: unknown): value is ApiRecord =>

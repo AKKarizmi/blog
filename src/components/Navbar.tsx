@@ -46,7 +46,7 @@ export function Navbar() {
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2 z-50">
             {/* <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center"> */}
-            <img src="/static/Logos/Nav-Logo.svg" alt="FOROZ Logo" width={100} />
+            <img src="https://foroz.me/static/Logos/Nav-Logo.svg" alt="FOROZ Logo" width={100} />
             {/* </div> */}
           </a>
 
@@ -65,7 +65,7 @@ export function Navbar() {
               )}
             </ul>
             <a
-              href="http://localhost:8000/api/user/login"
+              href="api/user/login"
               className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
 
               Login

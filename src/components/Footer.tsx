@@ -39,7 +39,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div className="lg:col-span-1">
             <a href="#home" className="flex items-center gap-2 mb-6">
-              <img src="/static/Logos/Footer-Logo.svg" alt="FOROZ Logo" width={100} />
+              <img src="https://foroz.me/static/Logos/Footer-Logo.svg" alt="FOROZ Logo" width={100} />
             </a>
             <p className="text-sm leading-relaxed mb-6">{footer.description}</p>
             <div className="flex gap-4 flex-wrap">

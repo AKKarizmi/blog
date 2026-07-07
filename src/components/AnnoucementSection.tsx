@@ -1,41 +1,14 @@
 import { motion } from 'framer-motion';
 import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { fetchJson, extractArray, resolveAssetUrl } from '../services/api';
+import { useState } from 'react';
+import { useForozData } from '../context/ForozDataContext';
+import type { AnnouncementData } from '../context/ForozDataContext';
 import type { SyntheticEvent } from 'react';
 
-interface AnnouncementData {
-  id: string | number;
-  title: string;
-  description: string;
-  short_description?: string;
-  image: string;
-  date: string;
-  link?: string;
-}
-
 export function AnnouncementSection() {
-  const [announcements, setAnnouncements] = useState<AnnouncementData[]>([]);
+  const { announcements } = useForozData();
   const [selectedItem, setSelectedItem] = useState<AnnouncementData | null>(null);
   const hasAnnouncements = announcements.length > 0;
-
-  useEffect(() => {
-    fetchJson<unknown>('/announcements/')
-      .then((payload) => {
-        const items = extractArray<any>(payload);
-        const mapped = items.map((item, index) => ({
-          id: item.id || index,
-          title: item.title || 'Announcement',
-          description: item.description || '',
-          short_description: item.posted_by || item.short_description || '',
-          image: resolveAssetUrl(item.image),
-          date: item.publish_date || item.date || '',
-          link: item.link || undefined,
-        }));
-        setAnnouncements(mapped);
-      })
-      .catch((err) => console.error('Failed to fetch announcements:', err));
-  }, []);
 
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     event.currentTarget.src = '/static/fallback.webp';

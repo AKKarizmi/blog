@@ -921,13 +921,65 @@ export function ForozDataProvider({ children }: { children: ReactNode }) {
     setLoading(true);
 
     try {
-      const servicesPayload = await fetchFirstJson(dataEndpoints.services);
+      const [
+        servicesPayload,
+        eventsPayload,
+        collaborationsPayload,
+        boardMembersPayload,
+        announcementsPayload,
+        contentPayload,
+        coreValuesPayload,
+        impactPayload,
+      ] = await Promise.all([
+        fetchFirstJson(dataEndpoints.services),
+        fetchFirstJson(dataEndpoints.events),
+        fetchFirstJson(dataEndpoints.collaborations),
+        fetchFirstJson(dataEndpoints.boardMembers),
+        fetchFirstJson(dataEndpoints.announcements),
+        fetchFirstJson(dataEndpoints.content),
+        fetchFirstJson(dataEndpoints.coreValues),
+        fetchFirstJson(dataEndpoints.impact),
+      ]);
 
       let next = cloneDefaults();
 
       const endpointServices = extractArray<unknown>(servicesPayload);
       if (endpointServices && endpointServices.length > 0) {
         next.services = mapServices(endpointServices);
+      }
+
+      const endpointEvents = extractArray<unknown>(eventsPayload);
+      if (endpointEvents && endpointEvents.length > 0) {
+        next.events = mapEvents(endpointEvents);
+      }
+
+      const endpointCollaborations = extractArray<unknown>(collaborationsPayload);
+      if (endpointCollaborations && endpointCollaborations.length > 0) {
+        next.collaborations = mapCollaborations(endpointCollaborations);
+      }
+
+      const endpointBoardMembers = extractArray<unknown>(boardMembersPayload);
+      if (endpointBoardMembers && endpointBoardMembers.length > 0) {
+        next.boardMembers = mapBoardMembers(endpointBoardMembers);
+      }
+
+      const endpointAnnouncements = extractArray<unknown>(announcementsPayload);
+      if (endpointAnnouncements && endpointAnnouncements.length > 0) {
+        next.announcements = mapAnnouncements(endpointAnnouncements);
+      }
+
+      if (contentPayload && isRecord(contentPayload)) {
+        next = mergeContent(next, contentPayload);
+      }
+
+      const endpointCoreValues = extractArray<unknown>(coreValuesPayload);
+      if (endpointCoreValues && endpointCoreValues.length > 0) {
+        next.coreValues = mapCoreValues(endpointCoreValues);
+      }
+
+      const endpointImpact = extractArray<unknown>(impactPayload);
+      if (endpointImpact && endpointImpact.length > 0) {
+        next.impact = mapImpact(endpointImpact);
       }
 
       setData(next);

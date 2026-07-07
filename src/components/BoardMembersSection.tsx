@@ -8,18 +8,10 @@ import {
   Globe,
   type LucideIcon,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { fetchJson, extractArray, resolveAssetUrl } from '../services/api';
+import { useState } from 'react';
+import { useForozData } from '../context/ForozDataContext';
+import type { BoardMemberData } from '../context/ForozDataContext';
 import type { ComponentType, SyntheticEvent } from 'react';
-
-interface BoardMemberData {
-  id: string | number;
-  title: string;
-  role: string;
-  short_description: string;
-  image: string;
-  socials: Record<string, string>;
-}
 
 const platformIcons: Record<string, LucideIcon> = {
   linkedin: Linkedin,
@@ -31,26 +23,9 @@ const platformIcons: Record<string, LucideIcon> = {
 };
 
 export function BoardMembersSection() {
-  const [boardMembers, setBoardMembers] = useState<BoardMemberData[]>([]);
+  const { boardMembers } = useForozData();
   const [selectedItem, setSelectedItem] = useState<BoardMemberData | null>(null);
   const hasMembers = boardMembers.length > 0;
-
-  useEffect(() => {
-    fetchJson<unknown>('/board-members/')
-      .then((payload) => {
-        const items = extractArray<any>(payload);
-        const mapped = items.map((item, index) => ({
-          id: item.id || index,
-          title: item.title || 'Team Member',
-          role: item.role || '',
-          short_description: item.short_description || '',
-          image: resolveAssetUrl(item.image),
-          socials: item.socials || {},
-        }));
-        setBoardMembers(mapped);
-      })
-      .catch((err) => console.error('Failed to fetch board members:', err));
-  }, []);
 
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     event.currentTarget.src = '/static/fallback.webp';
