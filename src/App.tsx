@@ -30,13 +30,14 @@ const MainRoutes = () => {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAuthRoute = ['/login', '/signup'].includes(location.pathname);
 
+  // Render auth/admin routes separately without navbar/footer
   if (isAdminRoute || isAuthRoute) {
     return <AppRoutes />;
   }
 
+  // Public homepage with scrolling sections - shows navbar and footer
   return (
     <>
-      <AppRoutes />
       <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-blue-200 selection:text-blue-900">
         <Navbar />
 
@@ -57,6 +58,9 @@ const MainRoutes = () => {
 
         <Footer />
       </div>
+      
+      {/* AppRoutes for handling any remaining route logic */}
+      <AppRoutes />
     </>
   );
 };
