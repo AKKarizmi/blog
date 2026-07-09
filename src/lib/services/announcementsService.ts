@@ -27,14 +27,14 @@ export const announcementsService = {
   },
 
   create: async (data: Omit<Announcement, 'id' | 'created_at' | 'updated_at'>): Promise<Announcement> => {
-    return api.post<Announcement>('/announcements/', data);
+    return api.post<Announcement>('/announcements/create_announcement/', data);
   },
 
   update: async (id: number, data: Partial<Announcement>): Promise<Announcement> => {
-    return api.patch<Announcement>(`/announcements/${id}/`, data);
+    return api.post<Announcement>(`/announcements/${id}/update_announcement/`, data);
   },
 
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/announcements/${id}/`);
+    await api.post(`/announcements/${id}/delete_announcement/`);
   },
 };

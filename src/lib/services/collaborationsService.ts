@@ -26,14 +26,14 @@ export const collaborationsService = {
   },
 
   create: async (data: Omit<Collaboration, 'id' | 'created_at' | 'updated_at'>): Promise<Collaboration> => {
-    return api.post<Collaboration>('/collaborations/', data);
+    return api.post<Collaboration>('/collaborations/create_collaboration/', data);
   },
 
   update: async (id: number, data: Partial<Collaboration>): Promise<Collaboration> => {
-    return api.patch<Collaboration>(`/collaborations/${id}/`, data);
+    return api.post<Collaboration>(`/collaborations/${id}/update_collaboration/`, data);
   },
 
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/collaborations/${id}/`);
+    await api.post(`/collaborations/${id}/delete_collaboration/`);
   },
 };
