@@ -11,7 +11,7 @@ import {
 import { useState } from 'react';
 import { useForozData } from '../context/ForozDataContext';
 import type { BoardMemberData } from '../context/ForozDataContext';
-import type { ComponentType, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 const platformIcons: Record<string, LucideIcon> = {
   linkedin: Linkedin,

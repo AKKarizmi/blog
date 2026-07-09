@@ -1,894 +1,255 @@
-# Technical Report: Portfolio Management System
+# Technical Report: FOROZ Nonprofit Organization Homepage
 
-Generated on: 2026-05-13
+This technical report provides a comprehensive architectural and engineering analysis of the frontend codebase for the **FOROZ Nonprofit Organization Homepage** project. 
+
+---
 
 ## 1. Executive Summary
 
-This project is a React-based portfolio management system built with Vite, TypeScript, Tailwind CSS, React Router, Axios, Framer Motion, Lucide icons, React Icons, and Sonner notifications. It contains a public portfolio website and a protected-style admin CMS used to manage portfolio content, projects, categories, skills, social links, and admin password changes.
+The **FOROZ Nonprofit Organization Homepage** is a modern, responsive single-page application (SPA) designed to showcase the mission, services, announcements, events, and collaborations of FOROZ—a nonprofit organization founded on September 6, 2025, dedicated to empowering youth through education, skills development, and equitable opportunities.
 
-The frontend expects a backend REST API at:
+Built on top of the **React** framework using **Vite**, **TypeScript**, and **Tailwind CSS**, the application features:
+- A rich, animated user experience driven by **Framer Motion** and **Lucide Icons**.
+- A resilient data synchronization layer utilizing a custom **Context API** provider.
+- An adaptive REST client integration with multi-endpoint routing fallbacks, ensuring high fault tolerance during backend API state changes or network outages.
+- Modular, decoupled components that consume cleanly isolated sections of the global layout context.
+
+---
+
+## 2. Project Identity & Configuration
+
+* **Project Title (HTML shell):** `FOROZ Nonprofit Homepage` (defined in [index.html](file:///d:/Web%20Projects/workshop/blog/index.html))
+* **Package Name:** `magic-patterns-vite-template`
+* **Version:** `0.0.1`
+* **Application Framework:** React 18.3.1 (using client-side rendering)
+* **Build Engine:** Vite 5.2.0 (leveraging `@vitejs/plugin-react`)
+* **Type System:** TypeScript 5.5.4 (configured with ES2020 target and strict compiler options)
+* **Styling Pipeline:** Tailwind CSS 3.4.17, PostCSS, and Autoprefixer
+* **Target Environment:** Node 20+, browser clients supporting modern ECMAScript specifications (ES2020+)
+
+---
+
+## 3. Repository Architecture & Layout
+
+The directory layout separates concerns into services (API calls), context (global state management, mapping, and caching), and components (modular UI sections).
 
 ```text
-http://127.0.0.1:8000/api
+blog/
+│
+├── index.html                  # HTML entry shell targeting '#root'
+├── package.json                # Project dependencies, metadata, and scripts
+├── postcss.config.js           # PostCSS plugins configuration
+├── tailwind.config.js          # Tailwind CSS layout content limits
+├── tsconfig.json               # Main TypeScript compilation options
+├── tsconfig.node.json          # Vite compiler-specific TypeScript options
+├── vite.config.ts              # Vite configuration using the React plugin
+├── .eslintrc.cjs               # ESLint configuration for static analysis
+├── TECHNICAL_REPORT.md         # This technical report
+│
+└── src/
+    ├── main.tsx                # React runtime entry point (mounts ForozDataProvider and App)
+    ├── App.tsx                 # Core page layout composition
+    ├── index.css               # Font imports, Tailwind directives, and custom keyframe animations
+    ├── vite-env.d.ts           # Vite typescript environment interface declarations
+    │
+    ├── services/
+    │   └── api.ts              # Custom REST client helpers, data parsing, and asset resolution
+    │
+    ├── context/
+    │   └── ForozDataContext.tsx # Context API provider, default static data, mapping models
+    │
+    └── components/             # Reusable UI component modules
+        ├── AboutSection.tsx
+        ├── AnnoucementSection.tsx (Contains AnnouncementSection)
+        ├── BoardMembersSection.tsx
+        ├── CTASection.tsx
+        ├── CollaborationSection.tsx
+        ├── ContactSection.tsx
+        ├── CoreValuesSection.tsx
+        ├── EventsSection.tsx
+        ├── Footer.tsx
+        ├── HeroSection.tsx
+        ├── ImpactSection.tsx
+        ├── MissionVisionSection.tsx
+        ├── Navbar.tsx
+        └── ServicesSection.tsx
 ```
 
-The application is client-side rendered, uses local browser storage for authentication and theme persistence, and ships a built production bundle in `dist/`.
+---
 
-## 2. Project Identity
+## 4. Component Composition & Page Layout
 
-- Project title in HTML shell: `Portfolio Management System`
-- Package name: `magic-patterns-vite-template`
-- Package version: `0.0.1`
-- Project type: private single-page application
-- Frontend framework: React 18
-- Build tool: Vite 5
-- Language: TypeScript
-- Styling: Tailwind CSS
-- Backend dependency: External REST API, likely a local backend service
+[App.tsx](file:///d:/Web%20Projects/workshop/blog/src/App.tsx) composes the entire page structure inside a single scrollable container styled with dynamic selection colors:
 
-## 3. Repository Structure
+```tsx
+export function App() {
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans selection:bg-blue-200 selection:text-blue-900">
+      <Navbar />
 
-```text
-.
-|-- index.html
-|-- package.json
-|-- package-lock.json
-|-- vite.config.ts
-|-- tsconfig.json
-|-- tsconfig.node.json
-|-- tailwind.config.js
-|-- postcss.config.js
-|-- .eslintrc.cjs
-|-- README.md
-|-- dist/
-|   |-- index.html
-|   `-- assets/
-`-- src/
-    |-- App.tsx
-    |-- index.tsx
-    |-- index.css
-    |-- types/
-    |-- services/
-    |-- context/
-    |-- pages/
-    |   |-- Portfolio.tsx
-    |   `-- admin/
-    |-- components/
-        |-- public/
-        |-- admin/
-        `-- shared/
-```
+      <main className="flex-grow">
+        <HeroSection />
+        <AboutSection />
+        <MissionVisionSection />
+        <CoreValuesSection />
+        <ServicesSection />
+        {/* <ImpactSection /> */}
+        <AnnouncementSection />
+        <EventsSection />
+        <CollaborationSection />
+        <BoardMembersSection />
+        <CTASection />
+        <ContactSection />
+      </main>
 
-## 4. Technology Stack
-
-### Runtime Dependencies
-
-| Dependency | Purpose |
-|---|---|
-| `react`, `react-dom` | Core UI rendering |
-| `react-router-dom` | Client-side routing |
-| `axios` | HTTP requests to backend API |
-| `framer-motion` | Page and component animations |
-| `lucide-react` | Main icon system |
-| `react-icons` | Additional social platform icons |
-| `sonner` | Toast notifications |
-| `@emotion/react` | Installed styling support, not visibly used in current source |
-
-### Development Dependencies
-
-| Dependency | Purpose |
-|---|---|
-| `vite` | Development server and production bundling |
-| `typescript` | Type checking and typed source files |
-| `@vitejs/plugin-react` | React integration for Vite |
-| `tailwindcss`, `postcss`, `autoprefixer` | Utility-first styling pipeline |
-| `eslint` | Static linting |
-| `@typescript-eslint/*` | TypeScript linting support |
-| `eslint-plugin-react-hooks` | React hooks linting |
-| `eslint-plugin-react-refresh` | Fast refresh export rules |
-
-## 5. Build and Runtime Scripts
-
-Defined in `package.json`:
-
-```json
-{
-  "dev": "npx vite",
-  "build": "npx vite build",
-  "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-  "preview": "npx vite preview"
+      <Footer />
+    </div>
+  );
 }
 ```
 
-Typical workflow:
+> [!NOTE]
+> The `ImpactSection` (number counter) is currently implemented but commented out in the layout tree of `App.tsx`. It can be safely re-enabled to display numeric metrics.
 
-```text
-npm install
-npm run dev
-npm run build
-npm run preview
-npm run lint
+---
+
+## 5. Architectural Deep Dives
+
+### A. Dynamic & Resilient Data Context ([ForozDataContext.tsx](file:///d:/Web%20Projects/workshop/blog/src/context/ForozDataContext.tsx))
+
+The application uses React's Context API to manage and distribute content rather than relying on heavy third-party libraries (e.g., Redux). The provider acts as a **fault-tolerant sync client** between the API and the components.
+
+```mermaid
+graph TD
+    A[API Backend] -->|Async Fetch JSON| B(ForozDataProvider)
+    C[Default Static Mock Data] -->|Sync Standby| B
+    B -->|Normalize & Map Payload| D{Context State}
+    D -->|Consume Context| E[Hero Section]
+    D -->|Consume Context| F[Services Section]
+    D -->|Consume Context| G[Events Section]
+    D -->|Consume Context| H[Team / Announcements...]
 ```
 
-Current workspace note: `node_modules` was not present during this report generation, so build and lint commands were not rerun locally.
+#### Core Responsibilities:
+1. **Fallback Design:** Holds a comprehensive `defaultData` object that reflects all texts, links, items, and social media references. If the API cannot be reached, the application falls back seamlessly to this default state without breaking the user experience.
+2. **Endpoint Mapping:** Maps incoming payloads dynamically using strict mapping routines (`mapEvents`, `mapBoardMembers`, `mapAnnouncements`, etc.) to guard against `null`, `undefined`, or mismatching types.
+3. **Key Normalization:** Resolves snake_case fields commonly returned by backends (such as `short_description`, `termination_date`, `posted_by`) and exposes them as camelCase parameters for typescript files.
 
-## 6. Application Entry Point
+---
 
-### `src/index.tsx`
+### B. Custom Resilient REST Service Layer ([api.ts](file:///d:/Web%20Projects/workshop/blog/src/services/api.ts))
 
-The application imports global CSS, creates a React root from the `#root` element in `index.html`, and renders the top-level `App` component.
+The API service file is written in vanilla TypeScript utilizing the native browser `fetch` API. It includes advanced parsing mechanisms to survive data layout changes.
 
-### `src/App.tsx`
+#### Key Features:
 
-`App` composes the global providers and route tree:
+1. **Sequential Endpoint Fallbacks (`fetchFirstJson`):**
+   To support flexible backends or evolving routes, the client accepts an array of routes and fetches them in order, returning the first successful response:
+   ```typescript
+   export const fetchFirstJson = async (paths: string[]) => {
+     let lastError: unknown;
+     for (const path of paths) {
+       try {
+         return await fetchJson<unknown>(path);
+       } catch (error) {
+         lastError = error;
+       }
+     }
+     if (lastError) {
+       console.warn(`Unable to fetch ${paths.join(' or ')}`, lastError);
+     }
+     return null;
+   };
+   ```
+   This is used to resolve URLs such as `['/content/', '/site-content/', '/home/', '/homepage/']` for general homepage text.
 
-```text
-ThemeProvider
-  AuthProvider
-    DataProvider
-      BrowserRouter
-        Toaster
-        Routes
-```
+2. **Fuzzy Record/Array Extraction (`extractArray` and `extractRecord`):**
+   If the API returns data nested inside wrapper properties (like `{ data: [...] }` or `{ results: [...] }`), these helpers inspect common packaging keys (`results`, `items`, `data`, `events`, etc.) or dynamically locate the first array present in the object, making the client highly resilient to API structure adjustments.
 
-The app uses React Router v6 and enables future flags:
+3. **Dynamic Asset Path Resolution (`resolveAssetUrl`):**
+   Checks if an asset link (like user avatars or event banners) is absolute (HTTP, data:, blob:) or relative. Relative paths are automatically prefixed with the backend source `API_ORIGIN` dynamically.
 
-```text
-v7_startTransition
-v7_relativeSplatPath
-```
+---
 
-## 7. Routing Architecture
+### C. Style System and Micro-Animations
 
-| Route | Component | Purpose | Protection |
+The styling is handled through **Tailwind CSS** directives combined with custom CSS classes in [index.css](file:///d:/Web%20Projects/workshop/blog/src/index.css).
+
+1. **Text Gradient Utility:**
+   The client-specific header style `.text-gradient` uses utility-first color ranges to create modern, polished visuals:
+   ```css
+   .text-gradient {
+     @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600;
+   }
+   ```
+2. **Animation Keyframes:**
+   Dedicated CSS animations (`fadeIn` and `scaleUp`) run side-by-side with Framer Motion transitions to power custom dialog overlays and modals with spring transitions:
+   ```css
+   .animate-fade-in {
+     animation: fadeIn 0.2s ease-out forwards;
+   }
+   .animate-scale-up {
+     animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+   }
+   ```
+
+---
+
+## 6. Functional Description of UI Sections
+
+The interface is broken down into fourteen modular components:
+
+| Component | Target CSS Selector ID | Context Consumption | Visual / Interactivity Details |
 |---|---|---|---|
-| `/` | `Portfolio` | Public portfolio site | Public |
-| `/admin/login` | `Login` | Admin sign-in page | Public |
-| `/admin/change-password` | `ChangePassword` | Password update page | Public route in current config |
-| `/admin/*` | `AdminLayout` with nested routes | Admin CMS shell | Wrapped by `ProtectedRoute` |
-| `/admin` | `Dashboard` | Admin overview | Protected through `/admin/*` |
-| `/admin/projects` | `ProjectsManager` | Project CRUD | Protected through `/admin/*` |
-| `/admin/categories` | `CategoriesManager` | Category CRUD | Protected through `/admin/*` |
-| `/admin/skills` | `SkillsManager` | Skill CRUD | Protected through `/admin/*` |
-| `/admin/content` | `ContentManager` | Site content editing | Protected through `/admin/*` |
-| `*` | Redirect to `/` | Fallback route | Public |
-
-### Important Routing Observation
-
-`/admin/change-password` is currently declared as a top-level public route, not inside the protected `/admin/*` layout. The `ChangePassword` component checks for `user` before submitting, but unauthenticated visitors can still reach the page. The sidebar link also leaves the admin layout when navigating to this route.
-
-Recommended fix:
-
-- Move `ChangePassword` under the protected admin route tree.
-- Render it inside `AdminLayout`.
-- Redirect unauthenticated users to `/admin/login`.
-
-## 8. State Management
-
-The project uses React Context rather than Redux or another global state library.
-
-### Theme Context
-
-File: `src/context/ThemeContext.tsx`
-
-Responsibilities:
-
-- Stores light/dark mode as `isDark`.
-- Reads initial preference from `localStorage.theme`.
-- Falls back to `prefers-color-scheme: dark`.
-- Adds or removes the `dark` class on `document.documentElement`.
-- Persists user selection in local storage.
-
-### Auth Context
-
-File: `src/context/AuthContext.tsx`
-
-Responsibilities:
-
-- Stores `isAuthenticated`, `token`, and `user`.
-- Loads `token` and `user` from local storage on mount.
-- Provides `login(token, user)` and `logout()`.
-- Persists auth state to local storage.
-
-Local storage keys used:
-
-```text
-token
-user
-```
-
-### Data Context
-
-File: `src/context/DataContext.tsx`
-
-Responsibilities:
-
-- Fetches projects, categories, skills, and content from the API.
-- Tracks loading and error state.
-- Exposes `refreshData()`.
-- Enriches projects and skills with `categoryName`.
-- Normalizes project `tech_stack` if the API sends it as either an array or JSON string.
-
-Data fetching is intentionally tolerant of partial API failures. Each dataset is fetched in its own `try/catch`, so one endpoint can fail without preventing the other fetch attempts.
-
-## 9. Data Models
-
-Defined in `src/types/index.ts`.
-
-### Project
-
-```ts
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  tech_stack: string[];
-  category: number;
-  categoryName?: string;
-  image: string;
-  github_link: string;
-  demo_link: string;
-  youtube_link: string;
-  createdAt: string;
-}
-```
-
-### Category
-
-```ts
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-```
-
-### Skill
-
-```ts
-interface Skill {
-  id: number;
-  name: string;
-  category: number;
-  categoryName?: string;
-  proficiency?: number;
-}
-```
-
-### SiteContent
-
-```ts
-interface SiteContent {
-  heroName: string;
-  heroTitle: string;
-  heroTagline: string;
-  aboutText: string;
-  contactEmail: string;
-  location?: string;
-  socialLinks: {
-    github?: string;
-    linkedin?: string;
-    twitter?: string;
-    youtube?: string;
-    instagram?: string;
-    facebook?: string;
-    telegram?: string;
-    discord?: string;
-    website?: string;
-  };
-}
-```
-
-### AuthState
-
-```ts
-interface AuthState {
-  isAuthenticated: boolean;
-  token: string | null;
-  user: { username: string } | null;
-}
-```
-
-## 10. API Integration
-
-The service layer lives in `src/services/`.
-
-### API Base URL
-
-Two Axios clients are declared:
-
-```text
-apiClient.baseURL = http://127.0.0.1:8000/api
-axiosInstance.baseURL = http://127.0.0.1:8000/api
-```
-
-### API Client
-
-File: `src/services/axios.ts`
-
-`apiClient` sets JSON content type and attaches a bearer token from local storage:
-
-```text
-Authorization: Bearer <access_token>
-```
-
-Important issue: the interceptor reads `access_token`, but the auth flow stores `token`. This means authenticated API calls may not receive an authorization header unless another part of the system stores `access_token`.
-
-### API Aggregator
-
-File: `src/services/api.ts`
-
-Exports:
-
-```text
-api.projects
-api.categories
-api.skills
-api.content
-api.auth
-```
-
-Also defines `axiosInstance`, which is used by `projectsApi.createProject`. This second client does not attach the auth interceptor.
-
-## 11. Backend Endpoint Contract
-
-Based on the frontend service layer, the backend is expected to expose these endpoints:
-
-### Authentication
-
-| Method | Endpoint | Purpose | Payload |
-|---|---|---|---|
-| `POST` | `/user_auth/` | Login | `{ username, password }` |
-| `PUT` | `/auth/change-password/` | Change admin password | `{ username, old_password, new_password }` |
-
-Expected login response:
-
-```json
-{
-  "token": "jwt-or-token",
-  "user": {
-    "username": "admin"
-  }
-}
-```
-
-### Projects
-
-| Method | Endpoint | Purpose | Payload |
-|---|---|---|---|
-| `GET` | `/projects/` | List projects | None |
-| `POST` | `/projects/` | Create project | `FormData` |
-| `PUT` | `/projects/:id/` | Update project | `FormData` |
-| `DELETE` | `/projects/:id/` | Delete project | None |
-
-Project `FormData` fields:
-
-```text
-title
-description
-tech_stack
-category
-github_link
-demo_link
-youtube_link
-image
-```
-
-`tech_stack` is sent as a JSON string.
-
-### Categories
-
-| Method | Endpoint | Purpose | Payload |
-|---|---|---|---|
-| `GET` | `/categories/` | List categories | None |
-| `POST` | `/categories/` | Create category | `{ name, slug }` |
-| `PUT` | `/categories/:id/` | Update category | partial category |
-| `DELETE` | `/categories/:id/` | Delete category | None |
-
-### Skills
-
-| Method | Endpoint | Purpose | Payload |
-|---|---|---|---|
-| `GET` | `/skills/` | List skills | None |
-| `POST` | `/skills/` | Create skill | `{ name, category, proficiency }` |
-| `PUT` | `/skills/:id/` | Update skill | partial skill |
-| `DELETE` | `/skills/:id/` | Delete skill | None |
-
-### Site Content
-
-| Method | Endpoint | Purpose | Payload |
-|---|---|---|---|
-| `GET` | `/content/` | Fetch site content | None |
-| `PUT` | `/content/` | Update site content | partial `SiteContent` |
-
-## 12. Public Portfolio Features
-
-The public site is composed in `src/pages/Portfolio.tsx`.
-
-### Sections
-
-| Section | Component | Purpose |
-|---|---|---|
-| Navigation | `Navbar` | Sticky responsive navigation, smooth scrolling, theme toggle, admin login link |
-| Hero | `Hero` | Name, title, tagline, call-to-action buttons |
-| About | `About` | Professional summary and feature cards |
-| Skills | `Skills` | Skills grouped by category with proficiency bars |
-| Projects | `ProjectsSection` and `ProjectCard` | Filterable project grid with tech tags and links |
-| Contact | `Contact` | Contact details, social links, simulated contact form |
-| Footer | `Footer` | Copyright and quick links |
-
-### Public Data Usage
-
-The public site reads from `DataContext`:
-
-- `content` powers hero, about, contact, social links, and footer name.
-- `categories` power project filtering and skill grouping.
-- `projects` power the featured projects grid.
-- `skills` power the skills section.
-
-### Loading and Error Handling
-
-`Portfolio` displays a full-screen loading spinner while data is loading. If `DataContext` enters an error state, the page renders a centered error message.
-
-## 13. Admin CMS Features
-
-The admin CMS is composed of `AdminLayout`, `Sidebar`, and individual admin pages.
-
-### Admin Layout
-
-Files:
-
-- `src/components/admin/AdminLayout.tsx`
-- `src/components/admin/Sidebar.tsx`
-
-Features:
-
-- Desktop sidebar navigation.
-- Mobile sidebar overlay.
-- Sticky top header.
-- Theme toggle.
-- Admin avatar placeholder.
-- Logout button.
-- Link to view the public site.
-
-### Dashboard
-
-File: `src/pages/admin/Dashboard.tsx`
-
-Features:
-
-- Displays total project, category, and skill counts.
-- Shows a recent projects list.
-- Links to relevant admin management screens.
-
-### Projects Manager
-
-File: `src/pages/admin/ProjectsManager.tsx`
-
-Features:
-
-- Search by project title or description.
-- Filter by category.
-- Project table with image, category, tech stack, and external links.
-- Add project modal.
-- Edit project modal.
-- Delete confirmation dialog.
-- Image upload using `ImageUpload`.
-- Tech stack entry using `TagInput`.
-- Uses `FormData` for create and update operations.
-
-### Categories Manager
-
-File: `src/pages/admin/CategoriesManager.tsx`
-
-Features:
-
-- Category table.
-- Slug generation from category name.
-- Add category modal.
-- Edit category modal UI.
-- Delete confirmation dialog.
-
-Important issue: the submit handler always calls `createCategory`, even when editing an existing category. `editingCategory` is set, but `updateCategory` is not used.
-
-### Skills Manager
-
-File: `src/pages/admin/SkillsManager.tsx`
-
-Features:
-
-- Skills table.
-- Category assignment.
-- Proficiency percentage display.
-- Add/edit modal.
-- Range input for proficiency from 0 to 100 in increments of 5.
-- Delete confirmation dialog.
-
-### Content Manager
-
-File: `src/pages/admin/ContentManager.tsx`
-
-Features:
-
-- Edits hero name, professional title, and tagline.
-- Edits about text.
-- Edits location and contact email.
-- Edits social links for GitHub, LinkedIn, Twitter, YouTube, Instagram, Facebook, Telegram, and Discord.
-- Maintains `website` in state and type, but the input field is currently commented out.
-
-### Change Password
-
-File: `src/pages/admin/ChangePassword.tsx`
-
-Features:
-
-- Reads authenticated user from `AuthContext`.
-- Requires current password, new password, and confirmation.
-- Validates matching passwords.
-- Enforces minimum password length of 8 characters.
-- Calls `/auth/change-password/`.
-- Shows success or error toast.
-- Redirects to `/admin` after successful update.
-
-## 14. Shared Components
-
-### Modal
-
-File: `src/components/shared/Modal.tsx`
-
-Capabilities:
-
-- Animated open/close with Framer Motion.
-- Backdrop click to close.
-- Escape key to close.
-- Body scroll locking while open.
-- Configurable max width.
-- Scrollable modal body.
-
-### ConfirmDialog
-
-File: `src/components/shared/ConfirmDialog.tsx`
-
-Capabilities:
-
-- Reuses `Modal`.
-- Provides destructive action warning.
-- Supports loading state.
-- Configurable confirm and cancel labels.
-
-### TagInput
-
-File: `src/components/shared/TagInput.tsx`
-
-Capabilities:
-
-- Add tags using Enter or comma.
-- Remove tags individually.
-- Backspace removes the last tag when the input is empty.
-- Prevents duplicate tags.
-
-### ImageUpload
-
-File: `src/components/shared/ImageUpload.tsx`
-
-Capabilities:
-
-- Click-to-upload and drag-and-drop upload.
-- Accepts image files.
-- Generates local object URL preview.
-- Supports existing string URL values.
-- Allows removing selected image.
-- Cleans up local object URLs.
-
-Implementation note: the UI text says "max. 5MB", but no file size validation currently exists.
-
-### LoadingSpinner
-
-File: `src/components/shared/LoadingSpinner.tsx`
-
-Capabilities:
-
-- Full-screen or inline loading state.
-- Exports `SkeletonCard`, although it is not currently used in the inspected source.
-
-## 15. Styling and Design System
-
-### Tailwind Configuration
-
-File: `tailwind.config.js`
-
-Key settings:
-
-- Dark mode strategy: `class`
-- Content paths:
-  - `./index.html`
-  - `./src/**/*.{js,ts,jsx,tsx}`
-- Font families:
-  - `sans`: Inter
-  - `heading`: Sora
-- Primary color:
-  - default: `#6366f1`
-  - hover: `#4f46e5`
-
-### Global CSS
-
-File: `src/index.css`
-
-Responsibilities:
-
-- Imports Google Fonts.
-- Imports Tailwind base, components, and utilities.
-- Enables smooth scrolling.
-- Applies global body colors, typography, antialiasing, and transition behavior.
-- Defines a blob animation for decorative background elements.
-- Customizes WebKit scrollbars.
-
-## 16. TypeScript Configuration
-
-File: `tsconfig.json`
-
-Important compiler settings:
-
-- Target: `ES2020`
-- Module: `ESNext`
-- Module resolution: `bundler`
-- JSX transform: `react-jsx`
-- Strict mode: enabled
-- No unused locals: enabled
-- No unused parameters: enabled
-- No fallthrough cases in switch: enabled
-- No emit: enabled
-
-This configuration is reasonably strict and should catch many common typing and unused-code issues during build or type checking.
-
-## 17. Linting Configuration
-
-File: `.eslintrc.cjs`
-
-Configured with:
-
-- `eslint:recommended`
-- `plugin:@typescript-eslint/recommended`
-- `plugin:react-hooks/recommended`
-- `react-refresh/only-export-components`
-
-Ignored paths:
-
-- `dist`
-- `.eslintrc.cjs`
-
-## 18. Build Output
-
-The repository contains an existing `dist/` folder:
-
-```text
-dist/index.html
-dist/assets/index-Dhs30jMs.css
-dist/assets/index-CFmglKRB.js
-```
-
-This indicates the app has been built previously. Because dependencies were not installed in the inspected workspace, the build was not rerun as part of this report.
-
-## 19. Security Review
-
-### Current Security Characteristics
-
-- Authentication state is stored in `localStorage`.
-- Admin route protection is client-side only.
-- API base URL is hard-coded.
-- Login credentials are initialized in state as `admin` and `admin123`.
-- Authenticated requests depend on a local storage token being attached by Axios.
-
-### Key Security Risks
-
-1. Token storage in `localStorage`
-
-   Local storage is vulnerable to token theft if cross-site scripting occurs. For higher-security deployments, consider HTTP-only cookies or a hardened token refresh strategy.
-
-2. Inconsistent token key
-
-   `AuthContext` and `authApi` store `token`, while the Axios interceptor reads `access_token`. This can prevent authorization headers from being sent.
-
-3. Unprotected change-password route
-
-   `/admin/change-password` is currently reachable without passing through `ProtectedRoute`.
-
-4. Default login values
-
-   The login state defaults to `admin` and `admin123`, which can accidentally submit default credentials even though the inputs are not controlled with `value`.
-
-5. Hard-coded backend URL
-
-   The API URL is fixed to local development. Production should use environment variables such as `VITE_API_BASE_URL`.
-
-6. Contact form simulation
-
-   The contact form only simulates submission and does not send data to a backend, which may mislead users unless intentional.
-
-## 20. Reliability and Maintainability Observations
-
-### Strengths
-
-- Clear separation between public UI, admin UI, services, context, and shared components.
-- Strict TypeScript settings.
-- Reusable modal, confirmation, tag input, image upload, and loading components.
-- Data context handles partial endpoint failures.
-- Admin features are mostly modular and easy to extend.
-
-### Issues and Gaps
-
-1. Category editing does not call update API
-
-   The category edit modal exists, but submit currently always creates a new category.
-
-2. Project create uses a different Axios instance
-
-   `projectsApi.createProject` uses `axiosInstance` from `api.ts`, not `apiClient` from `axios.ts`. That instance does not attach the auth token.
-
-3. Token key mismatch
-
-   The request interceptor reads `access_token`, while login stores `token`.
-
-4. Change password is outside the protected admin layout
-
-   This creates an inconsistent admin experience and weaker client-side protection.
-
-5. `tech_stack` parsing can fail globally
-
-   If a project returns malformed JSON in `tech_stack`, `JSON.parse` can throw during normalization and move the whole data context into an error state.
-
-6. Image upload file size is not validated
-
-   The UI says max 5MB, but the component does not enforce file size.
-
-7. Public logo is hard-coded
-
-   `Navbar` displays `Alex.dev` instead of deriving the brand/name from site content.
-
-8. Contact form is not integrated
-
-   It shows a success toast after a timeout but does not persist or send the message.
-
-9. Website social field is partially implemented
-
-   `SiteContent` and `Contact` support `website`, but `ContentManager` comments out the website input.
-
-10. Environment configuration is missing
-
-   API URLs and other deploy-time settings should be externalized.
-
-## 21. Performance Review
-
-### Positive Factors
-
-- Vite provides fast development and optimized production builds.
-- Project/category filtering is memoized in `ProjectsSection` and `ProjectsManager`.
-- Framer Motion viewport animations generally run only once.
-- Tailwind keeps styling mostly static and build-time optimized.
-
-### Potential Improvements
-
-- Lazy-load admin routes to reduce the public bundle size.
-- Add image optimization or thumbnails for project images.
-- Add API response caching or stale-while-revalidate behavior if backend latency grows.
-- Avoid excessive console logging in production.
-- Consider code splitting for heavy admin screens.
-
-## 22. Accessibility Review
-
-### Current Good Practices
-
-- Many icon-only links include `title` or `aria-label`.
-- Form inputs use labels in most admin and contact forms.
-- Buttons use semantic `button` elements.
-- Public navigation supports keyboard focus through normal anchors and buttons.
-
-### Recommended Improvements
-
-- Add explicit `aria-label` to all icon-only buttons, especially edit/delete controls.
-- Improve modal focus management by trapping focus inside open modals.
-- Restore focus to the triggering button after modal close.
-- Mark active navigation links in public navigation where possible.
-- Ensure color contrast remains sufficient for all primary and muted text in both themes.
-
-## 23. Testing Status
-
-No automated test framework is currently configured in `package.json`.
-
-Recommended test additions:
-
-- Unit tests for context providers and services.
-- Component tests for shared components such as `Modal`, `TagInput`, and `ImageUpload`.
-- Integration tests for admin CRUD flows.
-- End-to-end tests for login, content editing, project creation, filtering, and public rendering.
-- API contract tests between frontend and backend.
-
-Suggested tooling:
-
-```text
-Vitest
-React Testing Library
-Playwright
-MSW
-```
-
-## 24. Deployment Considerations
-
-### Frontend Deployment
-
-The project can be deployed as a static SPA after running:
-
-```text
-npm run build
-```
-
-The output directory is:
-
-```text
-dist/
-```
-
-Compatible static hosting targets:
-
-- Vercel
-- Netlify
-- GitHub Pages
-- Cloudflare Pages
-- Nginx or Apache static hosting
-
-### Required Production Configuration
-
-Before production deployment:
-
-- Replace hard-coded API URL with `VITE_API_BASE_URL`.
-- Ensure SPA fallback routes serve `index.html`.
-- Configure HTTPS.
-- Configure backend CORS for the production frontend domain.
-- Verify authentication header behavior.
-- Remove default credential assumptions from the login screen.
-
-## 25. Suggested Environment Variables
-
-Recommended `.env` pattern:
-
-```text
-VITE_API_BASE_URL=http://127.0.0.1:8000/api
-```
-
-Recommended service usage:
-
-```ts
-const baseURL = import.meta.env.VITE_API_BASE_URL;
-```
-
-## 26. Recommended Roadmap
-
-### High Priority
-
-1. Fix token key mismatch by standardizing on either `token` or `access_token`.
-2. Move change-password into protected admin routing.
-3. Use a single authenticated Axios client for all protected API calls.
-4. Implement category update behavior.
-5. Move the API base URL to an environment variable.
-
-### Medium Priority
-
-1. Add real contact form integration.
-2. Add file size validation in `ImageUpload`.
-3. Add route-level code splitting.
-4. Add automated tests for services, contexts, and CRUD screens.
-5. Replace hard-coded `Alex.dev` logo text with site content.
-
-### Low Priority
-
-1. Remove unused imports and console logs.
-2. Decide whether `@emotion/react` is needed.
-3. Add a website input back to `ContentManager` or remove website support from the model.
-4. Add skeleton cards to public loading states.
-5. Add richer admin audit/error states.
-
-## 27. Conclusion
-
-The current project is a functional portfolio frontend and lightweight admin CMS with a clean modular structure. It is strongest in its separation of public components, admin screens, context-based state management, and REST service wrappers.
-
-The main production-readiness concerns are authentication consistency, protected route coverage, environment configuration, missing automated tests, and a few incomplete CRUD details. Addressing the high-priority roadmap items would significantly improve reliability, security, and maintainability while preserving the existing architecture.
+| **Navbar** | — | — | Fixed header, scrolling transitions, logo display, responsive overlay, and external Admin Login CTA (`api/user/login`). |
+| **HeroSection** | `#home` | `hero` | Split-screen grid. Dynamic title gradients, CTA buttons, and interactive floating animated cards representing growth. |
+| **AboutSection** | `#about` | `about` | Organization background narrative and custom-designed Feature Cards. |
+| **MissionVisionSection** | — | `missionVision` | Dual mission/vision cards featuring subtle scale transitions on hover. |
+| **CoreValuesSection** | — | `coreValues` | 7 core values cards with dynamic Lucide icons (`Heart`, `Star`, `ShieldCheck`, `Users`, `Lightbulb`, `Handshake`, `Leaf`) and background shades. |
+| **ServicesSection** | `#services` | `services` | Multi-column grid representing programs, backed by gradient styling. |
+| **AnnouncementSection** | `#announcements` | `announcements` | Dynamic articles featuring image fallbacks, date badges, description fadeout, and pop-up details modals. |
+| **EventsSection** | `#events` | `events` | Cards for upcoming workshops/events. Details modals support direct registration link outs. |
+| **CollaborationSection**| `#collaborations` | `collaborations` | Partner collaboration highlights, featuring detail modals and outgoing URLs. |
+| **BoardMembersSection** | `#team` | `boardMembers` | Profile circles for board members, including social media icons (`Linkedin`, `Facebook`, etc.) and full biography modals. |
+| **CTASection** | — | `cta` | Dynamic newsletter/volunteer call-to-action layout pointing to volunteer forms. |
+| **ContactSection** | `#contact` | `contact` | Standard contact details grid (Email, Address, Phone) alongside a submission form. |
+| **ImpactSection** | — | `impact` | *Currently Commented Out*. Viewport-triggered count-up animations for key metrics. |
+| **Footer** | — | `footer` | Section navigation links, copyrights, legal items, and social media indicators. |
+
+---
+
+## 7. Quality, Reliability, and Roadmap Recommendations
+
+### 1. Rename Component Filename Typo
+> [!IMPORTANT]
+> The filename of the announcement section component contains a minor typo: [AnnoucementSection.tsx](file:///d:/Web%20Projects/workshop/blog/src/components/AnnoucementSection.tsx) (missing the second 'n'). However, inside the file, the function is exported correctly as `AnnouncementSection` and imported in [App.tsx](file:///d:/Web%20Projects/workshop/blog/src/App.tsx) using the typo-containing filename. Standardizing this filename to `AnnouncementSection.tsx` will avoid confusion in future code generations.
+
+### 2. Standardize Configuration Environment Variables
+API routing parameters like `API_ORIGIN` and `API_BASE_URL` in [api.ts](file:///d:/Web%20Projects/workshop/blog/src/services/api.ts) should be configured uniformly using local environment files (e.g. `.env.local` or `.env.production`) rather than relying on inline string defaults (`'http://localhost:8000'`).
+
+### 3. Re-enable the Impact Counter Section
+Since the [ImpactSection.tsx](file:///d:/Web%20Projects/workshop/blog/src/components/ImpactSection.tsx) is fully coded and functional (containing viewport detection and eased count-up animations), it can be reactivated by uncommenting `<ImpactSection />` in [App.tsx](file:///d:/Web%20Projects/workshop/blog/src/App.tsx).
+
+---
+
+## 8. Development & Build Script Execution
+
+The project defines standard package manager entry points in `package.json`:
+
+* **Start Development Mode:**
+  ```bash
+  npm run dev
+  ```
+* **Build Production Bundle:**
+  ```bash
+  npm run build
+  ```
+  Generates minified HTML, CSS, and JS chunks under the `/dist` directory.
+* **Launch Production Preview:**
+  ```bash
+  npm run preview
+  ```
+* **Run Static Code Linter:**
+  ```bash
+  npm run lint
+  ```
