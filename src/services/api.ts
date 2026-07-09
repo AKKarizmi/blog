@@ -10,7 +10,7 @@ export const API_ORIGIN = trimTrailingSlash(
 );
 
 export const API_BASE_URL = trimTrailingSlash(
-  import.meta.env.VITE_API_BASE_URL || '/api'
+  import.meta.env.VITE_API_BASE_URL || '/'
 );
 
 export const buildApiUrl = (path: string) => {

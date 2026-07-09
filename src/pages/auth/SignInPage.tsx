@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 export const SignInPage = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ export const SignInPage = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(username, password);
       navigate('/admin/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
@@ -47,23 +47,23 @@ export const SignInPage = () => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
+                Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-400" />
+                  <User className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="you@example.com"
+                  placeholder="Enter your username"
                 />
               </div>
             </div>

@@ -11,7 +11,7 @@ export interface User {
 }
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -24,6 +24,7 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
   first_name: string;
@@ -42,7 +43,7 @@ export interface PasswordResetConfirmRequest {
 
 export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/user/login_form/', credentials);
+    const response = await api.post<LoginResponse>('/user/login_form', credentials);
     if (!response.success) {
       throw new Error('Invalid credentials');
     }

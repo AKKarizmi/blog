@@ -5,13 +5,14 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
 }
 
 interface RegisterData {
+  username: string;
   email: string;
   password: string;
   first_name: string;
@@ -53,9 +54,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     loadUser();
   }, [loadUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
-      const response = await authService.login({ email, password });
+      const response = await authService.login({ username, password });
       setUser(response.user);
     } catch (error) {
       console.error('Login failed:', error);

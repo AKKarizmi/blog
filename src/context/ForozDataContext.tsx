@@ -429,14 +429,14 @@ const defaultData: ForozStaticData = {
 };
 
 const dataEndpoints = {
-  content: ['/content/', '/site-content/', '/home/', '/homepage/'],
-  coreValues: ['/core-values/', '/values/'],
-  services: ['/services/', '/programs/'],
-  events: ['/events/'],
-  collaborations: ['/collaborations/', '/collaboration/'],
-  boardMembers: ['/experts/', '/board-members/', '/team/'],
-  impact: ['/impact/', '/stats/'],
-  announcements: ['/announcements/'],
+  content: ['/content/', '/site-content/', '/home/', '/homepage/', '/content', '/site-content', '/home', '/homepage'],
+  coreValues: ['/core-values/', '/values/', '/core-values', '/values'],
+  services: ['/services/', '/programs/', '/services', '/programs'],
+  events: ['/events/', '/events', '/event/'],
+  collaborations: ['/collaborations/', '/collaboration/', '/collaborations', '/collaboration'],
+  boardMembers: ['/experts/', '/board-members/', '/team/', '/experts', '/board-members', '/team'],
+  impact: ['/impact/', '/stats/', '/impact', '/stats'],
+  announcements: ['/announcements/', '/announcements', '/announcement/'],
 };
 
 const ForozDataContext = createContext<ForozDataContextValue | undefined>(

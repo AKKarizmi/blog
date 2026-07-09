@@ -1,35 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Users, FileText, Calendar, TrendingUp } from 'lucide-react';
-
-interface DashboardStats {
-  total_users: number;
-  total_applications: number;
-  total_events: number;
-  active_volunteers: number;
-}
+import { Users, FileText, Calendar, TrendingUp, Megaphone, MessageSquare } from 'lucide-react';
+import {
+  fetchDashboardStats,
+  fetchRecentApplications,
+  fetchUpcomingEvents,
+  type DashboardStats,
+  type RecentApplication,
+  type DashboardEvent,
+} from '../../lib/services/dashboardService';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentApplications, setRecentApplications] = useState<RecentApplication[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<DashboardEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch dashboard stats from API
-    const fetchStats = async () => {
+    const loadDashboardData = async () => {
       try {
-        // TODO: Replace with actual API call when backend is ready
-        // const response = await api.get<DashboardStats>('/dashboard/');
-        // setStats(response);
-        
-        // Mock data for demonstration
-        setStats({
-          total_users: 156,
-          total_applications: 42,
-          total_events: 12,
-          active_volunteers: 28,
-        });
+        const [dashboardStats, applications, events] = await Promise.all([
+          fetchDashboardStats(),
+          fetchRecentApplications(),
+          fetchUpcomingEvents(),
+        ]);
+
+        setStats(dashboardStats);
+        setRecentApplications(applications);
+        setUpcomingEvents(events);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
       } finally {
@@ -37,7 +37,7 @@ export const DashboardPage = () => {
       }
     };
 
-    fetchStats();
+    loadDashboardData();
   }, []);
 
   const statCards = [
@@ -129,22 +129,26 @@ export const DashboardPage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Applications</h3>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
-                    {String.fromCharCode(64 + i)}
+            {recentApplications.length === 0 ? (
+              <p className="text-sm text-slate-500">No recent applications available yet.</p>
+            ) : (
+              recentApplications.map((application) => (
+                <div key={application.id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
+                      {application.applicant_name.charAt(0).toUpperCase() || 'A'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-900">{application.applicant_name}</p>
+                      <p className="text-xs text-slate-500">{application.program_name}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">Applicant {i}</p>
-                    <p className="text-xs text-slate-500">Volunteer Program</p>
-                  </div>
+                  <span className="px-2.5 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                    {application.status}
+                  </span>
                 </div>
-                <span className="px-2.5 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                  Pending
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <a href="/admin/applications" className="mt-4 block text-sm font-medium text-indigo-600 hover:text-indigo-500">
             View all applications →
@@ -155,17 +159,21 @@ export const DashboardPage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Upcoming Events</h3>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center space-x-4 py-3 border-b border-slate-100 last:border-0">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white">
-                  <Calendar className="h-6 w-6" />
+            {upcomingEvents.length === 0 ? (
+              <p className="text-sm text-slate-500">No upcoming events available right now.</p>
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event.id} className="flex items-center space-x-4 py-3 border-b border-slate-100 last:border-0">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-900">{event.title}</p>
+                    <p className="text-xs text-slate-500">{event.event_date}{event.location ? ` • ${event.location}` : ''}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-900">Event Title {i}</p>
-                  <p className="text-xs text-slate-500">December {10 + i}, 2025</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <a href="/admin/events" className="mt-4 block text-sm font-medium text-indigo-600 hover:text-indigo-500">
             View all events →
@@ -211,5 +219,3 @@ export const DashboardPage = () => {
   );
 };
 
-// Import missing icons
-import { Megaphone, MessageSquare } from 'lucide-react';

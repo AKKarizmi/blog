@@ -18,7 +18,7 @@ export const API_ORIGIN = trimTrailingSlash(
 );
 
 export const API_BASE_URL = trimTrailingSlash(
-  import.meta.env.VITE_API_BASE_URL || '/api'
+  import.meta.env.VITE_API_BASE_URL || '/'
 );
 
 export const buildApiUrl = (path: string) => {
@@ -69,7 +69,7 @@ const getCsrfToken = (): string | null => {
 const ensureCsrfCookie = async () => {
   if (!getCsrfToken()) {
     try {
-      await fetch(buildApiUrl('/user/auth/login/'), {
+      await fetch(buildApiUrl('/user/login_form'), {
         method: 'GET',
         credentials: 'include',
       });
@@ -102,12 +102,12 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
     const data = await response.json();
     accessToken = data.access || null;
-    
+
     // Update refresh token if rotated
     if (data.refresh) {
       setRefreshToken(data.refresh);
     }
-    
+
     return accessToken;
   } catch (error) {
     console.error('Token refresh error:', error);
@@ -153,6 +153,7 @@ export const apiClient = async <T>(
   const config: RequestInit = {
     method,
     headers: requestHeaders,
+    credentials: 'include',
     ...rest,
   };
 
@@ -190,7 +191,7 @@ export const apiClient = async <T>(
     if (contentType.includes('application/json')) {
       return response.json() as Promise<T>;
     }
-    
+
     return {} as T;
   } catch (error) {
     console.error(`API Error (${method} ${path}):`, error);
