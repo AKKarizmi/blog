@@ -14,12 +14,18 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { AppRoutes } from './routes/AppRoutes';
+import { ToastProvider } from './hooks/useToast';
+import { NotificationsProvider } from './hooks/useNotifications';
 
 export function App() {
   return (
     <Router>
       <AuthProvider>
-        <MainRoutes />
+        <ToastProvider>
+          <NotificationsProvider>
+            <MainRoutes />
+          </NotificationsProvider>
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );

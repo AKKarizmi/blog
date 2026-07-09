@@ -9,6 +9,12 @@ import { ApplicationsPage } from '../pages/admin/ApplicationsPage';
 import { EventsPage } from '../pages/admin/EventsPage';
 import { AnnouncementsPage } from '../pages/admin/AnnouncementsPage';
 import { MessagesPage } from '../pages/admin/MessagesPage';
+import { UsersPage } from '../pages/admin/UsersPage';
+import { BoardMembersPage } from '../pages/admin/BoardMembersPage';
+import { CollaborationsPage } from '../pages/admin/CollaborationsPage';
+import { EmailPage } from '../pages/admin/EmailPage';
+import { NotificationsPage } from '../pages/admin/NotificationsPage';
+import { ProfilePage } from '../pages/admin/ProfilePage';
 
 export const AppRoutes = () => {
   return (
@@ -31,6 +37,18 @@ export const AppRoutes = () => {
         }
       />
 
+      {/* Profile Route */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ProfilePage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
       {/* Protected Admin Routes */}
       <Route
         path="/admin/*"
@@ -43,6 +61,11 @@ export const AppRoutes = () => {
                 <Route path="events" element={<EventsPage />} />
                 <Route path="announcements" element={<AnnouncementsPage />} />
                 <Route path="messages" element={<MessagesPage />} />
+                <Route path="users" element={<UsersPage />} />
+                <Route path="board-members" element={<BoardMembersPage />} />
+                <Route path="collaborations" element={<CollaborationsPage />} />
+                <Route path="email" element={<EmailPage />} />
+                <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
               </Routes>
             </AdminLayout>

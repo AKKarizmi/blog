@@ -49,6 +49,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: 'Announcements', href: '/admin/announcements', icon: Megaphone },
     { name: 'Events', href: '/admin/events', icon: Calendar },
     { name: 'Collaborations', href: '/admin/collaborations', icon: Handshake },
+    { name: 'Profile', href: '/profile', icon: UserCircle },
   ];
 
   const communicationNav = [
