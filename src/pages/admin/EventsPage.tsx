@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Plus, Edit2, Trash2, ExternalLink } from 'lucide-react';
 import { eventsService, type Event } from '../../lib/services/eventsService';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Label } from '../../components/ui/Label';
+import { useToast } from '../../hooks/useToast';
 
 export const EventsPage = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -8,6 +13,17 @@ export const EventsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    event_date: '',
+    location: '',
+    image: '',
+    registration_link: '',
+    is_active: true,
+  });
 
   useEffect(() => {
     loadEvents();
@@ -25,13 +41,87 @@ export const EventsPage = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      event_date: '',
+      location: '',
+      image: '',
+      registration_link: '',
+      is_active: true,
+    });
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setShowCreateModal(true);
+  };
+
+  const handleOpenEdit = (event: Event) => {
+    setFormData({
+      title: event.title,
+      description: event.description,
+      event_date: event.event_date.split('T')[0],
+      location: event.location || '',
+      image: event.image || '',
+      registration_link: event.registration_link || '',
+      is_active: event.is_active,
+    });
+    setEditingEvent(event);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setEditingEvent(null);
+    resetForm();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingEvent) {
+        await eventsService.update(editingEvent.id, formData);
+        toast({
+          title: 'Success',
+          description: 'Event updated successfully',
+          variant: 'success',
+        });
+      } else {
+        await eventsService.create(formData);
+        toast({
+          title: 'Success',
+          description: 'Event created successfully',
+          variant: 'success',
+        });
+      }
+      handleCloseModal();
+      await loadEvents();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err instanceof Error ? err.message : 'Failed to save event',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this event?')) return;
     try {
       await eventsService.delete(id);
+      toast({
+        title: 'Success',
+        description: 'Event deleted successfully',
+        variant: 'success',
+      });
       await loadEvents();
     } catch (err) {
-      alert('Failed to delete event');
+      toast({
+        title: 'Error',
+        description: 'Failed to delete event',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -60,7 +150,7 @@ export const EventsPage = () => {
           <p className="text-sm text-slate-600 mt-1">Manage workshops, seminars, and community events</p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={handleOpenCreate}
           className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
         >
           <Plus className="h-5 w-5" />
@@ -104,7 +194,7 @@ export const EventsPage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setEditingEvent(event)}
+                    onClick={() => handleOpenEdit(event)}
                     className="flex-1 flex items-center justify-center gap-1 bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -123,30 +213,97 @@ export const EventsPage = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal - Placeholder */}
-      {(showCreateModal || editingEvent) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {editingEvent ? 'Edit Event' : 'Create Event'}
-            </h3>
-            <p className="text-sm text-slate-600 mb-4">
-              Event form coming soon. Backend endpoint: {editingEvent ? `/events/${editingEvent.id}/update_event/` : '/events/create_event/'}
-            </p>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setEditingEvent(null);
-                }}
-                className="flex-1 bg-slate-100 text-slate-700 py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                Cancel
-              </button>
+      {/* Create/Edit Modal */}
+      <Modal
+        open={showCreateModal || !!editingEvent}
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
+        }}
+        title={editingEvent ? 'Edit Event' : 'Create Event'}
+        description={editingEvent ? 'Update the event details' : 'Add a new event'}
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+              placeholder="Enter event title"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              required
+              placeholder="Enter event description"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="event_date">Date</Label>
+              <Input
+                id="event_date"
+                type="date"
+                value={formData.event_date}
+                onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="Event location"
+              />
             </div>
           </div>
-        </div>
-      )}
+          <div className="space-y-2">
+            <Label htmlFor="image">Image URL</Label>
+            <Input
+              id="image"
+              value={formData.image}
+              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="registration_link">Registration Link</Label>
+            <Input
+              id="registration_link"
+              value={formData.registration_link}
+              onChange={(e) => setFormData({ ...formData, registration_link: e.target.value })}
+              placeholder="https://example.com/register"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="is_active"
+              checked={formData.is_active}
+              onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
+            />
+            <Label htmlFor="is_active">Active</Label>
+          </div>
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={handleCloseModal} className="flex-1">
+              Cancel
+            </Button>
+            <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700">
+              {editingEvent ? 'Update' : 'Create'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

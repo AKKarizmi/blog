@@ -7,7 +7,9 @@ import { Label } from '../../components/ui/Label';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '../../components/ui/Dialog';
-import { Mail, Send, Trash2, Eye } from 'lucide-react';
+import { Mail, Send, Trash2, Eye, Inbox, SentHorizontal } from 'lucide-react';
+
+type EmailView = 'inbox' | 'sent';
 
 export function EmailPage() {
   const [emails, setEmails] = useState<Email[]>([]);
@@ -15,6 +17,7 @@ export function EmailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [currentView, setCurrentView] = useState<EmailView>('inbox');
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -28,7 +31,11 @@ export function EmailPage() {
     try {
       setLoading(true);
       const data = await emailService.getAll();
-      setEmails(data);
+      // Filter based on current view
+      const filtered = data.filter((email) => 
+        currentView === 'inbox' ? email.sender !== 'admin@foroz.org' : email.sender === 'admin@foroz.org'
+      );
+      setEmails(filtered);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch emails');
@@ -44,7 +51,7 @@ export function EmailPage() {
 
   useEffect(() => {
     fetchEmails();
-  }, []);
+  }, [currentView]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +81,7 @@ export function EmailPage() {
 
   const handleView = async (email: Email) => {
     setSelectedEmail(email);
-    if (!email.is_read) {
+    if (!email.is_read && currentView === 'inbox') {
       try {
         await emailService.markAsRead(email.id);
         setEmails((prev) => prev.map((e) => (e.id === email.id ? { ...e, is_read: true } : e)));
@@ -122,12 +129,14 @@ export function EmailPage() {
     );
   }
 
+  const unreadCount = emails.filter((e) => !e.is_read).length;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Email</h1>
-          <p className="text-muted-foreground">Manage your inbox and send messages</p>
+          <p className="text-muted-foreground">Manage your inbox and sent messages</p>
         </div>
         <Button onClick={() => setIsComposeOpen(true)}>
           <Send className="w-4 h-4 mr-2" />
@@ -135,12 +144,49 @@ export function EmailPage() {
         </Button>
       </div>
 
+      {/* Inbox/Sent Toggle */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => {
+            setCurrentView('inbox');
+            setSelectedEmail(null);
+          }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            currentView === 'inbox'
+              ? 'bg-indigo-100 text-indigo-700'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <Inbox className="w-4 h-4" />
+          Inbox
+          {unreadCount > 0 && (
+            <span className="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => {
+            setCurrentView('sent');
+            setSelectedEmail(null);
+          }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            currentView === 'sent'
+              ? 'bg-indigo-100 text-indigo-700'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <SentHorizontal className="w-4 h-4" />
+          Sent
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5" />
-              Inbox ({emails.filter((e) => !e.is_read).length} unread)
+              {currentView === 'inbox' ? 'Inbox' : 'Sent Items'} ({emails.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -148,7 +194,7 @@ export function EmailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>From</TableHead>
+                    <TableHead>{currentView === 'inbox' ? 'From' : 'To'}</TableHead>
                     <TableHead>Subject</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -156,10 +202,12 @@ export function EmailPage() {
                   {emails.map((email) => (
                     <TableRow 
                       key={email.id}
-                      className={`cursor-pointer ${!email.is_read ? 'bg-blue-50 font-medium' : ''}`}
+                      className={`cursor-pointer ${!email.is_read && currentView === 'inbox' ? 'bg-blue-50 font-medium' : ''}`}
                       onClick={() => handleView(email)}
                     >
-                      <TableCell className="max-w-[100px] truncate">{email.sender}</TableCell>
+                      <TableCell className="max-w-[100px] truncate">
+                        {currentView === 'inbox' ? email.sender : email.recipient}
+                      </TableCell>
                       <TableCell className="max-w-[150px] truncate">{email.subject}</TableCell>
                     </TableRow>
                   ))}
@@ -179,7 +227,7 @@ export function EmailPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>
-              {selectedEmail ? selectedEmail.subject : 'Select an email to view'}
+              {selectedEmail ? selectedEmail.subject : `Select an email to view`}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -187,8 +235,12 @@ export function EmailPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm text-muted-foreground">From: {selectedEmail.sender}</p>
-                    <p className="text-sm text-muted-foreground">To: {selectedEmail.recipient}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {currentView === 'inbox' ? 'From' : 'To'}: {currentView === 'inbox' ? selectedEmail.sender : selectedEmail.recipient}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {currentView === 'inbox' ? 'To' : 'From'}: {currentView === 'inbox' ? selectedEmail.recipient : selectedEmail.sender}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="icon" onClick={() => handleDelete(selectedEmail.id)}>
@@ -200,13 +252,13 @@ export function EmailPage() {
                   <p className="whitespace-pre-wrap">{selectedEmail.body}</p>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Received: {new Date(selectedEmail.created_at).toLocaleString()}
+                  {currentView === 'inbox' ? 'Received' : 'Sent'}: {new Date(selectedEmail.created_at).toLocaleString()}
                 </p>
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <Mail className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Select an email from the inbox to view its contents</p>
+                <p>Select an email from the {currentView} to view its contents</p>
               </div>
             )}
           </CardContent>
