@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { notificationsService, Notification as NotificationType } from '../lib/services/notificationsService';
 
 interface NotificationsContextType {
@@ -67,10 +67,12 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }
   };
 
-  return (
-    <NotificationsContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, refreshNotifications }}>
-      {children}
-    </NotificationsContext.Provider>
+  return React.createElement(
+    NotificationsContext.Provider,
+    {
+      value: { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, refreshNotifications },
+    },
+    children
   );
 }
 

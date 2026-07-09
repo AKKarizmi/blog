@@ -1,4 +1,4 @@
-# FOROZ Admin Dashboard - Complete Technical Report
+# FOROZ Admin Dashboard - Old Dashboard
 
 **Generated:** July 2025  
 **Version:** 1.0.0  

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { Plus, Pencil, Trash2, Users } from 'lucide-react';
 
-export default function BoardMembersPage() {
+export function BoardMembersPage() {
   const [members, setMembers] = useState<BoardMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

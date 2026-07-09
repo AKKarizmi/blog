@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Bell, Check, CheckCheck, Trash2 } from 'lucide-react';
 
-export default function NotificationsPage() {
+export function NotificationsPage() {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

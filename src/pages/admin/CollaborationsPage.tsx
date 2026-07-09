@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { Plus, Pencil, Trash2, Handshake } from 'lucide-react';
 
-export default function CollaborationsPage() {
+export function CollaborationsPage() {
   const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

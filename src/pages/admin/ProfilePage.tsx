@@ -7,7 +7,7 @@ import { Label } from '../../components/ui/Label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { User, Save, Lock, Upload } from 'lucide-react';
 
-export default function ProfilePage() {
+export function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
