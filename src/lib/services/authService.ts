@@ -16,9 +16,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access: string;
-  refresh: string;
-  user: User;
+  success: boolean;
+  message?: string;
+  access?: string;
+  refresh?: string;
+  user?: User;
 }
 
 export interface RegisterRequest {
@@ -40,7 +42,11 @@ export interface PasswordResetConfirmRequest {
 
 export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/user/auth/login/', credentials);
+    const response = await api.post<LoginResponse>('/user/login_form/', credentials);
+    if (!response.success) {
+      throw new Error('Invalid credentials');
+    }
+    // Assuming backend returns access/refresh tokens on success
     if (response.access) {
       setAccessToken(response.access);
       localStorage.setItem('rtoken', response.refresh);

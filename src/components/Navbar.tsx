@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 const navLinks = [
   {
     name: 'Home',
@@ -64,12 +65,12 @@ export function Navbar() {
                 </li>
               )}
             </ul>
-            <a
-              href="api/user/login"
+            <Link
+              to="/login"
               className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
 
               Login
-            </a>
+            </Link>
           </nav>
 
           {/* Mobile Toggle */}
@@ -112,13 +113,13 @@ export function Navbar() {
                   {link.name}
                 </a>
               )}
-              <a
-                href="#contact"
+              <Link
+                to="/login"
                 onClick={() => setIsOpen(false)}
                 className="mt-4 text-center px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-md">
 
-                Join Us
-              </a>
+                Login
+              </Link>
             </div>
           </motion.div>
         }

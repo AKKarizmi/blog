@@ -41,9 +41,6 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
-      {/* Default redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
