@@ -12,7 +12,7 @@ export interface Application {
 
 export const applicationsService = {
   getAll: async (): Promise<Application[]> => {
-    const response = await api.get<unknown>('/applications/');
+    const response = await api.get<unknown>('/applicants/');
     const data = response as { results?: Application[] } | Application[];
     if (Array.isArray(data)) {
       return data;
@@ -21,18 +21,14 @@ export const applicationsService = {
   },
 
   getById: async (id: number): Promise<Application> => {
-    return api.get<Application>(`/applications/${id}/`);
+    return api.get<Application>(`/view_applicant/${id}/`);
   },
 
-  create: async (data: Omit<Application, 'id' | 'created_at' | 'updated_at'>): Promise<Application> => {
-    return api.post<Application>('/applications/', data);
+  updateStatus: async (id: number, status: string): Promise<Application> => {
+    return api.post<Application>(`/applicants/${id}/update-status/`, { status });
   },
 
-  update: async (id: number, data: Partial<Application>): Promise<Application> => {
-    return api.patch<Application>(`/applications/${id}/`, data);
-  },
-
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/applications/${id}/`);
+  sendEmail: async (id: number, subject: string, message: string): Promise<void> => {
+    await api.post(`/applicants/${id}/send-email/`, { subject, message });
   },
 };

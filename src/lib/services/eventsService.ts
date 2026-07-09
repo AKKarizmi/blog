@@ -28,14 +28,14 @@ export const eventsService = {
   },
 
   create: async (data: Omit<Event, 'id' | 'created_at' | 'updated_at'>): Promise<Event> => {
-    return api.post<Event>('/events/', data);
+    return api.post<Event>('/events/create_event/', data);
   },
 
   update: async (id: number, data: Partial<Event>): Promise<Event> => {
-    return api.patch<Event>(`/events/${id}/`, data);
+    return api.post<Event>(`/events/${id}/update_event/`, data);
   },
 
   delete: async (id: number): Promise<void> => {
-    await api.delete(`/events/${id}/`);
+    await api.post(`/events/${id}/delete_event/`);
   },
 };
