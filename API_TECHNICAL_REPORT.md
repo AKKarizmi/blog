@@ -1,8 +1,8 @@
-# FOROZ Admin Dashboard - Full Technical Report
+# FOROZ Admin Dashboard - Full Technical Report (Updated)
 
 ## 1. Project Purpose
 
-This project is a React + TypeScript admin dashboard for managing a community organization’s internal operations. The interface is designed for administrative users to monitor and manage volunteer applications, users, announcements, events, collaborations, board members, messages, email, notifications, and profile data.
+This project is a React + TypeScript admin dashboard for managing a community organization's internal operations. The interface is designed for administrative users to monitor and manage volunteer applications, users, announcements, events, collaborations, board members, messages, email, notifications, and profile data.
 
 The application is structured as a modern single-page app using Vite, React Router, Tailwind CSS, and a service-oriented API layer.
 
@@ -18,10 +18,11 @@ The application is structured as a modern single-page app using Vite, React Rout
 
 ### Routing and UI
 
-- React Router DOM 6.26.2
+- React Router DOM 7.18.1
 - Tailwind CSS 3.4.17
 - Lucide React 0.522.0
 - Framer Motion 11.5.4
+- Radix UI primitives
 
 ### Development Tooling
 
@@ -48,21 +49,22 @@ The project follows a modular frontend architecture:
 
 - [src/App.tsx](src/App.tsx) initializes the app shell and providers.
 - [src/index.tsx](src/index.tsx) mounts the React application into the DOM.
-- [src/routes/AppRoutes.tsx](src/routes/AppRoutes.tsx) defines the application’s route structure.
-- [src/context/AppContext.tsx](src/context/AppContext.tsx) provides global application state and user context.
+- [src/routes/AppRoutes.tsx](src/routes/AppRoutes.tsx) defines the application's route structure.
+- [src/context/AuthContext.tsx](src/context/AuthContext.tsx) provides authentication state management.
+- [src/context/ForozDataContext.tsx](src/context/ForozDataContext.tsx) provides content/data context for the public homepage.
 - [src/pages](src/pages) contains route-level page components.
 - [src/components](src/components) contains reusable UI and feature components.
-- [src/services](src/services) contains the API abstraction layer.
-- [src/types](src/types) defines domain models.
-- [src/utils](src/utils) contains helper functions for formatting and exporting data.
+- [src/lib/api](src/lib/api) contains the secure API client with token refresh.
+- [src/lib/services](src/lib/services) contains domain-specific service modules.
+- [src/services](src/services) contains the legacy API client for public content fetching.
 
 ### Runtime Flow
 
 1. The app loads from [src/index.tsx](src/index.tsx).
-2. [src/App.tsx](src/App.tsx) wraps the app in a browser router and app provider.
-3. [src/context/AppContext.tsx](src/context/AppContext.tsx) loads the current user profile on startup.
-4. [src/routes/AppRoutes.tsx](src/routes/AppRoutes.tsx) renders the appropriate page based on the current URL.
-5. Pages consume data through the service layer and render UI with reusable components.
+2. [src/App.tsx](src/App.tsx) wraps the app in a browser router and renders routes.
+3. [src/routes/AppRoutes.tsx](src/routes/AppRoutes.tsx) renders the appropriate page based on the current URL.
+4. Protected routes require authentication via [src/components/auth/ProtectedRoute.tsx](src/components/auth/ProtectedRoute.tsx).
+5. Pages consume data through the service layer in `src/lib/services/` and render UI with reusable components.
 
 ---
 
@@ -85,23 +87,27 @@ The project follows a modular frontend architecture:
 ### Main Folders
 
 - [src/components](src/components): reusable UI and feature components.
-- [src/context](src/context): global context providers.
-- [src/hooks](src/hooks): custom hooks for reusable logic.
+  - `auth/`: ProtectedRoute, PublicOnlyRoute guards
+  - `layout/`: AdminLayout for dashboard pages
+- [src/context](src/context): global context providers (AuthContext, ForozDataContext).
+- [src/lib](src/lib): modern API client and services.
+  - `api/client.ts`: Secure API client with token refresh
+  - `services/`: Domain-specific service modules
 - [src/pages](src/pages): route-level views.
+  - `auth/`: SignInPage, SignUpPage
+  - `admin/`: DashboardPage
 - [src/routes](src/routes): routing definitions.
-- [src/services](src/services): backend API clients and domain services.
-- [src/types](src/types): TypeScript interfaces and domain types.
-- [src/utils](src/utils): small helpers for CSV export and date formatting.
+- [src/services](src/services): legacy API abstraction for public content.
 
 ---
 
 ## 5. Routing Design
 
-The application uses React Router with nested routes and a shared layout.
+The application uses React Router v7 with nested routes and a shared layout.
 
 ### Main Route Layout
 
-All pages are rendered inside [src/components/AdminLayout.tsx](src/components/AdminLayout.tsx), which provides:
+All admin pages are rendered inside [src/components/layout/AdminLayout.tsx](src/components/layout/AdminLayout.tsx), which provides:
 
 - top navigation
 - sidebar/mobile menu behavior
@@ -113,37 +119,41 @@ All pages are rendered inside [src/components/AdminLayout.tsx](src/components/Ad
 
 The route table in [src/routes/AppRoutes.tsx](src/routes/AppRoutes.tsx) includes:
 
-- `/dashboard`
-- `/announcements`
-- `/events`
-- `/collaborations`
-- `/board-members`
-- `/users`
-- `/applications`
-- `/messages`
-- `/email`
-- `/profile`
+- `/login` - Public sign-in page
+- `/signup` - Public registration page
+- `/admin/dashboard` - Main dashboard (default admin route)
+- `/admin/*` - Protected admin routes (expandable for future features)
 
-The app defaults to `/dashboard` and redirects unmatched routes there.
+The app defaults to `/admin/dashboard` for authenticated users and redirects unmatched admin routes there.
+
+### Route Guards
+
+- **ProtectedRoute**: Requires authentication; redirects to `/login` if not authenticated
+- **PublicOnlyRoute**: Redirects authenticated users away from auth pages
 
 ---
 
 ## 6. State Management Approach
 
-### 6.1 Global State
+### 6.1 Authentication State
 
-The app uses React Context through [src/context/AppContext.tsx](src/context/AppContext.tsx).
+The app uses React Context through [src/context/AuthContext.tsx](src/context/AuthContext.tsx).
 
 It provides:
 
-- `currentUser`
-- `addToast`
-- `updateCurrentUser`
-- `logout`
+- `user` - Current authenticated user
+- `loading` - Authentication loading state
+- `login()` - Sign-in function
+- `logout()` - Sign-out function
+- `register()` - Registration function
 
-The context is initialized by fetching the current user profile from the backend during app startup.
+### 6.2 Token Storage
 
-### 6.2 Local Component State
+- **Access token**: Stored in memory only (never persisted)
+- **Refresh token**: Stored securely in localStorage under key `rtoken`
+- **Automatic refresh**: Access token is refreshed automatically on 401 errors
+
+### 6.3 Local Component State
 
 Pages and components mostly use React's built-in `useState` and `useEffect` hooks for:
 
@@ -153,33 +163,25 @@ Pages and components mostly use React's built-in `useState` and `useEffect` hook
 - filtered lists
 - delete and edit targets
 
-### 6.3 Custom Hooks
-
-The project includes [src/hooks/useNotifications.ts](src/hooks/useNotifications.ts), which centralizes notification loading, polling, unread-count computation, and mark-as-read actions.
-
 ---
 
 ## 7. UI Architecture
 
-The UI is built with reusable, composable components under [src/components/ui](src/components/ui).
+The UI is built with reusable, composable components under [src/components](src/components).
 
 ### Common UI Components
 
-- [src/components/ui/Button.tsx](src/components/ui/Button.tsx): reusable button component with variants and sizes.
-- [src/components/ui/Input.tsx](src/components/ui/Input.tsx): input field with optional label and icon.
-- [src/components/ui/Modal.tsx](src/components/ui/Modal.tsx): accessible modal with focus handling and animation.
-- [src/components/ui/Card.tsx](src/components/ui/Card.tsx): styled card wrapper.
-- [src/components/ui/ConfirmDialog.tsx](src/components/ui/ConfirmDialog.tsx): confirmation dialog.
-- [src/components/ui/Toast.tsx](src/components/ui/Toast.tsx): toast notification container.
-- [src/components/ui/Textarea.tsx](src/components/ui/Textarea.tsx): textarea wrapper.
-- [src/components/ui/Badge.tsx](src/components/ui/Badge.tsx): status and tag badge component.
+- Navbar, Footer - Public page layout components
+- HeroSection, AboutSection, ServicesSection, etc. - Homepage sections
+- AdminLayout - Dashboard shell with sidebar navigation
+- ProtectedRoute, PublicOnlyRoute - Route guards
 
 ### UI Design Patterns
 
 - Tailwind-based utility classes are used throughout.
-- The design is modern and card-based.
-- Modals and dialogs are animated with Framer Motion.
-- Buttons, cards, inputs, and modals follow a shared visual language.
+- The design is modern with gradient accents and card-based layouts.
+- Animations use Framer Motion for smooth transitions.
+- Icons are provided by Lucide React.
 
 ---
 
@@ -187,158 +189,92 @@ The UI is built with reusable, composable components under [src/components/ui](s
 
 ### 8.1 Dashboard
 
-The dashboard page in [src/pages/DashboardPage.tsx](src/pages/DashboardPage.tsx) shows:
+The dashboard page in [src/pages/admin/DashboardPage.tsx](src/pages/admin/DashboardPage.tsx) shows:
 
-- total applications
-- pending review count
-- approved volunteers count
-- approval rate
+- total users count
+- total applications count
+- total events count
+- active volunteers count
+- recent applications list
+- upcoming events list
+- quick action links
 
-It also embeds the application table for recent data.
+Data is fetched via [src/lib/services/dashboardService.ts](src/lib/services/dashboardService.ts).
 
-### 8.2 Applications
+### 8.2 Authentication
 
-The application management UI is handled primarily by [src/components/ApplicationTable.tsx](src/components/ApplicationTable.tsx).
+Authentication is handled by:
 
-It supports:
+- [src/lib/services/authService.ts](src/lib/services/authService.ts) - Auth API calls
+- [src/context/AuthContext.tsx](src/context/AuthContext.tsx) - Auth state provider
+- [src/pages/auth/SignInPage.tsx](src/pages/auth/SignInPage.tsx) - Login UI
+- [src/pages/auth/SignUpPage.tsx](src/pages/auth/SignUpPage.tsx) - Registration UI
 
-- listing applications
-- search and filtering by name/email/status
-- status updates
-- email sending to applicants
-- deletion
-- CSV export
+Features:
 
-### 8.3 Users
-
-The users management experience is handled through [src/pages/Users/UsersPage.tsx](src/pages/Users/UsersPage.tsx) and [src/pages/Users/UserModal.tsx](src/pages/Users/UserModal.tsx).
-
-The module is responsible for:
-
-- viewing users
-- creating and editing users
-- assigning roles and statuses
-- deleting users
-- uploading avatars
-
-### 8.4 Announcements
-
-The announcements module lives in [src/pages/Announcements](src/pages/Announcements), with page and modal components for:
-
-- listing announcements
-- searching and filtering content
-- creating and updating announcements
-- removing announcements
-- handling image upload
-
-### 8.5 Events
-
-The events module in [src/pages/EventsPage.tsx](src/pages/EventsPage.tsx) provides:
-
-- event card listing
-- create/edit/delete flows
-- image upload support
-- publish and termination date handling
-- search functionality
-
-### 8.6 Collaborations
-
-The collaboration management page in [src/pages/Collaborations](src/pages/Collaborations) supports:
-
-- listing partner collaborations
-- editing collaboration metadata
-- image/logo handling
-- creating and deleting collaborations
-
-### 8.7 Board Members
-
-The board members page in [src/pages/BoardMembersPage.tsx](src/pages/BoardMembersPage.tsx) manages:
-
-- board member profiles
-- role and description fields
-- social links
-- photos
-
-### 8.8 Messages
-
-The messages feature in [src/pages/Messages](src/pages/Messages) provides conversation-based messaging capabilities and a thread view for chat-like interactions.
-
-### 8.9 Email
-
-The email feature in [src/pages/Email](src/pages/Email) supports:
-
-- inbox-style data loading
-- composing and sending emails
-- read-state updates
-- attachments
-
-### 8.10 Notifications
-
-The notifications system uses [src/hooks/useNotifications.ts](src/hooks/useNotifications.ts) and [src/services/notificationsService.ts](src/services/notificationsService.ts) to load and update real-time notification data.
-
-### 8.11 Profile
-
-The profile page in [src/pages/Profile/ProfilePage.tsx](src/pages/Profile/ProfilePage.tsx) handles:
-
-- displaying user details
-- updating profile information
-- changing passwords
-- uploading avatars
+- JWT-based authentication
+- Automatic token refresh
+- CSRF protection for mutations
+- Route guards for protected pages
 
 ---
 
 ## 9. API and Service Layer
 
-### 9.1 Shared API Client
+### 9.1 Modern API Client
 
-All requests flow through [src/services/apiClient.ts](src/services/apiClient.ts).
+All admin API requests flow through [src/lib/api/client.ts](src/lib/api/client.ts).
 
 This client:
 
-- reads the API base URL from [src/config.ts](src/config.ts)
+- reads the API base URL from environment variables (`VITE_API_ORIGIN`, `VITE_API_BASE_URL`)
 - injects CSRF headers for state-changing requests
-- reads auth tokens from local storage
-- sets Authorization headers for API calls
+- reads access token from memory
+- reads refresh token from localStorage
+- sets Authorization headers for API calls (`Bearer <token>`)
 - uses `fetch` with credentials enabled
+- automatically refreshes access token on 401 errors
+- retries failed requests after token refresh
 
-### 9.2 Authentication Handling
+### 9.2 Environment Configuration
 
-The app expects tokens to be stored in one of the following keys:
+Default values:
 
-- `token`
-- `access`
-- `accessToken`
-- `jwt`
+- `VITE_API_ORIGIN=http://localhost:8000`
+- `VITE_API_BASE_URL=/`
 
-If a token is present, the client sends it as either:
+Create a `.env` file in the project root to override:
 
-- `Authorization: Bearer <token>` for JWT-like tokens
-- `Authorization: Token <token>` otherwise
+```bash
+VITE_API_ORIGIN=https://your-api-domain.com
+VITE_API_BASE_URL=/api/
+```
 
 ### 9.3 Service Modules
 
-The services folder contains domain-specific wrappers around the API:
+The `src/lib/services/` folder contains domain-specific wrappers around the API:
 
-- [src/services/announcementsService.ts](src/services/announcementsService.ts)
-- [src/services/applicationsService.ts](src/services/applicationsService.ts)
-- [src/services/boardMembersService.ts](src/services/boardMembersService.ts)
-- [src/services/collaborationsService.ts](src/services/collaborationsService.ts)
-- [src/services/dashboardService.ts](src/services/dashboardService.ts)
-- [src/services/emailService.ts](src/services/emailService.ts)
-- [src/services/eventsService.ts](src/services/eventsService.ts)
-- [src/services/messagesService.ts](src/services/messagesService.ts)
-- [src/services/notificationsService.ts](src/services/notificationsService.ts)
-- [src/services/profileService.ts](src/services/profileService.ts)
-- [src/services/usersService.ts](src/services/usersService.ts)
-
-These modules normalize backend responses into the frontend’s expected data shape before returning them to the UI.
+| Service | File | Endpoints |
+|---------|------|-----------|
+| Auth | `authService.ts` | `/user/login_form`, `/user/auth/register/`, `/user/auth/logout/`, `/user/auth/user/` |
+| Dashboard | `dashboardService.ts` | `/dashboard/`, `/applications/recent`, `/events/` |
+| Announcements | `announcementsService.ts` | `/announcements/` |
+| Events | `eventsService.ts` | `/events/` |
+| Collaborations | `collaborationsService.ts` | `/collaborations/` |
+| Board Members | `boardMembersService.ts` | `/board-members/` |
+| Applications | `applicationsService.ts` | `/applications/` |
+| Users | `usersService.ts` | `/users/` |
+| Messages | `messagesService.ts` | `/messages/` |
+| Email | `emailService.ts` | `/email/` |
+| Notifications | `notificationsService.ts` | `/notifications/` |
+| Profile | `profileService.ts` | `/user/auth/user/` |
 
 ### 9.4 Request Patterns
 
 The application uses several request methods:
 
 - `GET` for read operations
-- `POST` for create, update, send, and action-triggering requests
+- `POST` for create, login, register, send actions
 - `PATCH` for partial updates
 - `DELETE` for record removal
 
@@ -347,35 +283,30 @@ Payloads vary by endpoint:
 - JSON payloads for regular structured data
 - `FormData` for file uploads and multipart forms
 
+### 9.5 Legacy API Client
+
+The [src/services/api.ts](src/services/api.ts) client is used for public homepage content fetching with fallback strategies. It is NOT used for admin dashboard operations.
+
 ---
 
 ## 10. Data Flow Patterns
 
-### 10.1 Page → Service → UI
+### 10.1 Page → Service → API → UI
 
 The common flow is:
 
-1. A page or hook calls a service function.
-2. The service sends an HTTP request using the shared fetch client.
-3. The response is parsed and normalized.
-4. The UI updates state and renders the result.
+1. A page component calls a service function (e.g., `fetchDashboardStats()`)
+2. The service sends an HTTP request using `api.get/post/patch/delete`
+3. The API client adds auth headers and handles token refresh
+4. The response is parsed and returned
+5. The UI updates state and renders the result
 
-### 10.2 Modal and Form Patterns
-
-Many modules use modal-based create/edit flows. These forms typically:
-
-- maintain local form state
-- validate required fields
-- submit through service layer functions
-- close the modal and reload data after success
-
-### 10.3 Loading and Error Handling
+### 10.2 Loading and Error Handling
 
 The app uses a consistent pattern for asynchronous operations:
 
 - loading state while the request is pending
 - error messages when a request fails
-- retry flows for failed loads
 - toast notifications for success or failure feedback
 
 ---
@@ -389,118 +320,181 @@ The project uses Tailwind CSS for styling.
 - utility-first classes throughout components
 - consistent spacing, color, and typography conventions
 - responsive layouts using Tailwind breakpoints
-- modern card-based UI with soft shadows and rounded corners
+- modern card-based UI with gradients and soft shadows
 
 ### Global Styles
 
-The global stylesheet in [src/index.css](src/index.css) contains the required Tailwind directives and is the entry point for project-wide styling.
+The global stylesheet in [src/index.css](src/index.css) contains the required Tailwind directives.
 
 ---
 
-## 12. Configuration Details
+## 12. Authentication and Session Model
 
-### Environment Configuration
+### Token-Based Authentication
 
-The app uses [src/config.ts](src/config.ts) to determine the API base URL.
+- Access tokens are stored in memory only (never in localStorage)
+- Refresh tokens are stored in localStorage under `rtoken`
+- Tokens are automatically refreshed on 401 responses
+- CSRF cookies are fetched and included with mutations
 
-Default value:
+### Logout Flow
 
-- `http://localhost:8000/`
+1. Call `authService.logout()` to notify backend
+2. Clear local tokens
+3. Redirect to `/login`
 
-Optional override:
+### Protected Routes
 
-- `VITE_API_BASE_URL`
-
-### Build Configuration
-
-Vite handles bundling and build output, and TypeScript is configured for strict mode with React JSX support.
-
-The project is set up for browser-based SPA development and does not currently include a dedicated backend server.
-
----
-
-## 13. Authentication and Session Model
-
-The app appears to be designed for authenticated admin access.
-
-### Current Implementation Details
-
-- the app initializes the current user on startup
-- if no authenticated profile is available, the app shows an access-denied view
-- logout clears stored auth tokens from local storage
-- the UI includes a login redirect to a backend login endpoint
-
-### Important Note
-
-The auth flow is currently dependent on local storage tokens and a backend endpoint. The code does not appear to use a dedicated auth library such as Auth0, Clerk, or Firebase.
+All `/admin/*` routes require authentication. Unauthenticated users are redirected to `/login`.
 
 ---
 
-## 14. Accessibility and UX Considerations
+## 13. API Endpoint Reference
 
-Several UI components have been implemented with accessibility in mind.
+### Authentication Endpoints
 
-Examples include:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/user/login_form` | Sign in with username/password |
+| POST | `/user/auth/register/` | Register new user |
+| POST | `/user/auth/logout/` | Sign out |
+| GET | `/user/auth/user/` | Get current user profile |
+| PATCH | `/user/auth/user/` | Update profile |
+| POST | `/user/auth/token/refresh/` | Refresh access token |
 
-- modal focus management in [src/components/ui/Modal.tsx](src/components/ui/Modal.tsx)
-- keyboard handling for dialogs and escape-to-close behavior
-- descriptive labels for form fields
-- ARIA attributes on interactive modal elements
+### Dashboard Endpoints
 
-The project generally follows a polished admin-panel design pattern with clear feedback and action-oriented interactions.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard/` | Get dashboard statistics |
+| GET | `/applications/recent?limit=5` | Get recent applications |
+| GET | `/events/` | Get all events |
 
----
+### Resource Endpoints
 
-## 15. Testing and Quality Practices
+All resource endpoints follow RESTful conventions:
 
-### Current State
-
-The repository includes linting support but does not appear to include a formal test suite yet.
-
-### Existing Quality Tools
-
-- ESLint
-- TypeScript strict mode
-- build validation via Vite
-
-### Recommendations
-
-A strong next step would be to add:
-
-- unit tests for service helpers
-- component tests for modals and forms
-- integration tests for core CRUD flows
-- end-to-end tests for authentication and routing
-
----
-
-## 16. Observed Strengths
-
-- Clear separation between UI, state, routing, and services
-- Reusable component library for consistent UI
-- Centralized API client for auth and CSRF handling
-- Strong route-based feature organization
-- Good use of TypeScript for domain modeling
-- Modal-based CRUD patterns are consistent across features
+| Resource | List | Detail | Create | Update | Delete |
+|----------|------|--------|--------|--------|--------|
+| Announcements | `GET /announcements/` | `GET /announcements/{id}/` | `POST /announcements/` | `PATCH /announcements/{id}/` | `DELETE /announcements/{id}/` |
+| Events | `GET /events/` | `GET /events/{id}/` | `POST /events/` | `PATCH /events/{id}/` | `DELETE /events/{id}/` |
+| Collaborations | `GET /collaborations/` | `GET /collaborations/{id}/` | `POST /collaborations/` | `PATCH /collaborations/{id}/` | `DELETE /collaborations/{id}/` |
+| Board Members | `GET /board-members/` | `GET /board-members/{id}/` | `POST /board-members/` | `PATCH /board-members/{id}/` | `DELETE /board-members/{id}/` |
+| Applications | `GET /applications/` | `GET /applications/{id}/` | `POST /applications/` | `PATCH /applications/{id}/` | `DELETE /applications/{id}/` |
+| Users | `GET /users/` | `GET /users/{id}/` | `POST /users/` | `PATCH /users/{id}/` | `DELETE /users/{id}/` |
+| Messages | `GET /messages/` | `GET /messages/{id}/` | `POST /messages/` | `PATCH /messages/{id}/` | `DELETE /messages/{id}/` |
+| Email | `GET /email/` | `GET /email/{id}/` | `POST /email/` | `PATCH /email/{id}/` | `DELETE /email/{id}/` |
+| Notifications | `GET /notifications/` | - | - | `PATCH /notifications/{id}/` | `DELETE /notifications/{id}/` |
 
 ---
 
-## 17. Areas for Improvement
+## 14. Troubleshooting 404 Errors
 
-While the project is well structured, a few areas could be improved:
+If you're getting 404 errors from API endpoints, check the following:
 
-1. Standardize API endpoint naming across the backend contract.
-2. Consolidate duplicated logic for CRUD flows.
-3. Introduce a more formal auth library or centralized auth guard.
-4. Add automated tests.
-5. Add stronger validation and error handling in forms.
-6. Improve consistency in response normalization across services.
-7. Document the expected backend payload formats for each feature.
+### 1. Verify Backend Server
+
+Ensure your Django/backend server is running at the expected origin:
+
+```bash
+# Default: http://localhost:8000
+curl http://localhost:8000/dashboard/
+```
+
+### 2. Check Environment Variables
+
+Create or update `.env` in the project root:
+
+```bash
+VITE_API_ORIGIN=http://localhost:8000
+VITE_API_BASE_URL=/
+```
+
+Restart the dev server after changing `.env`:
+
+```bash
+npm run dev
+```
+
+### 3. Verify API Endpoint Paths
+
+The frontend expects these endpoint patterns:
+
+- `/dashboard/` - Dashboard stats
+- `/announcements/` - Announcements list
+- `/events/` - Events list
+- `/user/login_form` - Login endpoint
+- `/user/auth/user/` - Current user
+
+If your backend uses different paths, update the service files in `src/lib/services/`.
+
+### 4. Check CORS Configuration
+
+Your backend must allow requests from your frontend origin. For development:
+
+```python
+# Django settings.py
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+```
+
+### 5. Debug API Calls
+
+Open browser DevTools → Network tab and inspect failed requests:
+
+- Check the full URL being requested
+- Verify request headers (Authorization, X-CSRFToken)
+- Check response status and body
 
 ---
 
-## 18. Summary
+## 15. Summary
 
-This project is a feature-rich admin dashboard built with React, TypeScript, Vite, Tailwind CSS, and React Router. It provides a polished internal management experience for a community organization and clearly separates presentation, routing, state, and data access concerns.
+This project is a feature-rich admin dashboard built with React, TypeScript, Vite, Tailwind CSS, and React Router v7. It provides a polished internal management experience for a community organization with:
 
-Its architecture is modular and maintainable, with domain-specific services, reusable UI components, and context-based global state. The project is production-ready in structure but would benefit from stronger testing, authentication standardization, and API contract consistency.
+- Secure JWT-based authentication with automatic token refresh
+- Modular service layer for clean API integration
+- Protected routes with authentication guards
+- Modern UI with responsive design
+- Comprehensive error handling and loading states
+
+The architecture is maintainable and extensible, with clear separation between presentation, routing, state, and data access concerns.
+
+---
+
+## Appendix: Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- Backend API server running at `http://localhost:8000`
+
+### Installation
+
+```bash
+npm install
+```
+
+### Configure Environment
+
+Create `.env` file:
+
+```bash
+VITE_API_ORIGIN=http://localhost:8000
+VITE_API_BASE_URL=/
+```
+
+### Run Development Server
+
+```bash
+npm run dev
+```
+
+### Build for Production
+
+```bash
+npm run build
+npm run preview
+```
