@@ -1,5 +1,5 @@
 import { API_BASE } from '../config';
-import { csrfHeader } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 import type { Collaboration } from '../types/Collaboration';
 
 function toArray(value: unknown): Record<string, unknown>[] {
@@ -124,7 +124,7 @@ export async function createCollaboration(payload: Omit<Collaboration, 'id'> & {
   const data = await requestJson<unknown>('/d1/create_collaboration/', {
     method: 'POST',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     },
     body: form
   });
@@ -154,7 +154,7 @@ export async function updateCollaboration(id: string, payload: Partial<Collabora
   const data = await requestJson<unknown>(`/d1/update_collaboration/${id}/`, {
     method: 'POST',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     },
     body: form
   });
@@ -167,7 +167,7 @@ export async function deleteCollaboration(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_collaboration/${id}/`, {
     method: 'DELETE',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     }
   });
 }

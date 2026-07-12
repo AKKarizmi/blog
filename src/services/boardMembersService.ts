@@ -1,5 +1,5 @@
 import { API_BASE } from '../config';
-import { csrfHeader } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 
 export interface BoardMember {
   id: string;
@@ -204,7 +204,7 @@ export async function createBoardMember(payload: Omit<BoardMember, 'id'> & { pho
   const data = await requestJson<unknown>('/d1/create_member/', {
     method: 'POST',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     },
     body: form
   });
@@ -233,7 +233,7 @@ export async function updateBoardMember(id: string, payload: Partial<BoardMember
   const data = await requestJson<unknown>(`/d1/update_member/${id}/`, {
     method: 'POST',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     },
     body: form
   });
@@ -246,7 +246,7 @@ export async function deleteBoardMember(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_member/${id}/`, {
     method: 'DELETE',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     }
   });
 }
@@ -260,7 +260,7 @@ export async function sendEmailToBoardMember(id: string, payload?: { subject?: s
   await requestJson<unknown>(`/send_email_to_member/${id}/`, {
     method: 'POST',
     headers: {
-      ...csrfHeader()
+      ...getAuthHeaders(true)
     },
     body: form
   });

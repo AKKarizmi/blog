@@ -1,5 +1,5 @@
 import { API_BASE } from '../config';
-import { csrfHeader } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 
 export interface VolunteerApplication {
   id: string;
@@ -196,8 +196,10 @@ function toArray(value: unknown): Record<string, unknown>[] {
 
 async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
+    credentials: 'include',
     headers: {
       ...(options?.method && options.method !== 'GET' ? { 'Content-Type': 'application/json' } : {}),
+      ...getAuthHeaders(true),
       ...(options?.headers ?? {})
     },
     ...options
@@ -225,9 +227,7 @@ export async function viewVolunteer(id: string): Promise<VolunteerApplication> {
 export async function updateVolunteerStatus(id: string, status: VolunteerApplication['status']): Promise<VolunteerApplication> {
   const data = await requestJson<unknown>(`/d1/update_volunteer_status/${id}/`, {
     method: 'POST',
-    headers: {
-      ...csrfHeader()
-    },
+    headers: getAuthHeaders(false),
     body: JSON.stringify({ status })
   });
 
@@ -238,9 +238,7 @@ export async function updateVolunteerStatus(id: string, status: VolunteerApplica
 export async function deleteVolunteer(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_volunteer/${id}/`, {
     method: 'DELETE',
-    headers: {
-      ...csrfHeader()
-    }
+    headers: getAuthHeaders(false)
   });
 }
 

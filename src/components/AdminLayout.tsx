@@ -35,6 +35,11 @@ const mainNavItems = [
   icon: Users
 },
 {
+  to: '/users',
+  label: 'Users',
+  icon: Users
+},
+{
   to: '/announcements',
   label: 'Announcements',
   icon: Megaphone

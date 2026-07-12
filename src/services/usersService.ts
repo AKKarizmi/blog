@@ -1,9 +1,12 @@
 import { API_BASE } from '../config';
 import type { User } from '../types/User';
-import { csrfHeader } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 
 export async function getUsers(): Promise<User[]> {
-  const res = await fetch(`${API_BASE}/user/users`, { credentials: 'include' });
+  const res = await fetch(`${API_BASE}/user/users`, { 
+    credentials: 'include',
+    headers: getAuthHeaders(false)
+  });
   if (!res.ok) throw new Error('Failed to fetch users');
   return res.json();
 }
@@ -18,7 +21,7 @@ export async function createUser(
   if (payload.email) form.append('email', payload.email);
   if (payload.fullName) form.append('fullName', payload.fullName);
   if (payload.role) form.append('role', payload.role);
-  const headers = { 'Content-Type': 'application/x-www-form-urlencoded', ...csrfHeader() };
+  const headers = { 'Content-Type': 'application/x-www-form-urlencoded', ...getAuthHeaders(true) };
   const res = await fetch(`${API_BASE}/user/auth/register/`, {
     method: 'POST',
     headers,
@@ -36,7 +39,7 @@ export async function updateUser(
   id: string,
   payload: Partial<User>
 ): Promise<User> {
-  const headers = { 'Content-Type': 'application/json', ...csrfHeader() };
+  const headers = { 'Content-Type': 'application/json', ...getAuthHeaders(true) };
   const res = await fetch(`${API_BASE}/user/auth/update_user/${id}/`, {
     method: 'PATCH',
     headers,
@@ -51,7 +54,7 @@ export async function updateUser(
 }
 
 export async function deleteUser(id: string): Promise<void> {
-  const headers = { ...csrfHeader() };
+  const headers = getAuthHeaders(true);
   const res = await fetch(`${API_BASE}/user/auth/delete_user/${id}/`, {
     method: 'DELETE',
     credentials: 'include',
