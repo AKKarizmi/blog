@@ -103,7 +103,7 @@ export function Modal({
   return (
     <AnimatePresence>
       {isOpen &&
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
           <motion.div
           initial={{
             opacity: 0
@@ -114,7 +114,7 @@ export function Modal({
           exit={{
             opacity: 0
           }}
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9998]"
           onClick={onClose}
           aria-hidden="true" />
         
@@ -144,9 +144,9 @@ export function Modal({
             damping: 25,
             stiffness: 300
           }}
-          className={`relative w-full ${sizeClasses[size]} z-10 outline-none`}>
+          className={`relative w-full ${sizeClasses[size]} z-[9999] outline-none`}>
           
-            <Card className="flex flex-col max-h-[90vh]">
+            <Card className="flex flex-col max-h-[90vh] bg-white">
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <h2
                 id={titleId}

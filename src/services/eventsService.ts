@@ -1,5 +1,5 @@
 import { API_BASE } from '../config';
-import { csrfHeader } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 import type { Event } from '../types/Event';
 
 function toArray(value: unknown): Record<string, unknown>[] {
@@ -84,6 +84,7 @@ async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
+      ...getAuthHeaders(true),
       ...(options?.headers ?? {})
     },
     ...options
@@ -124,9 +125,7 @@ export async function createEvent(payload: Omit<Event, 'id'> & { imageFile?: Fil
 
   const data = await requestJson<unknown>('/d1/create_event/', {
     method: 'POST',
-    headers: {
-      ...csrfHeader()
-    },
+    headers: getAuthHeaders(false),
     body: form
   });
 
@@ -152,9 +151,7 @@ export async function updateEvent(id: string, payload: Partial<Event> & { imageF
 
   const data = await requestJson<unknown>(`/d1/update_event/${id}/`, {
     method: 'POST',
-    headers: {
-      ...csrfHeader()
-    },
+    headers: getAuthHeaders(false),
     body: form
   });
 
@@ -165,8 +162,6 @@ export async function updateEvent(id: string, payload: Partial<Event> & { imageF
 export async function deleteEvent(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_event/${id}/`, {
     method: 'DELETE',
-    headers: {
-      ...csrfHeader()
-    }
+    headers: getAuthHeaders(false)
   });
 }

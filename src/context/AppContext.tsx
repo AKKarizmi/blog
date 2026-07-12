@@ -3,7 +3,7 @@ import { useToast, ToastType } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/Toast';
 import type { Profile } from '../types/Profile';
 import { API_BASE } from '../config';
-import { csrfHeader } from '../utils/csrf';
+import { csrfHeader, getAuthHeaders } from '../utils/csrf';
 
 interface LoginNotificationPayload {
   type?: ToastType;
@@ -57,7 +57,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const url = `${API_BASE}/user/auth/user/`;
       console.log('[auth] fetching current user ->', url);
       try {
-        const res = await fetch(url, { credentials: 'include' });
+        const res = await fetch(url, { 
+          credentials: 'include',
+          headers: getAuthHeaders(false)
+        });
         if (!mounted) return;
         const txt = await res.text();
         console.log('[auth] current user response', res.status, txt);
@@ -85,7 +88,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const url = `${API_BASE}/user/auth/login/`;
         const body = JSON.stringify({ username, password });
         console.log('[auth] login request ->', url, body);
-        const headers = { 'Content-Type': 'application/json', ...csrfHeader() };
+        const headers = { 'Content-Type': 'application/json', ...getAuthHeaders(true) };
         const res = await fetch(url, {
           method: 'POST',
           headers,
@@ -145,7 +148,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const url = `${API_BASE}/user/auth/logout/`;
       // console.log('[auth] logout request ->', url);
-      const headers = { ...csrfHeader() };
+      const headers = getAuthHeaders(true);
       const res = await fetch(url, { method: 'POST', credentials: 'include', headers });
       const txt = await res.clone().text();
       // console.log('[auth] logout response', res.status, txt);
