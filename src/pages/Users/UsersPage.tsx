@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Plus,
   Users as UsersIcon,
@@ -21,7 +21,7 @@ import {
 '../../components/DataTable/DataTable';
 import { UserModal } from './UserModal';
 import { useApp } from '../../context/AppContext';
-import { getUsers } from '../../services/usersService';
+import { getUsers, createUser, updateUser, deleteUser } from '../../services/usersService';
 import { formatDate } from '../../utils/date';
 import type { User } from '../../types/User';
 type RoleFilter = 'all' | User['role'];
@@ -58,65 +58,44 @@ export function UsersPage() {
     if (statusFilter !== 'all' && u.status !== statusFilter) return false;
     return true;
   });
-  const handleSave = (data: Omit<User, 'id' | 'createdAt'>) => {
-    if (editing) {
-      setUsers((prev) =>
-      prev.map((u) =>
-      u.id === editing.id ?
-      {
-        ...u,
-        ...data
-      } :
-      u
-      )
-      );
-      addToast('User updated', 'success');
-    } else {
-      setUsers((prev) => [
-      {
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-        ...data
-      },
-      ...prev]
-      );
-      addToast('User created', 'success');
+  const handleSave = async (data: Omit<User, 'id' | 'createdAt'>) => {
+    try {
+      if (editing) {
+        const updated = await updateUser(editing.id, data);
+        setUsers((prev) => prev.map((u) => (u.id === editing.id ? updated : u)));
+        addToast('User updated', 'success');
+      } else {
+        const created = await createUser(data);
+        setUsers((prev) => [created, ...prev]);
+        addToast('User created', 'success');
+      }
+      setModalOpen(false);
+      setEditing(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to save user', 'error');
     }
-    setModalOpen(false);
-    setEditing(null);
   };
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!confirm) return;
     const { user, action } = confirm;
-    if (action === 'delete') {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      addToast(`${user.username} deleted`, 'success');
-    } else if (action === 'suspend') {
-      setUsers((prev) =>
-      prev.map((u) =>
-      u.id === user.id ?
-      {
-        ...u,
-        status: 'suspended'
-      } :
-      u
-      )
-      );
-      addToast(`${user.username} suspended`, 'success');
-    } else if (action === 'reactivate') {
-      setUsers((prev) =>
-      prev.map((u) =>
-      u.id === user.id ?
-      {
-        ...u,
-        status: 'active'
-      } :
-      u
-      )
-      );
-      addToast(`${user.username} reactivated`, 'success');
+    try {
+      if (action === 'delete') {
+        await deleteUser(user.id);
+        setUsers((prev) => prev.filter((u) => u.id !== user.id));
+        addToast(`${user.username} deleted`, 'success');
+      } else if (action === 'suspend') {
+        const updated = await updateUser(user.id, { status: 'suspended' });
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        addToast(`${user.username} suspended`, 'success');
+      } else if (action === 'reactivate') {
+        const updated = await updateUser(user.id, { status: 'active' });
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        addToast(`${user.username} reactivated`, 'success');
+      }
+      setConfirm(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : `Unable to ${action} user`, 'error');
     }
-    setConfirm(null);
   };
   const sendMessage = () => {
     if (!msgSubject.trim() || !msgBody.trim()) {
