@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect, useState } from 'react';
+import { ComponentType, useEffect, useState } from 'react';
 import { Briefcase, Calendar, Clock3, FileText, GraduationCap, Hash, Mail, MapPin, Phone, Sparkles, Users as UsersIcon } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { Badge } from './ui/Badge';
@@ -43,7 +43,29 @@ function getColor(name: string) {
     'bg-rose-100 text-rose-700'
   ];
 
-  return colors[name.length % colors.length];
+  return colors[Math.abs(name.length) % colors.length];
+}
+
+function getDocumentPreviewType(url: string) {
+  const normalized = url.toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?.*)?$/.test(normalized)) {
+    return 'image' as const;
+  }
+
+  if (normalized.endsWith('.pdf') || normalized.includes('/pdf')) {
+    return 'pdf' as const;
+  }
+
+  return 'file' as const;
+}
+
+function getDocumentPreviewUrl(url: string) {
+  const normalized = url.toLowerCase();
+  if (normalized.endsWith('.pdf') || normalized.includes('/pdf')) {
+    return `https://docs.google.com/viewer?embedded=true&url=${encodeURIComponent(url)}`;
+  }
+
+  return url;
 }
 
 export function ApplicationDetailModal({ application, onClose, onStatusChange, onDelete, isUpdating = false }: Props) {
@@ -62,8 +84,14 @@ export function ApplicationDetailModal({ application, onClose, onStatusChange, o
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className={`flex-shrink-0 h-14 w-14 rounded-full flex items-center justify-center text-lg font-bold ${getColor(application.name)}`}>
-              {getInitials(application.name)}
+            <div className="flex-shrink-0 h-14 w-14 rounded-full overflow-hidden border border-gray-200 bg-gray-100">
+              {application.photoUrl ? (
+                <img src={application.photoUrl} alt={application.name} className="h-full w-full object-cover" />
+              ) : (
+                <div className={`h-full w-full rounded-full flex items-center justify-center text-lg font-bold ${getColor(application.name)}`}>
+                  {getInitials(application.name || 'Applicant')}
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-xl font-semibold text-gray-900">{application.name}</h3>
@@ -152,14 +180,43 @@ export function ApplicationDetailModal({ application, onClose, onStatusChange, o
               <FileText className="w-4 h-4 text-gray-400" />
               <h4 className="text-sm font-medium text-gray-700">Documents</h4>
             </div>
-            <ul className="space-y-2">
-              {application.documents.map((document) => (
-                <li key={document.name} className="text-sm text-gray-600">
-                  <a href={document.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">
-                    {document.name}
-                  </a>
-                </li>
-              ))}
+            <ul className="space-y-3">
+              {application.documents.map((document) => {
+                const previewType = getDocumentPreviewType(document.url);
+                const previewUrl = getDocumentPreviewUrl(document.url);
+
+                return (
+                  <li key={`${document.name}-${document.url}`} className="rounded-lg border border-gray-200 bg-white p-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gray-50 text-gray-500">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <a href={document.url} target="_blank" rel="noreferrer" className="text-sm font-medium text-indigo-600 hover:underline">
+                            {document.name || 'Uploaded document'}
+                          </a>
+                          {previewType === 'pdf' ? (
+                            <a href={document.url} target="_blank" rel="noreferrer" className="text-xs font-medium text-gray-600 hover:text-indigo-600">
+                              Open file
+                            </a>
+                          ) : null}
+                        </div>
+                        {previewType === 'image' ? (
+                          <div className="mt-2 overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-2">
+                            <img src={document.url} alt={document.name} className="max-h-48 w-full rounded object-contain" />
+                          </div>
+                        ) : null}
+                        {previewType === 'pdf' ? (
+                          <div className="mt-2 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                            <iframe src={previewUrl} title={document.name} className="h-64 w-full" />
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}

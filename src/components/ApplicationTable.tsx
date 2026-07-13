@@ -120,8 +120,14 @@ export function ApplicationTable() {
     try {
       setIsUpdating(true);
       const updated = await updateVolunteerStatus(viewing.id, status);
-      setApplications((prev) => prev.map((app) => (app.id === updated.id ? updated : app)));
-      setViewing(updated);
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === updated.id ? { ...app, ...updated, status: updated.status ?? status } : app
+        )
+      );
+      setViewing((prev) =>
+        prev ? { ...prev, ...updated, status: updated.status ?? status } : { ...updated, status }
+      );
       addToast(`Application marked as ${status.toLowerCase()}`, 'success');
     } catch (error) {
       addToast(error instanceof Error ? error.message : 'Unable to update application status', 'error');
@@ -237,8 +243,14 @@ export function ApplicationTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold ${getColor(app.name)}`}>
-                          {getInitials(app.name)}
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden border border-gray-200 bg-gray-100">
+                          {app.photoUrl ? (
+                            <img src={app.photoUrl} alt={app.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className={`h-full w-full rounded-full flex items-center justify-center text-sm font-bold ${getColor(app.name)}`}>
+                              {getInitials(app.name)}
+                            </div>
+                          )}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">

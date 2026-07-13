@@ -16,6 +16,7 @@ export interface VolunteerApplication {
   availability?: string;
   education?: string;
   skills?: string[];
+  photoUrl?: string;
   documents?: Array<{ name: string; url: string }>;
 }
 
@@ -75,8 +76,9 @@ function normalizePhone(rawItem: Record<string, unknown>): string {
   const phone = typeof rawItem.phone === 'string' ? rawItem.phone : '';
   const phoneNumber = typeof rawItem.phone_number === 'string' ? rawItem.phone_number : '';
   const mobile = typeof rawItem.mobile === 'string' ? rawItem.mobile : '';
+  const whatsapp = typeof rawItem.whatsapp_number === 'string' ? rawItem.whatsapp_number : '';
 
-  return phone || phoneNumber || mobile || '';
+  return phone || phoneNumber || mobile || whatsapp || '';
 }
 
 function normalizeEmail(rawItem: Record<string, unknown>): string {
@@ -114,26 +116,76 @@ function normalizeSkills(rawItem: Record<string, unknown>): string[] | undefined
   return undefined;
 }
 
+function resolveAssetUrl(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) {
+    return '';
+  }
+
+  const trimmedValue = value.trim();
+  if (/^https?:\/\//i.test(trimmedValue) || /^data:/i.test(trimmedValue) || /^blob:/i.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  try {
+    return new URL(trimmedValue, API_BASE).toString();
+  } catch {
+    return trimmedValue.startsWith('/') ? `${API_BASE}${trimmedValue}` : trimmedValue;
+  }
+}
+
+function normalizePhotoUrl(rawItem: Record<string, unknown>): string | undefined {
+  const candidateKeys = ['personal_photo', 'profile_photo', 'photo', 'avatar'];
+  for (const key of candidateKeys) {
+    const value = rawItem[key];
+    if (typeof value === 'string' && value.trim()) {
+      const resolved = resolveAssetUrl(value);
+      if (resolved) return resolved;
+    }
+
+    if (value && typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      const nestedUrl = typeof record.url === 'string' ? record.url : '';
+      const resolved = resolveAssetUrl(nestedUrl);
+      if (resolved) return resolved;
+    }
+  }
+
+  return undefined;
+}
+
 function normalizeDocuments(rawItem: Record<string, unknown>): Array<{ name: string; url: string }> | undefined {
   const rawDocuments = rawItem.documents ?? rawItem.files ?? rawItem.attachments;
+
+  const documentsFromFields = ['national_id', 'personal_photo', 'cv', 'signature']
+    .map((key) => {
+      const value = rawItem[key];
+      if (value && typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        const fileName = typeof record.file_name === 'string' ? record.file_name : '';
+        const url = typeof record.url === 'string' ? record.url : '';
+        return fileName && url ? { name: fileName, url: resolveAssetUrl(url) } : null;
+      }
+      return null;
+    })
+    .filter((document): document is { name: string; url: string } => Boolean(document));
 
   if (Array.isArray(rawDocuments)) {
     const documents = rawDocuments
       .map((document) => {
         if (document && typeof document === 'object') {
           const record = document as Record<string, unknown>;
-          const name = typeof record.name === 'string' ? record.name : '';
+          const name = typeof record.name === 'string' ? record.name : typeof record.file_name === 'string' ? record.file_name : '';
           const url = typeof record.url === 'string' ? record.url : '';
-          return name ? { name, url } : null;
+          return name && url ? { name, url: resolveAssetUrl(url) } : null;
         }
         return null;
       })
       .filter((document): document is { name: string; url: string } => Boolean(document));
 
-    return documents.length ? documents : undefined;
+    return documents.length ? [...documents, ...documentsFromFields] : documentsFromFields.length ? documentsFromFields : undefined;
   }
 
-  return undefined;
+  return documentsFromFields.length ? documentsFromFields : undefined;
 }
 
 function normalizeId(rawItem: Record<string, unknown>): string {
@@ -155,12 +207,13 @@ function normalizeApplication(rawItem: Record<string, unknown>): VolunteerApplic
     ),
     date: normalizeDate(rawItem.created_at ?? rawItem.submitted_at ?? rawItem.date ?? rawItem.created),
     notes: normalizeNotes(rawItem),
-    address: normalizeOptionalText(rawItem, ['address', 'location', 'city', 'country']),
-    motivation: normalizeOptionalText(rawItem, ['motivation', 'reason', 'why_join', 'why_volunteer']),
-    experience: normalizeOptionalText(rawItem, ['experience', 'previous_experience', 'background', 'ngo_experience']),
-    availability: normalizeOptionalText(rawItem, ['availability', 'availability_hours', 'preferred_schedule']),
-    education: normalizeOptionalText(rawItem, ['education', 'educational_background', 'qualification']),
+    address: normalizeOptionalText(rawItem, ['current_address', 'address', 'location', 'city', 'country']),
+    motivation: normalizeOptionalText(rawItem, ['why_volunteer', 'motivation', 'reason', 'why_join']),
+    experience: normalizeOptionalText(rawItem, ['relevant_experience', 'experience', 'previous_experience', 'background', 'ngo_experience']),
+    availability: normalizeOptionalText(rawItem, ['weekly_availability', 'availability', 'availability_hours', 'preferred_schedule']),
+    education: normalizeOptionalText(rawItem, ['highest_education', 'education', 'educational_background', 'qualification']),
     skills: normalizeSkills(rawItem),
+    photoUrl: normalizePhotoUrl(rawItem),
     documents: normalizeDocuments(rawItem)
   };
 }
@@ -179,6 +232,10 @@ function toArray(value: unknown): Record<string, unknown>[] {
       if (Array.isArray(nested)) {
         return nested.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
       }
+    }
+
+    if ('volunteer_application' in record && record.volunteer_application && typeof record.volunteer_application === 'object') {
+      return [record.volunteer_application as Record<string, unknown>];
     }
 
     if ('applicant' in record || 'volunteer' in record) {
@@ -227,7 +284,10 @@ export async function viewVolunteer(id: string): Promise<VolunteerApplication> {
 export async function updateVolunteerStatus(id: string, status: VolunteerApplication['status']): Promise<VolunteerApplication> {
   const data = await requestJson<unknown>(`/d1/update_volunteer_status/${id}/`, {
     method: 'POST',
-    headers: getAuthHeaders(false),
+    headers: {
+      ...getAuthHeaders(true),
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ status })
   });
 

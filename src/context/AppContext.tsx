@@ -54,10 +54,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
     (async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        if (mounted) {
+          setCurrentUser(null);
+          setIsInitializing(false);
+        }
+        return;
+      }
+
       const url = `${API_BASE}/user/auth/user/`;
       console.log('[auth] fetching current user ->', url);
       try {
-        const res = await fetch(url, { 
+        const res = await fetch(url, {
           credentials: 'include',
           headers: getAuthHeaders(false)
         });
@@ -65,14 +74,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const txt = await res.text();
         console.log('[auth] current user response', res.status, txt);
         if (res.ok) {
-          const user = await res.json();
-          setCurrentUser(user as Profile);
+          try {
+            const user = txt ? JSON.parse(txt) : null;
+            setCurrentUser(user as Profile);
+          } catch (err) {
+            console.error('[auth] parse current user error', err);
+            setCurrentUser(null);
+          }
         } else {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
           setCurrentUser(null);
         }
       } catch (err) {
         console.error('[auth] current user error', err);
-        if (mounted) setCurrentUser(null);
+        if (mounted) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          setCurrentUser(null);
+        }
       } finally {
         if (mounted) setIsInitializing(false);
       }

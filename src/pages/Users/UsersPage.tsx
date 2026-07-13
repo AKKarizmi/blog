@@ -135,22 +135,28 @@ export function UsersPage() {
   join('').
   toUpperCase().
   slice(0, 2);
-  const roleBadge = (role: User['role']) => {
-    const map = {
+  const roleBadge = (role: User['role'] | string) => {
+    const map: Record<string, { variant: 'danger' | 'warning' | 'success' | 'neutral'; label: string }> = {
       admin: {
-        variant: 'danger' as const,
+        variant: 'danger',
         label: 'Admin'
       },
       moderator: {
-        variant: 'warning' as const,
+        variant: 'warning',
         label: 'Moderator'
       },
       volunteer: {
-        variant: 'success' as const,
+        variant: 'success',
         label: 'Volunteer'
       }
     };
-    return <Badge variant={map[role].variant}>{map[role].label}</Badge>;
+
+    const config = map[role] ?? {
+      variant: 'neutral' as const,
+      label: role ? String(role).replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()) : 'User'
+    };
+
+    return <Badge variant={config.variant}>{config.label}</Badge>;
   };
   const columns: DataTableColumn<User>[] = [
   {
