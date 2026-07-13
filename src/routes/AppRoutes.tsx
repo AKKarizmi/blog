@@ -14,6 +14,7 @@ import { EmailPage } from '../pages/Email/EmailPage';
 import { ProfilePage } from '../pages/Profile/ProfilePage';
 import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
 import { LoginPage } from '../pages/LoginPage';
+import { SignupPage } from '../pages/SignupPage';
 export function AppRoutes() {
   const { isAuthenticated, isInitializing } = useApp();
   if (isInitializing) {
@@ -32,6 +33,7 @@ export function AppRoutes() {
       {!isAuthenticated ?
       <>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </> :
 
