@@ -187,11 +187,13 @@ export async function getBoardMembers(): Promise<BoardMember[]> {
 export async function createBoardMember(payload: Omit<BoardMember, 'id'> & { photoFile?: File | null; socialPayload?: Array<Record<string, string>>; roles?: string[] }): Promise<BoardMember> {
   const form = new FormData();
   form.append('name', payload.name);
+  form.append('title', payload.name);
   form.append('role', payload.role);
   form.append('email', payload.email ?? '');
   form.append('roles', JSON.stringify(payload.roles ?? []));
   form.append('shortDesc', payload.shortDesc);
   form.append('short_desc', payload.shortDesc);
+  form.append('short_description', payload.shortDesc);
   for (const item of payload.socialPayload ?? []) {
     form.append('socials', JSON.stringify(item));
   }
@@ -199,6 +201,9 @@ export async function createBoardMember(payload: Omit<BoardMember, 'id'> & { pho
   if (payload.photoFile) {
     form.append('image', payload.photoFile);
     form.append('photo', payload.photoFile);
+  } else if (payload.photo) {
+    form.append('image', payload.photo);
+    form.append('photo', payload.photo);
   }
 
   const data = await requestJson<unknown>('/d1/create_member/', {
@@ -215,12 +220,18 @@ export async function createBoardMember(payload: Omit<BoardMember, 'id'> & { pho
 
 export async function updateBoardMember(id: string, payload: Partial<BoardMember> & { photoFile?: File | null; socialPayload?: Array<Record<string, string>>; roles?: string[] }): Promise<BoardMember> {
   const form = new FormData();
-  if (payload.name) form.append('name', payload.name);
+  if (payload.name) {
+    form.append('name', payload.name);
+    form.append('title', payload.name);
+  }
   if (payload.role) form.append('role', payload.role);
   form.append('email', payload.email ?? '');
   if (payload.roles) form.append('roles', JSON.stringify(payload.roles));
-  if (payload.shortDesc) form.append('shortDesc', payload.shortDesc);
-  if (payload.shortDesc) form.append('short_desc', payload.shortDesc);
+  if (payload.shortDesc) {
+    form.append('shortDesc', payload.shortDesc);
+    form.append('short_desc', payload.shortDesc);
+    form.append('short_description', payload.shortDesc);
+  }
   for (const item of payload.socialPayload ?? []) {
     form.append('socials', JSON.stringify(item));
   }
@@ -228,6 +239,9 @@ export async function updateBoardMember(id: string, payload: Partial<BoardMember
   if (payload.photoFile) {
     form.append('image', payload.photoFile);
     form.append('photo', payload.photoFile);
+  } else if (payload.photo) {
+    form.append('image', payload.photo);
+    form.append('photo', payload.photo);
   }
 
   const data = await requestJson<unknown>(`/d1/update_member/${id}/`, {

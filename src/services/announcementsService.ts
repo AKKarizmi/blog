@@ -121,7 +121,7 @@ export async function createAnnouncement(payload: Omit<Announcement, 'id'> & { i
 
   const data = await requestJson<unknown>('/d1/create_announcement/', {
     method: 'POST',
-    headers: getAuthHeaders(false),
+    headers: getAuthHeaders(true),
     body: form
   });
 
@@ -146,7 +146,7 @@ export async function updateAnnouncement(id: string, payload: Partial<Announceme
 
   const data = await requestJson<unknown>(`/d1/update_announcement/${id}/`, {
     method: 'POST',
-    headers: getAuthHeaders(false),
+    headers: getAuthHeaders(true),
     body: form
   });
 
@@ -157,6 +157,6 @@ export async function updateAnnouncement(id: string, payload: Partial<Announceme
 export async function deleteAnnouncement(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_announcement/${id}/`, {
     method: 'DELETE',
-    headers: getAuthHeaders(false)
+    headers: getAuthHeaders(true)
   });
 }

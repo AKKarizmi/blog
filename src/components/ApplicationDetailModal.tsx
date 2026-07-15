@@ -48,24 +48,15 @@ function getColor(name: string) {
 
 function getDocumentPreviewType(url: string) {
   const normalized = url.toLowerCase();
-  if (/\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?.*)?$/.test(normalized)) {
+  if (/\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?.*)?$/i.test(normalized)) {
     return 'image' as const;
   }
 
-  if (normalized.endsWith('.pdf') || normalized.includes('/pdf')) {
+  if (/\.pdf(\?.*)?$/i.test(normalized) || normalized.includes('/pdf')) {
     return 'pdf' as const;
   }
 
   return 'file' as const;
-}
-
-function getDocumentPreviewUrl(url: string) {
-  const normalized = url.toLowerCase();
-  if (normalized.endsWith('.pdf') || normalized.includes('/pdf')) {
-    return `https://docs.google.com/viewer?embedded=true&url=${encodeURIComponent(url)}`;
-  }
-
-  return url;
 }
 
 export function ApplicationDetailModal({ application, onClose, onStatusChange, onDelete, isUpdating = false }: Props) {
@@ -180,44 +171,47 @@ export function ApplicationDetailModal({ application, onClose, onStatusChange, o
               <FileText className="w-4 h-4 text-gray-400" />
               <h4 className="text-sm font-medium text-gray-700">Documents</h4>
             </div>
-            <ul className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {application.documents.map((document) => {
                 const previewType = getDocumentPreviewType(document.url);
-                const previewUrl = getDocumentPreviewUrl(document.url);
 
                 return (
-                  <li key={`${document.name}-${document.url}`} className="rounded-lg border border-gray-200 bg-white p-3">
+                  <div key={`${document.name}-${document.url}`} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gray-50 text-gray-500">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-50 text-gray-500">
                         <FileText className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <a href={document.url} target="_blank" rel="noreferrer" className="text-sm font-medium text-indigo-600 hover:underline">
-                            {document.name || 'Uploaded document'}
+                        <p className="text-sm font-medium text-gray-900 truncate">{document.name || 'Uploaded document'}</p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <a href={document.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-indigo-600 hover:underline">
+                            Open file
                           </a>
                           {previewType === 'pdf' ? (
-                            <a href={document.url} target="_blank" rel="noreferrer" className="text-xs font-medium text-gray-600 hover:text-indigo-600">
-                              Open file
-                            </a>
+                            <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-indigo-700">
+                              PDF
+                            </span>
                           ) : null}
                         </div>
-                        {previewType === 'image' ? (
-                          <div className="mt-2 overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-2">
-                            <img src={document.url} alt={document.name} className="max-h-48 w-full rounded object-contain" />
-                          </div>
-                        ) : null}
-                        {previewType === 'pdf' ? (
-                          <div className="mt-2 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
-                            <iframe src={previewUrl} title={document.name} className="h-64 w-full" />
-                          </div>
-                        ) : null}
                       </div>
                     </div>
-                  </li>
+
+                    {previewType === 'image' ? (
+                      <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                        <img src={document.url} alt={document.name} className="h-48 w-full object-cover" />
+                      </div>
+                    ) : previewType === 'pdf' ? (
+                      <div className="mt-4 flex h-36 items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50">
+                        <div className="text-center">
+                          <FileText className="inline h-8 w-8 text-indigo-500" />
+                          <p className="mt-2 text-sm text-gray-500">PDF preview unavailable</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           </div>
         ) : null}
 

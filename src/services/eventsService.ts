@@ -125,7 +125,7 @@ export async function createEvent(payload: Omit<Event, 'id'> & { imageFile?: Fil
 
   const data = await requestJson<unknown>('/d1/create_event/', {
     method: 'POST',
-    headers: getAuthHeaders(false),
+    headers: getAuthHeaders(true),
     body: form
   });
 
@@ -151,7 +151,7 @@ export async function updateEvent(id: string, payload: Partial<Event> & { imageF
 
   const data = await requestJson<unknown>(`/d1/update_event/${id}/`, {
     method: 'POST',
-    headers: getAuthHeaders(false),
+    headers: getAuthHeaders(true),
     body: form
   });
 
@@ -162,6 +162,6 @@ export async function updateEvent(id: string, payload: Partial<Event> & { imageF
 export async function deleteEvent(id: string): Promise<void> {
   await requestJson<unknown>(`/d1/delete_event/${id}/`, {
     method: 'DELETE',
-    headers: getAuthHeaders(false)
+    headers: getAuthHeaders(true)
   });
 }

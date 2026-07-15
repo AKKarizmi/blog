@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader2Icon, User, Lock, Globe, Linkedin, Github } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -32,6 +33,15 @@ export function LoginPage() {
       }
     })();
   };
+
+  const handleSocialLogin = (provider: string) => {
+    alert(`${provider} login is under construction...`);
+  };
+
+  const handleForgotPassword = () => {
+    alert('Forgot password flow is under construction...');
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
@@ -66,6 +76,7 @@ export function LoginPage() {
                 type="text"
                 autoComplete="username"
                 required
+                icon={<User className="w-4 h-4" />}
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
@@ -90,6 +101,7 @@ export function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
+                  icon={<Lock className="w-4 h-4" />}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -113,6 +125,15 @@ export function LoginPage() {
               </div>
             </div>
 
+            <div className="flex items-center justify-between text-sm">
+              <button type="button" onClick={handleForgotPassword} className="font-medium text-indigo-600 hover:text-indigo-700 focus:outline-none">
+                Forgot password?
+              </button>
+              <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium">
+                Create account
+              </Link>
+            </div>
+
             {error &&
             <p
               role="alert"
@@ -133,6 +154,38 @@ export function LoginPage() {
               }
             </Button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative text-center text-sm text-gray-500">
+              <span className="bg-slate-50 px-2">Or continue with</span>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full p-0"
+                aria-label="Continue with Google"
+                onClick={() => handleSocialLogin('Google')}>
+                <Google className="w-5 h-5" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full p-0"
+                aria-label="Continue with LinkedIn"
+                onClick={() => handleSocialLogin('LinkedIn')}>
+                <Linkedin className="w-5 h-5" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full p-0"
+                aria-label="Continue with GitHub"
+                onClick={() => handleSocialLogin('GitHub')}>
+                <Github className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
         </Card>
       </div>
     </div>);
