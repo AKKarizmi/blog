@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Loader2Icon, Globe, Linkedin, Github, User, Mail, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
@@ -17,7 +17,7 @@ export function SignupPage() {
   const [gender, setGender] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSocialSignup = (provider: string) => {
+  const handleSocialSignup = (_provider: string) => {
     addToast('Under Construction...', 'info');
   };
 

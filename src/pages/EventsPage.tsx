@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Edit2, Trash2, Calendar } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -25,6 +25,7 @@ export function EventsPage() {
 
   useEffect(() => {
     loadEvents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadEvents = () => {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Component } from 'react';
+import { useMemo, useState, ReactNode, ComponentType } from 'react';
 import {
   Search,
   ChevronUp,
