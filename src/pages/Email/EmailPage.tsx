@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Inbox, Send, Mail, PenSquare, Eye } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -39,6 +39,7 @@ export function EmailPage() {
   };
   useEffect(() => {
     load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const inboxUnread = emails.filter(
     (e) => e.folder === 'inbox' && e.status === 'unread'

@@ -12,12 +12,12 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function createUser(
-  payload: Omit<User, 'id' | 'createdAt'>
+  payload: Omit<User, 'id' | 'createdAt'> & { password?: string }
 ): Promise<User> {
   const form = new URLSearchParams();
   // append known fields; backend form views typically read POST params
   if (payload.username) form.append('username', payload.username);
-  if ((payload as any).password) form.append('password', (payload as any).password);
+  if (payload.password) form.append('password', payload.password);
   if (payload.email) form.append('email', payload.email);
   if (payload.fullName) form.append('fullName', payload.fullName);
   if (payload.role) form.append('role', payload.role);

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Upload, Image as ImageIcon, X } from 'lucide-react';
+import { useState } from 'react';
+import { Image as ImageIcon } from 'lucide-react';
 interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;

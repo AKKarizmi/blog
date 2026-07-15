@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState, createContext, useContext } from 'react';
+import { useCallback, useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { useToast, ToastType } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/Toast';
 import type { Profile } from '../types/Profile';
 import { API_BASE } from '../config';
-import { csrfHeader, getAuthHeaders } from '../utils/csrf';
+import { getAuthHeaders } from '../utils/csrf';
 
 interface LoginNotificationPayload {
   type?: ToastType;
@@ -169,9 +169,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const url = `${API_BASE}/user/auth/logout/`;
       // console.log('[auth] logout request ->', url);
       const headers = getAuthHeaders(true);
-      const res = await fetch(url, { method: 'POST', credentials: 'include', headers });
-      const txt = await res.clone().text();
-      // console.log('[auth] logout response', res.status, txt);
+      await fetch(url, { method: 'POST', credentials: 'include', headers });
     } catch (err) {
       console.error('[auth] logout error', err);
     }

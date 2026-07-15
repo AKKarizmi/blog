@@ -17,7 +17,7 @@ export function getAccessToken(): string | null {
   return localStorage.getItem('accessToken');
 }
 
-export function getAuthHeaders(includeCsrf: boolean = false): { [k: string]: string } {
+export function getAuthHeaders(includeCsrf = false): { [k: string]: string } {
   const headers: { [k: string]: string } = {};
   
   const accessToken = getAccessToken();

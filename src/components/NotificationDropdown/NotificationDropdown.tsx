@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Component } from 'react';
+import { useEffect, useState, useRef, ComponentType } from 'react';
 import {
   Bell,
   BellOff,
