@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getNotifications } from '../services/notificationsService';
+import { getNotifications, normalizeNotifications } from '../services/notificationsService';
 import type { Notification } from '../types/Notification';
 
 export function useNotifications() {
@@ -8,13 +8,24 @@ export function useNotifications() {
 
   useEffect(() => {
     let mounted = true;
-    getNotifications().
-    then((data) => {
-      if (mounted) setNotifications(data);
-    }).
-    finally(() => {
-      if (mounted) setLoading(false);
-    });
+
+    getNotifications()
+      .then((data) => {
+        if (mounted) {
+          setNotifications(normalizeNotifications(data));
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setNotifications([]);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
     return () => {
       mounted = false;
     };

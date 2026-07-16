@@ -23,6 +23,7 @@ import { UserModal } from './UserModal';
 import { useApp } from '../../context/AppContext';
 import { getUsers, createUser, updateUser, deleteUser } from '../../services/usersService';
 import { formatDate } from '../../utils/date';
+import { getUserInitials } from '../../utils/user';
 import type { User } from '../../types/User';
 type RoleFilter = 'all' | User['role'];
 type StatusFilter = 'all' | User['status'];
@@ -107,13 +108,6 @@ export function UsersPage() {
     setMsgSubject('');
     setMsgBody('');
   };
-  const getInitials = (name: string) =>
-  name.
-  split(' ').
-  map((n) => n[0]).
-  join('').
-  toUpperCase().
-  slice(0, 2);
   const roleBadge = (role: User['role'] | string) => {
     const map: Record<string, { variant: 'danger' | 'warning' | 'success' | 'neutral'; label: string }> = {
       admin: {
@@ -151,7 +145,7 @@ export function UsersPage() {
 
 
       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-              {getInitials(u.fullName)}
+              {getUserInitials(u.fullName)}
             </div>
       }
           <div>

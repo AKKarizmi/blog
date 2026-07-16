@@ -91,7 +91,7 @@ function normalizeSocials(rawSocials: unknown): BoardMember['socials'] {
   return {};
 }
 
-function normalizeBoardMember(rawItem: Record<string, unknown>): BoardMember {
+export function normalizeBoardMember(rawItem: Record<string, unknown>): BoardMember {
   const roleValue =
     typeof rawItem.role === 'string'
       ? rawItem.role
@@ -136,26 +136,36 @@ function normalizeBoardMember(rawItem: Record<string, unknown>): BoardMember {
   };
 }
 
+export function unwrapBoardMemberPayload(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const candidateKeys = ['member', 'result', 'data', 'item', 'record', 'board_member', 'members', 'board_members', 'results', 'items', 'records'];
+
+  for (const key of candidateKeys) {
+    const nested = record[key];
+    if (Array.isArray(nested) && nested.length > 0) {
+      const [first] = nested;
+      return first && typeof first === 'object' ? (first as Record<string, unknown>) : null;
+    }
+
+    if (nested && typeof nested === 'object') {
+      return nested as Record<string, unknown>;
+    }
+  }
+
+  return record;
+}
+
 function toArray(value: unknown): Record<string, unknown>[] {
   if (Array.isArray(value)) {
     return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
   }
 
-  if (value && typeof value === 'object') {
-    const record = value as Record<string, unknown>;
-    const candidateKeys = ['results', 'items', 'data', 'members', 'board_members', 'records'];
-
-    for (const key of candidateKeys) {
-      const nested = record[key];
-      if (Array.isArray(nested)) {
-        return nested.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
-      }
-    }
-
-    return [record];
-  }
-
-  return [];
+  const unwrapped = unwrapBoardMemberPayload(value);
+  return unwrapped ? [unwrapped] : [];
 }
 
 async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
@@ -214,8 +224,8 @@ export async function createBoardMember(payload: Omit<BoardMember, 'id'> & { pho
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeBoardMember(first ?? {});
+  const responsePayload = unwrapBoardMemberPayload(data) ?? {};
+  return normalizeBoardMember(responsePayload);
 }
 
 export async function updateBoardMember(id: string, payload: Partial<BoardMember> & { photoFile?: File | null; socialPayload?: Array<Record<string, string>>; roles?: string[] }): Promise<BoardMember> {
@@ -252,8 +262,8 @@ export async function updateBoardMember(id: string, payload: Partial<BoardMember
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeBoardMember(first ?? {});
+  const responsePayload = unwrapBoardMemberPayload(data) ?? {};
+  return normalizeBoardMember(responsePayload);
 }
 
 export async function deleteBoardMember(id: string): Promise<void> {
@@ -265,13 +275,29 @@ export async function deleteBoardMember(id: string): Promise<void> {
   });
 }
 
-export async function sendEmailToBoardMember(id: string, payload?: { subject?: string; body?: string; attachment?: File | null }): Promise<void> {
+export async function sendEmailToBoardMember(_id: string, payload?: { subject?: string; body?: string; attachment?: File | null; recipient?: string; recipientName?: string }): Promise<void> {
   const form = new FormData();
-  if (payload?.subject) form.append('subject', payload.subject);
-  if (payload?.body) form.append('body', payload.body);
-  if (payload?.attachment) form.append('attachment', payload.attachment);
+  const recipient = payload?.recipient?.trim() || '';
+  const recipientName = payload?.recipientName?.trim() || '';
+  const subject = payload?.subject?.trim() || '';
+  const body = payload?.body?.trim() || '';
 
-  await requestJson<unknown>(`/send_email_to_member/${id}/`, {
+  if (recipient) {
+    form.append('to', recipient);
+    form.append('recipients', recipient);
+  }
+  if (recipientName) {
+    form.append('recipient_name', recipientName);
+    form.append('name', recipientName);
+  }
+  if (subject) form.append('subject', subject);
+  if (body) form.append('body', body);
+  if (payload?.attachment) {
+    form.append('attachment', payload.attachment);
+    form.append('attachments', payload.attachment);
+  }
+
+  await requestJson<unknown>(`/email/send/`, {
     method: 'POST',
     headers: {
       ...getAuthHeaders(true)

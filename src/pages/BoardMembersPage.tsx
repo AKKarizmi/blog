@@ -304,6 +304,8 @@ export function BoardMembersPage() {
     try {
       setEmailSending(true);
       await sendEmailToBoardMember(emailMember.id, {
+        recipient: emailMember.email || '',
+        recipientName: emailMember.name || '',
         subject: emailSubject.trim(),
         body: emailBody.trim(),
         attachment: emailAttachment
