@@ -10,8 +10,14 @@ import {
   Save,
   Plus,
   Trash2,
-  Loader2 } from
-'lucide-react';
+  Loader2,
+  Heart,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  Edit2,
+  X
+} from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
@@ -20,8 +26,24 @@ import { FileImageUpload } from '../../components/FileImageUpload/FileImageUploa
 import { useApp } from '../../context/AppContext';
 import { getBlogPageData, updateBlogPageData, type UpdateBlogPagePayload } from '../../services/blogPageService';
 import type { BlogPage as BlogPageType } from '../../types/BlogPage';
+import { getCoreValues, updateCoreValues } from '../../services/coreValueService';
+import type { CoreValue } from '../../types/CoreValue';
+import {
+  getCourses,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  getCourseCategories,
+  createCourseCategory,
+  updateCourseCategory,
+  deleteCourseCategory
+} from '../../services/courseService';
+import type { Course, CourseCategory } from '../../types/Course';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { Badge } from '../../components/ui/Badge';
 
-type FormTab = 'branding' | 'hero' | 'about' | 'mission' | 'cta' | 'contact' | 'footer';
+type FormTab = 'branding' | 'hero' | 'about' | 'mission' | 'cta' | 'contact' | 'footer' | 'core_values' | 'programs';
+type ProgramsSubTab = 'courses' | 'categories';
 
 interface SocialRow {
   id: string;
@@ -29,9 +51,24 @@ interface SocialRow {
   url: string;
 }
 
+const PLATFORM_OPTIONS = [
+  'facebook',
+  'instagram',
+  'twitter',
+  'linkedin',
+  'youtube',
+  'tiktok',
+  'whatsapp',
+  'telegram',
+  'github',
+  'pinterest',
+  'snapchat'
+] as const;
+
 export function BlogPage() {
   const { addToast } = useApp();
   const [activeTab, setActiveTab] = useState<FormTab>('branding');
+  const [programsSubTab, setProgramsSubTab] = useState<ProgramsSubTab>('courses');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,6 +81,26 @@ export function BlogPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
   const [aboutImageFile, setAboutImageFile] = useState<File | null>(null);
+
+  // Core Values State
+  const [coreValues, setCoreValues] = useState<CoreValue[]>([]);
+  const [coreValuesLoading, setCoreValuesLoading] = useState(false);
+  const [editingCoreValue, setEditingCoreValue] = useState<CoreValue | null>(null);
+  const [showCoreValueForm, setShowCoreValueForm] = useState(false);
+
+  // Programs State
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [showCourseForm, setShowCourseForm] = useState(false);
+  const [toDeleteCourse, setToDeleteCourse] = useState<Course | null>(null);
+
+  // Categories State
+  const [categories, setCategories] = useState<CourseCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<CourseCategory | null>(null);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [toDeleteCategory, setToDeleteCategory] = useState<CourseCategory | null>(null);
 
   // Load Data
   useEffect(() => {
@@ -73,6 +130,51 @@ export function BlogPage() {
     };
   }, [addToast]);
 
+  // Load Core Values
+  useEffect(() => {
+    if (activeTab === 'core_values') {
+      loadCoreValues();
+    }
+  }, [activeTab]);
+
+  const loadCoreValues = () => {
+    setCoreValuesLoading(true);
+    getCoreValues()
+      .then(setCoreValues)
+      .catch((e) => addToast(e.message, 'error'))
+      .finally(() => setCoreValuesLoading(false));
+  };
+
+  // Load Courses
+  useEffect(() => {
+    if (activeTab === 'programs' && programsSubTab === 'courses') {
+      loadCourses();
+    }
+  }, [activeTab, programsSubTab]);
+
+  const loadCourses = () => {
+    setCoursesLoading(true);
+    getCourses()
+      .then(setCourses)
+      .catch((e) => addToast(e.message, 'error'))
+      .finally(() => setCoursesLoading(false));
+  };
+
+  // Load Categories
+  useEffect(() => {
+    if (activeTab === 'programs' && programsSubTab === 'categories') {
+      loadCategories();
+    }
+  }, [activeTab, programsSubTab]);
+
+  const loadCategories = () => {
+    setCategoriesLoading(true);
+    getCourseCategories()
+      .then(setCategories)
+      .catch((e) => addToast(e.message, 'error'))
+      .finally(() => setCategoriesLoading(false));
+  };
+
   const updateField = (key: keyof BlogPageType, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -95,6 +197,105 @@ export function BlogPage() {
     setSocialRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
+  };
+
+  // Core Values handlers
+  const handleSaveCoreValue = async (data: CoreValue) => {
+    try {
+      let updatedList: CoreValue[];
+      if (editingCoreValue) {
+        updatedList = coreValues.map((cv) => (cv.id === editingCoreValue.id ? { ...data, id: editingCoreValue.id } : cv));
+      } else {
+        updatedList = [...coreValues, { ...data, id: Date.now() }];
+      }
+      await updateCoreValues(updatedList);
+      setCoreValues(updatedList);
+      addToast(editingCoreValue ? 'Core value updated' : 'Core value added', 'success');
+      setShowCoreValueForm(false);
+      setEditingCoreValue(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to save core value', 'error');
+    }
+  };
+
+  const handleDeleteCoreValue = (id: number) => {
+    const updated = coreValues.filter((cv) => cv.id !== id);
+    updateCoreValues(updated).then(() => {
+      setCoreValues(updated);
+      addToast('Core value deleted', 'success');
+    }).catch((e) => addToast(e.message, 'error'));
+  };
+
+  const moveCoreValue = (index: number, direction: 'up' | 'down') => {
+    const newList = [...coreValues];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newList.length) return;
+    [newList[index], newList[targetIndex]] = [newList[targetIndex], newList[index]];
+    const reordered = newList.map((cv, i) => ({ ...cv, order: i }));
+    setCoreValues(reordered);
+    updateCoreValues(reordered).catch((e) => addToast(e.message, 'error'));
+  };
+
+  // Course handlers
+  const handleSaveCourse = async (data: any) => {
+    try {
+      if (editingCourse) {
+        const updated = await updateCourse(editingCourse.id, data);
+        setCourses((prev) => prev.map((c) => (c.id === editingCourse.id ? updated : c)));
+        addToast('Course updated', 'success');
+      } else {
+        const created = await createCourse(data);
+        setCourses((prev) => [created, ...prev]);
+        addToast('Course created', 'success');
+      }
+      setShowCourseForm(false);
+      setEditingCourse(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to save course', 'error');
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    if (!toDeleteCourse) return;
+    try {
+      await deleteCourse(toDeleteCourse.id);
+      setCourses((prev) => prev.filter((c) => c.id !== toDeleteCourse.id));
+      addToast('Course deleted', 'success');
+      setToDeleteCourse(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to delete course', 'error');
+    }
+  };
+
+  // Category handlers
+  const handleSaveCategory = async (data: Omit<CourseCategory, 'id'>) => {
+    try {
+      if (editingCategory) {
+        const updated = await updateCourseCategory(editingCategory.id!, data);
+        setCategories((prev) => prev.map((c) => (c.id === editingCategory.id ? updated : c)));
+        addToast('Category updated', 'success');
+      } else {
+        const created = await createCourseCategory(data);
+        setCategories((prev) => [created, ...prev]);
+        addToast('Category created', 'success');
+      }
+      setShowCategoryForm(false);
+      setEditingCategory(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to save category', 'error');
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!toDeleteCategory) return;
+    try {
+      await deleteCourseCategory(toDeleteCategory.id!);
+      setCategories((prev) => prev.filter((c) => c.id !== toDeleteCategory.id));
+      addToast('Category deleted', 'success');
+      setToDeleteCategory(null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Unable to delete category', 'error');
+    }
   };
 
   const validate = (): boolean => {
@@ -197,6 +398,8 @@ export function BlogPage() {
     { id: 'mission', label: 'Mission & Vision', icon: Compass },
     { id: 'cta', label: 'Call to Action', icon: Megaphone },
     { id: 'contact', label: 'Contact Info', icon: Phone },
+    { id: 'core_values', label: 'Core Values', icon: Heart },
+    { id: 'programs', label: 'Programs', icon: BookOpen },
     { id: 'footer', label: 'Footer Settings', icon: Settings }
   ];
 
@@ -524,6 +727,151 @@ export function BlogPage() {
                 </div>
               )}
 
+              {/* Core Values Tab */}
+              {activeTab === 'core_values' && (
+                <div className="space-y-6">
+                  <div className="border-b border-gray-100 pb-3 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Core Values</h3>
+                      <p className="text-xs text-gray-500">Manage your organization's core values displayed on the homepage.</p>
+                    </div>
+                    {!showCoreValueForm && (
+                      <Button onClick={() => { setEditingCoreValue(null); setShowCoreValueForm(true); }} size="sm">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Value
+                      </Button>
+                    )}
+                  </div>
+
+                  {showCoreValueForm && (
+                    <CoreValueForm
+                      initial={editingCoreValue}
+                      onSave={handleSaveCoreValue}
+                      onCancel={() => { setShowCoreValueForm(false); setEditingCoreValue(null); }}
+                    />
+                  )}
+
+                  {!showCoreValueForm && (
+                    <div className="space-y-3">
+                      {coreValuesLoading ? (
+                        <div className="space-y-3">
+                          {[1, 2, 3].map((n) => (
+                            <div key={n} className="h-20 bg-gray-50 rounded-lg animate-pulse" />
+                          ))}
+                        </div>
+                      ) : coreValues.length > 0 ? (
+                        coreValues.sort((a, b) => a.order - b.order).map((cv, index) => (
+                          <div key={cv.id || index} className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+                            <div className="flex flex-col gap-1">
+                              <button
+                                type="button"
+                                onClick={() => moveCoreValue(index, 'up')}
+                                disabled={index === 0}
+                                className="p-1 text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-400"
+                              >
+                                <ChevronUp className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveCoreValue(index, 'down')}
+                                disabled={index === coreValues.length - 1}
+                                className="p-1 text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-400"
+                              >
+                                <ChevronDown className="w-4 h-4" />
+                              </button>
+                            </div>
+                            <div
+                              className="w-10 h-10 rounded-lg flex items-center justify-center"
+                              style={{ backgroundColor: cv.color || '#e0e7ff' }}
+                            >
+                              <IconPreview name={cv.icon} className="w-5 h-5" style={{ color: '#fff' }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-gray-900">{cv.title}</div>
+                              <div className="text-xs text-gray-500 line-clamp-1">{cv.description}</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => { setEditingCoreValue(cv); setShowCoreValueForm(true); }}
+                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-md"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCoreValue(cv.id!)}
+                                className="p-2 text-rose-600 hover:bg-rose-50 rounded-md"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="border border-dashed border-gray-200 rounded-lg p-8 text-center">
+                          <Heart className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">No core values configured yet.</p>
+                          <p className="text-xs text-gray-400 mt-1">Add your first core value to get started.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Programs Tab */}
+              {activeTab === 'programs' && (
+                <div className="space-y-6">
+                  <div className="border-b border-gray-100 pb-3">
+                    <h3 className="text-lg font-semibold text-gray-900">Programs & Courses</h3>
+                    <p className="text-xs text-gray-500">Manage courses and categories offered by your organization.</p>
+                  </div>
+
+                  {/* Sub-tabs */}
+                  <div className="flex gap-1 bg-gray-50 p-1 rounded-lg w-fit">
+                    <button
+                      type="button"
+                      onClick={() => setProgramsSubTab('courses')}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                        programsSubTab === 'courses' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Courses
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setProgramsSubTab('categories')}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                        programsSubTab === 'categories' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      Categories
+                    </button>
+                  </div>
+
+                  {programsSubTab === 'courses' && (
+                    <CoursesList
+                      courses={courses}
+                      loading={coursesLoading}
+                      onEdit={(c) => { setEditingCourse(c); setShowCourseForm(true); }}
+                      onDelete={(c) => setToDeleteCourse(c)}
+                      onAdd={() => { setEditingCourse(null); setShowCourseForm(true); }}
+                    />
+                  )}
+
+                  {programsSubTab === 'categories' && (
+                    <CategoriesList
+                      categories={categories}
+                      loading={categoriesLoading}
+                      onEdit={(c) => { setEditingCategory(c); setShowCategoryForm(true); }}
+                      onDelete={(c) => setToDeleteCategory(c)}
+                      onAdd={() => { setEditingCategory(null); setShowCategoryForm(true); }}
+                    />
+                  )}
+                </div>
+              )}
+
               {/* Footer Section */}
               {activeTab === 'footer' && (
                 <div className="space-y-6">
@@ -566,12 +914,16 @@ export function BlogPage() {
                         {socialRows.map((row) => (
                           <div key={row.id} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                             <div className="w-1/3">
-                              <Input
+                              <select
                                 value={row.platform}
                                 onChange={(e) => handleUpdateSocialRow(row.id, 'platform', e.target.value)}
-                                placeholder="Platform (e.g. facebook)"
-                                className="bg-white border-slate-200"
-                              />
+                                className="block w-full rounded-lg border-gray-300 border bg-white py-2 px-3 text-sm placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
+                              >
+                                <option value="">Select platform</option>
+                                {PLATFORM_OPTIONS.map((p) => (
+                                  <option key={p} value={p}>{p}</option>
+                                ))}
+                              </select>
                             </div>
                             <div className="flex-1">
                               <Input
