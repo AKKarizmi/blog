@@ -164,8 +164,22 @@ function toArray(value: unknown): Record<string, unknown>[] {
     return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
   }
 
-  const unwrapped = unwrapBoardMemberPayload(value);
-  return unwrapped ? [unwrapped] : [];
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const candidateKeys = ['members', 'board_members', 'results', 'items', 'data', 'records'];
+
+    for (const key of candidateKeys) {
+      const nested = record[key];
+      if (Array.isArray(nested)) {
+        return nested.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
+      }
+    }
+
+    const unwrapped = unwrapBoardMemberPayload(value);
+    return unwrapped ? [unwrapped] : [];
+  }
+
+  return [];
 }
 
 async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {

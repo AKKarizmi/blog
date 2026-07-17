@@ -15,6 +15,7 @@ import { ProfilePage } from '../pages/Profile/ProfilePage';
 import { NotificationsPage } from '../pages/Notifications/NotificationsPage';
 import { LoginPage } from '../pages/LoginPage';
 import { SignupPage } from '../pages/SignupPage';
+import { BlogPage } from '../pages/BlogPage/BlogPage';
 export function AppRoutes() {
   const { isAuthenticated, isInitializing } = useApp();
   if (isInitializing) {
@@ -24,27 +25,28 @@ export function AppRoutes() {
           className="w-10 h-10 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin"
           role="status"
           aria-label="Loading" />
-        
+
       </div>);
 
   }
   return (
     <Routes>
       {!isAuthenticated ?
-      <>
+        <>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </> :
 
-      <Route element={<AdminLayout />}>
+        <Route element={<AdminLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/blog-page" element={<BlogPage />} />
           <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route
-          path="/services"
-          element={<Navigate to="/announcements" replace />} />
-        
+            path="/services"
+            element={<Navigate to="/announcements" replace />} />
+
           <Route path="/events" element={<EventsPage />} />
           <Route path="/collaborations" element={<CollaborationsPage />} />
           <Route path="/board-members" element={<BoardMembersPage />} />

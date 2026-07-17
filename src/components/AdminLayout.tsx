@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
-  X } from
+  X,
+  Globe } from
 'lucide-react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { NotificationDropdown } from './NotificationDropdown/NotificationDropdown';
@@ -23,6 +24,11 @@ const mainNavItems = [
   to: '/dashboard',
   label: 'Dashboard',
   icon: LayoutDashboard
+},
+{
+  to: '/blog-page',
+  label: 'Blog Page',
+  icon: Globe
 },
 {
   to: '/applications',
@@ -92,6 +98,7 @@ export function AdminLayout() {
     .slice(0, 2);
   const getPageTitle = () => {
     const path = location.pathname;
+    if (path.startsWith('/blog-page')) return 'Blog Page';
     if (path.startsWith('/dashboard')) return 'Dashboard';
     if (path.startsWith('/applications')) return 'Applications';
     if (path.startsWith('/board-members')) return 'Board Members';
