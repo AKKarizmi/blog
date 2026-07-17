@@ -24,6 +24,21 @@ function toArray(value: unknown): Record<string, unknown>[] {
   return [];
 }
 
+function unwrapCollaborationPayload(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const nested = record.collaboration ?? record.data ?? record.result ?? record.item ?? record.record;
+
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    return nested as Record<string, unknown>;
+  }
+
+  return record;
+}
+
 function resolveAssetUrl(value: string): string {
   if (!value) return '';
 
@@ -109,16 +124,14 @@ export async function getCollaborations(): Promise<Collaboration[]> {
 
 export async function createCollaboration(payload: Omit<Collaboration, 'id'> & { logoFile?: File | null }): Promise<Collaboration> {
   const form = new FormData();
-  form.append('organizationName', payload.organizationName);
-  form.append('organization_name', payload.organizationName);
-  form.append('shortDescription', payload.shortDescription || '');
+  form.append('title', payload.organizationName);
   form.append('short_description', payload.shortDescription || '');
-  form.append('collaborationText', payload.collaborationText);
+  form.append('description', payload.collaborationText);
   form.append('date', payload.date);
-  if (payload.websiteLink) form.append('websiteLink', payload.websiteLink);
+  form.append('website', payload.websiteLink ?? '');
 
   if (payload.logoFile) {
-    form.append('logo', payload.logoFile);
+    form.append('image', payload.logoFile);
   }
 
   const data = await requestJson<unknown>('/d1/create_collaboration/', {
@@ -129,26 +142,21 @@ export async function createCollaboration(payload: Omit<Collaboration, 'id'> & {
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeCollaboration(first ?? {});
+  return normalizeCollaboration(unwrapCollaborationPayload(data) ?? {});
 }
 
 export async function updateCollaboration(id: string, payload: Partial<Collaboration> & { logoFile?: File | null }): Promise<Collaboration> {
   const form = new FormData();
-  if (payload.organizationName) {
-    form.append('organizationName', payload.organizationName);
-    form.append('organization_name', payload.organizationName);
-  }
+  if (payload.organizationName !== undefined) form.append('title', payload.organizationName);
   if (payload.shortDescription !== undefined) {
-    form.append('shortDescription', payload.shortDescription);
     form.append('short_description', payload.shortDescription);
   }
-  if (payload.collaborationText) form.append('collaborationText', payload.collaborationText);
-  if (payload.date) form.append('date', payload.date);
-  if (payload.websiteLink) form.append('websiteLink', payload.websiteLink);
+  if (payload.collaborationText !== undefined) form.append('description', payload.collaborationText);
+  if (payload.date !== undefined) form.append('date', payload.date);
+  if (payload.websiteLink !== undefined) form.append('website', payload.websiteLink ?? '');
 
   if (payload.logoFile) {
-    form.append('logo', payload.logoFile);
+    form.append('image', payload.logoFile);
   }
 
   const data = await requestJson<unknown>(`/d1/update_collaboration/${id}/`, {
@@ -159,8 +167,7 @@ export async function updateCollaboration(id: string, payload: Partial<Collabora
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeCollaboration(first ?? {});
+  return normalizeCollaboration(unwrapCollaborationPayload(data) ?? {});
 }
 
 export async function deleteCollaboration(id: string): Promise<void> {

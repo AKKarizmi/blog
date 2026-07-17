@@ -15,6 +15,8 @@ import { Card } from '../components/ui/Card';
 import { useApp } from '../context/AppContext';
 import { API_BASE } from '../config';
 import { getVolunteers, type VolunteerApplication } from '../services/applicationsService';
+import { getEvents } from '../services/eventsService';
+import type { Event } from '../types/Event';
 
 interface DashboardSummary {
   total: number;
@@ -32,6 +34,7 @@ export function DashboardPage() {
   const firstName = (fullNameSafe.split(' ')[0] || 'there');
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [recentApplications, setRecentApplications] = useState<VolunteerApplication[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +52,7 @@ export function DashboardPage() {
         }
 
         const data = (await response.json()) as Partial<DashboardSummary>;
-        const volunteers = await getVolunteers();
+        const [volunteers, events] = await Promise.all([getVolunteers(), getEvents()]);
 
         if (!isMounted) return;
 
@@ -66,6 +69,25 @@ export function DashboardPage() {
         });
 
         setRecentApplications(sortedVolunteers.slice(0, 3));
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const activeEvents = events
+          .filter((event) => {
+            const publishDate = new Date(event.publishDate);
+            const terminationDate = new Date(event.terminationDate);
+
+            return !Number.isNaN(publishDate.getTime()) &&
+              !Number.isNaN(terminationDate.getTime()) &&
+              publishDate <= today &&
+              terminationDate >= today;
+          })
+          .sort((firstEvent, secondEvent) =>
+            new Date(secondEvent.publishDate).getTime() - new Date(firstEvent.publishDate).getTime()
+          );
+
+        setUpcomingEvents(activeEvents.slice(0, 3));
       } catch (err) {
         if (!isMounted) return;
         setError(err instanceof Error ? err.message : 'Unable to load dashboard data.');
@@ -163,9 +185,22 @@ export function DashboardPage() {
             Upcoming Events
           </h3>
           <div className="flex-1 flex flex-col justify-center">
-            <p className="text-sm text-gray-500 mb-4">
-              No upcoming events available right now.
-            </p>
+            {upcomingEvents.length > 0 ? (
+              <ul className="space-y-3 mb-4">
+                {upcomingEvents.map((event) => (
+                  <li key={event.id} className="rounded-lg border border-gray-200 px-3 py-2">
+                    <p className="text-sm font-medium text-gray-900">{event.title}</p>
+                    <p className="text-xs text-gray-500">
+                      Ends {new Date(event.terminationDate).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500 mb-4">
+                No upcoming events available right now.
+              </p>
+            )}
             <Link
               to="/events"
               className="text-sm font-medium text-purple-600 hover:text-purple-700 inline-flex items-center gap-1 w-fit">

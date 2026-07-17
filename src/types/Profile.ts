@@ -1,8 +1,11 @@
 export interface Profile {
-  id: string;
+  id: number;
   username: string;
   email: string;
   fullName: string;
-  avatar?: string;
-  role: 'admin' | 'moderator' | 'volunteer';
+  role: 'Admin' | 'Teacher' | 'Student' | 'User';
+  gender: string | null;
+  status: 'active' | 'suspended';
+  createdAt: string;
+  image: string | null;
 }

@@ -24,6 +24,21 @@ function toArray(value: unknown): Record<string, unknown>[] {
   return [];
 }
 
+function unwrapEventPayload(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const nested = record.event ?? record.data ?? record.result ?? record.item ?? record.record;
+
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    return nested as Record<string, unknown>;
+  }
+
+  return record;
+}
+
 function resolveAssetUrl(value: string): string {
   if (!value) return '';
 
@@ -70,6 +85,8 @@ function normalizeEvent(rawItem: Record<string, unknown>): Event {
         ? rawItem.publishDate
         : typeof rawItem.publish_date === 'string'
           ? rawItem.publish_date
+          : typeof rawItem.date === 'string'
+            ? rawItem.date
           : '',
     terminationDate:
       typeof rawItem.terminationDate === 'string'
@@ -110,13 +127,9 @@ export async function getEvents(): Promise<Event[]> {
 export async function createEvent(payload: Omit<Event, 'id'> & { imageFile?: File | null }): Promise<Event> {
   const form = new FormData();
   form.append('title', payload.title);
-  form.append('shortDesc', payload.shortDesc);
   form.append('short_description', payload.shortDesc);
-  form.append('fullDesc', payload.fullDesc);
-  form.append('full_description', payload.fullDesc);
-  form.append('publishDate', payload.publishDate);
-  form.append('publish_date', payload.publishDate);
-  form.append('terminationDate', payload.terminationDate);
+  form.append('description', payload.fullDesc);
+  form.append('date', payload.publishDate);
   form.append('termination_date', payload.terminationDate);
 
   if (payload.imageFile) {
@@ -129,21 +142,16 @@ export async function createEvent(payload: Omit<Event, 'id'> & { imageFile?: Fil
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeEvent(first ?? {});
+  return normalizeEvent(unwrapEventPayload(data) ?? {});
 }
 
 export async function updateEvent(id: string, payload: Partial<Event> & { imageFile?: File | null }): Promise<Event> {
   const form = new FormData();
-  if (payload.title) form.append('title', payload.title);
-  if (payload.shortDesc) form.append('shortDesc', payload.shortDesc);
-  if (payload.shortDesc) form.append('short_description', payload.shortDesc);
-  if (payload.fullDesc) form.append('fullDesc', payload.fullDesc);
-  if (payload.fullDesc) form.append('full_description', payload.fullDesc);
-  if (payload.publishDate) form.append('publishDate', payload.publishDate);
-  if (payload.publishDate) form.append('publish_date', payload.publishDate);
-  if (payload.terminationDate) form.append('terminationDate', payload.terminationDate);
-  if (payload.terminationDate) form.append('termination_date', payload.terminationDate);
+  if (payload.title !== undefined) form.append('title', payload.title);
+  if (payload.shortDesc !== undefined) form.append('short_description', payload.shortDesc);
+  if (payload.fullDesc !== undefined) form.append('description', payload.fullDesc);
+  if (payload.publishDate !== undefined) form.append('date', payload.publishDate);
+  if (payload.terminationDate !== undefined) form.append('termination_date', payload.terminationDate);
 
   if (payload.imageFile) {
     form.append('image', payload.imageFile);
@@ -155,8 +163,7 @@ export async function updateEvent(id: string, payload: Partial<Event> & { imageF
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeEvent(first ?? {});
+  return normalizeEvent(unwrapEventPayload(data) ?? {});
 }
 
 export async function deleteEvent(id: string): Promise<void> {

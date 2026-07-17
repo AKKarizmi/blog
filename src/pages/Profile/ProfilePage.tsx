@@ -12,7 +12,7 @@ export function ProfilePage() {
     fullName: currentUser?.fullName ?? '',
     username: currentUser?.username ?? '',
     email: currentUser?.email ?? '',
-    avatar: currentUser?.avatar || ''
+    image: currentUser?.image || ''
   });
   const [savedProfile, setSavedProfile] = useState(profile);
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
@@ -38,7 +38,7 @@ export function ProfilePage() {
         fullName: profile.fullName,
         username: profile.username,
         email: profile.email,
-        avatar: profile.avatar || undefined
+        image: profile.image || null
       });
       addToast('Profile updated', 'success');
     } catch (err) {
@@ -96,17 +96,17 @@ export function ProfilePage() {
         <div className="space-y-4">
           <FileImageUpload
             label="Profile Photo"
-            value={profile.avatar}
+            value={profile.image}
             onChange={(file) => {
               if (!file)
               setProfile({
                 ...profile,
-                avatar: ''
+                image: ''
               });else
 
               setProfile({
                 ...profile,
-                avatar: URL.createObjectURL(file)
+                image: URL.createObjectURL(file)
               });
             }} />
           

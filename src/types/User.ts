@@ -3,8 +3,8 @@ export interface User {
   username: string;
   email: string;
   fullName: string;
-  role: 'admin' | 'moderator' | 'volunteer';
+  role: 'admin' | 'teacher' | 'student' | 'user';
   status: 'active' | 'suspended';
   createdAt: string;
-  avatar?: string;
+  image?: string;
 }

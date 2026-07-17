@@ -25,7 +25,7 @@ export function ConversationThread({ conversation, onBack }: Props) {
     if (!text) return;
     sendMessage({
       conversationId: conversation.id,
-      senderId: currentUser?.id ?? 'usr_admin_1',
+      senderId: currentUser?.id ? String(currentUser.id) : 'usr_admin_1',
       senderName: currentUser?.fullName ?? 'Admin User',
       body: text
     }).then((m) => {
@@ -96,7 +96,7 @@ export function ConversationThread({ conversation, onBack }: Props) {
             </div>
             <div className="space-y-2">
               {group.messages.map((m) => {
-              const isMe = m.senderId === currentUser?.id;
+              const isMe = currentUser?.id ? m.senderId === String(currentUser.id) : false;
               return (
                 <div
                   key={m.id}

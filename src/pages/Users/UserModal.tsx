@@ -7,7 +7,7 @@ import type { User } from '../../types/User';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: Omit<User, 'id' | 'createdAt'>) => void;
+  onSave: (data: Omit<User, 'id' | 'createdAt'> & { imageFile?: File | null }) => void;
   initial?: User | null;
 }
 interface FormState {
@@ -16,7 +16,8 @@ interface FormState {
   fullName: string;
   role: User['role'];
   status: User['status'];
-  avatar?: string;
+  image?: string;
+  imageFile?: File | null;
   password: string;
   confirmPassword: string;
 }
@@ -24,9 +25,10 @@ const EMPTY: FormState = {
   username: '',
   email: '',
   fullName: '',
-  role: 'volunteer',
+  role: 'user',
   status: 'active',
-  avatar: '',
+  image: '',
+  imageFile: null,
   password: '',
   confirmPassword: ''
 };
@@ -44,7 +46,8 @@ export function UserModal({ isOpen, onClose, onSave, initial }: Props) {
           fullName: initial.fullName,
           role: initial.role,
           status: initial.status,
-          avatar: initial.avatar || '',
+          image: initial.image || '',
+          imageFile: null,
           password: '',
           confirmPassword: ''
         } :
@@ -81,7 +84,8 @@ export function UserModal({ isOpen, onClose, onSave, initial }: Props) {
       fullName: form.fullName,
       role: form.role,
       status: form.status,
-      avatar: form.avatar || undefined
+      image: form.image || undefined,
+      imageFile: form.imageFile ?? null
     });
   };
   return (
@@ -94,17 +98,19 @@ export function UserModal({ isOpen, onClose, onSave, initial }: Props) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <FileImageUpload
           label="Avatar (optional)"
-          value={form.avatar}
+          value={form.image}
           onChange={(file) => {
             if (!file)
             setForm({
               ...form,
-              avatar: ''
+              image: '',
+              imageFile: null
             });else
 
             setForm({
               ...form,
-              avatar: URL.createObjectURL(file)
+              image: URL.createObjectURL(file),
+              imageFile: file
             });
           }} />
         
@@ -183,9 +189,10 @@ export function UserModal({ isOpen, onClose, onSave, initial }: Props) {
               }
               className="block w-full rounded-lg border-gray-300 border bg-white py-2 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
               
-              <option value="volunteer">Volunteer</option>
-              <option value="moderator">Moderator</option>
               <option value="admin">Admin</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+              <option value="user">User</option>
             </select>
           </div>
           <div>

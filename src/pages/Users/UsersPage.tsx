@@ -59,11 +59,17 @@ export function UsersPage() {
     if (statusFilter !== 'all' && u.status !== statusFilter) return false;
     return true;
   });
-  const handleSave = async (data: Omit<User, 'id' | 'createdAt'>) => {
+  const mergeUserUpdate = (current: User, updated: User, imageFallback?: string): User => ({
+    ...current,
+    ...updated,
+    createdAt: updated.createdAt || current.createdAt,
+    image: updated.image || imageFallback || current.image
+  });
+  const handleSave = async (data: Omit<User, 'id' | 'createdAt'> & { imageFile?: File | null }) => {
     try {
       if (editing) {
         const updated = await updateUser(editing.id, data);
-        setUsers((prev) => prev.map((u) => (u.id === editing.id ? updated : u)));
+        setUsers((prev) => prev.map((u) => (u.id === editing.id ? mergeUserUpdate(u, updated, data.image) : u)));
         addToast('User updated', 'success');
       } else {
         const created = await createUser(data);
@@ -86,11 +92,11 @@ export function UsersPage() {
         addToast(`${user.username} deleted`, 'success');
       } else if (action === 'suspend') {
         const updated = await updateUser(user.id, { status: 'suspended' });
-        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? mergeUserUpdate(u, updated) : u)));
         addToast(`${user.username} suspended`, 'success');
       } else if (action === 'reactivate') {
         const updated = await updateUser(user.id, { status: 'active' });
-        setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? mergeUserUpdate(u, updated) : u)));
         addToast(`${user.username} reactivated`, 'success');
       }
       setConfirm(null);
@@ -114,13 +120,17 @@ export function UsersPage() {
         variant: 'danger',
         label: 'Admin'
       },
-      moderator: {
+      teacher: {
         variant: 'warning',
-        label: 'Moderator'
+        label: 'Teacher'
       },
-      volunteer: {
+      student: {
         variant: 'success',
-        label: 'Volunteer'
+        label: 'Student'
+      },
+      user: {
+        variant: 'neutral',
+        label: 'User'
       }
     };
 
@@ -137,10 +147,10 @@ export function UsersPage() {
     label: 'User',
     render: (u) =>
     <div className="flex items-center gap-3">
-          {u.avatar ?
+          {u.image ?
       <img
-        src={u.avatar}
-        alt=""
+        src={u.image}
+        alt={`${u.fullName || u.username}'s profile`}
         className="w-9 h-9 rounded-full object-cover border border-gray-200" /> :
 
 
@@ -254,14 +264,19 @@ export function UsersPage() {
             onClick={() => setRoleFilter('admin')} />
           
           <FilterChip
-            active={roleFilter === 'moderator'}
-            label="Moderator"
-            onClick={() => setRoleFilter('moderator')} />
+            active={roleFilter === 'teacher'}
+            label="Teacher"
+            onClick={() => setRoleFilter('teacher')} />
           
           <FilterChip
-            active={roleFilter === 'volunteer'}
-            label="Volunteer"
-            onClick={() => setRoleFilter('volunteer')} />
+            active={roleFilter === 'student'}
+            label="Student"
+            onClick={() => setRoleFilter('student')} />
+          
+          <FilterChip
+            active={roleFilter === 'user'}
+            label="User"
+            onClick={() => setRoleFilter('user')} />
           
         </div>
         <div className="flex flex-wrap gap-1 bg-white p-1 rounded-lg shadow-sm border border-gray-100">

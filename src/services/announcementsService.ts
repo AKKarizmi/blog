@@ -24,6 +24,21 @@ function toArray(value: unknown): Record<string, unknown>[] {
   return [];
 }
 
+function unwrapAnnouncementPayload(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const nested = record.announcement ?? record.data ?? record.result ?? record.item ?? record.record;
+
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    return nested as Record<string, unknown>;
+  }
+
+  return record;
+}
+
 function resolveAssetUrl(value: string): string {
   if (!value) return '';
 
@@ -108,12 +123,10 @@ export async function createAnnouncement(payload: Omit<Announcement, 'id'> & { i
   const form = new FormData();
   form.append('title', payload.title);
   form.append('description', payload.description);
-  form.append('date', payload.date);
-  form.append('expirationDate', payload.expirationDate);
+  form.append('publish_date', payload.date);
   form.append('expiration_date', payload.expirationDate);
-  form.append('postedBy', payload.postedBy);
   form.append('posted_by', payload.postedBy);
-  if (payload.link) form.append('link', payload.link);
+  form.append('link', payload.link ?? '');
 
   if (payload.imageFile) {
     form.append('image', payload.imageFile);
@@ -125,20 +138,17 @@ export async function createAnnouncement(payload: Omit<Announcement, 'id'> & { i
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeAnnouncement(first ?? {});
+  return normalizeAnnouncement(unwrapAnnouncementPayload(data) ?? {});
 }
 
 export async function updateAnnouncement(id: string, payload: Partial<Announcement> & { imageFile?: File | null }): Promise<Announcement> {
   const form = new FormData();
-  if (payload.title) form.append('title', payload.title);
-  if (payload.description) form.append('description', payload.description);
-  if (payload.date) form.append('date', payload.date);
-  if (payload.expirationDate) form.append('expirationDate', payload.expirationDate);
-  if (payload.expirationDate) form.append('expiration_date', payload.expirationDate);
-  if (payload.postedBy) form.append('postedBy', payload.postedBy);
-  if (payload.postedBy) form.append('posted_by', payload.postedBy);
-  if (payload.link) form.append('link', payload.link);
+  if (payload.title !== undefined) form.append('title', payload.title);
+  if (payload.description !== undefined) form.append('description', payload.description);
+  if (payload.date !== undefined) form.append('publish_date', payload.date);
+  if (payload.expirationDate !== undefined) form.append('expiration_date', payload.expirationDate);
+  if (payload.postedBy !== undefined) form.append('posted_by', payload.postedBy);
+  if (payload.link !== undefined) form.append('link', payload.link ?? '');
 
   if (payload.imageFile) {
     form.append('image', payload.imageFile);
@@ -150,8 +160,7 @@ export async function updateAnnouncement(id: string, payload: Partial<Announceme
     body: form
   });
 
-  const [first] = toArray(data);
-  return normalizeAnnouncement(first ?? {});
+  return normalizeAnnouncement(unwrapAnnouncementPayload(data) ?? {});
 }
 
 export async function deleteAnnouncement(id: string): Promise<void> {

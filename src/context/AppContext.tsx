@@ -19,20 +19,56 @@ interface LoginResponsePayload {
   success?: boolean;
   message?: string;
   notifications?: LoginNotificationPayload[];
-  user?: Partial<Profile> & { id?: string | number; username?: string; email?: string; role?: Profile['role']; fullName?: string; avatar?: string };
+  user?: Partial<Profile> & {
+    id?: string | number;
+    username?: string;
+    email?: string;
+    role?: unknown;
+    fullName?: string;
+    avatar?: string;
+    image?: string;
+    gender?: string | null;
+    status?: string;
+    createdAt?: string;
+  };
   tokens?: LoginTokenPayload;
+}
+
+function normalizeRole(value: unknown): Profile['role'] {
+  const role = typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+  if (role === 'admin') return 'Admin';
+  if (role === 'teacher') return 'Teacher';
+  if (role === 'student') return 'Student';
+
+  return 'User';
+}
+
+function resolveProfileImageUrl(value: string | undefined): string | undefined {
+  if (!value || /^https?:\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
+    return value;
+  }
+
+  try {
+    return new URL(value, API_BASE).toString();
+  } catch {
+    return value;
+  }
 }
 
 function normalizeUserProfile(user: LoginResponsePayload['user'] | null | undefined): Profile | null {
   if (!user) return null;
 
   return {
-    id: String(user.id ?? ''),
+    id: Number(user.id ?? 0),
     username: user.username ?? '',
     email: user.email ?? '',
     fullName: user.fullName ?? user.username ?? '',
-    avatar: user.avatar,
-    role: (user.role ?? 'volunteer') as Profile['role']
+    role: normalizeRole(user.role),
+    gender: user.gender ?? null,
+    status: user.status === 'suspended' ? 'suspended' : 'active',
+    createdAt: user.createdAt ?? '',
+    image: resolveProfileImageUrl(user.image ?? user.avatar) ?? null
   };
 }
 
@@ -76,7 +112,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (res.ok) {
           try {
             const user = txt ? JSON.parse(txt) : null;
-            setCurrentUser(user as Profile);
+            setCurrentUser(normalizeUserProfile(user));
           } catch (err) {
             console.error('[auth] parse current user error', err);
             setCurrentUser(null);

@@ -173,9 +173,9 @@ export function AdminLayout() {
         <div className="p-4 border-t border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-                  {currentUser.avatar ?
+                  {currentUser.image ?
               <img
-                src={currentUser.avatar}
+                src={currentUser.image}
                 alt=""
                 className="w-9 h-9 rounded-full object-cover border border-gray-200 flex-shrink-0" /> :
 
