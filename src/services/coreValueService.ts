@@ -57,6 +57,9 @@ export async function updateCoreValues(values: CoreValue[]): Promise<CoreValue[]
 
   return requestJson<CoreValue[]>('/update_core_values/', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify(values)
   });
 }
