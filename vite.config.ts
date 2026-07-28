@@ -4,6 +4,20 @@ import react from '@vitejs/plugin-react'
 const apiProxy = {
   target: 'http://localhost:8000',
   changeOrigin: true,
+  configure: (proxy: { on: (event: string, listener: (proxyRequest: { getHeader: (name: string) => string | string[] | undefined; setHeader: (name: string, value: string) => void }) => void) => void }) => {
+    proxy.on('proxyReq', (proxyRequest) => {
+      const csrfHeader = proxyRequest.getHeader('x-csrftoken');
+      const cookie = proxyRequest.getHeader('cookie');
+
+      if (typeof csrfHeader === 'string') {
+        proxyRequest.setHeader('X-CSRFToken', csrfHeader);
+        const existingCookies = typeof cookie === 'string'
+          ? cookie.split(';').filter((item) => !item.trim().toLowerCase().startsWith('csrftoken=')).join(';')
+          : '';
+        proxyRequest.setHeader('Cookie', `${existingCookies}${existingCookies ? '; ' : ''}csrftoken=${csrfHeader}`);
+      }
+    });
+  },
   // Browser refreshes request HTML and must be handled by Vite's SPA fallback.
   // Only non-HTML requests (the actual API calls) should reach Django.
   bypass: (request: { headers: { accept?: string }; url?: string }) => {
@@ -53,6 +67,12 @@ export default defineConfig({
         ...apiProxy,
       },
       '/blog': {
+        ...apiProxy,
+      },
+      '/blog_page_data': {
+        ...apiProxy,
+      },
+      '/update_blog_page_data': {
         ...apiProxy,
       },
       '/applications': {

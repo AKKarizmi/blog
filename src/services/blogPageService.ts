@@ -109,16 +109,7 @@ export async function getBlogPageData(): Promise<BlogPage> {
     });
   }
 
-  let data: unknown;
-  try {
-    data = await requestJson<unknown>('/blog_page_data/');
-  } catch (err) {
-    try {
-      data = await requestJson<unknown>('/get_blogpage_content/');
-    } catch {
-      data = await requestJson<unknown>('/d1/get_blogpage_content/');
-    }
-  }
+  const data = await requestJson<unknown>('/blog_page_data/');
 
   const list = toArray(data);
   const record = list[0] ?? {};
@@ -202,18 +193,10 @@ export async function updateBlogPageData(
   }
 
   // Call the update endpoint
-  let data: unknown;
-  try {
-    data = await requestJson<unknown>('/update_blog_page_data/', {
-      method: 'POST',
-      body: form
-    });
-  } catch (err) {
-    data = await requestJson<unknown>('/d1/update_blog_page_data/', {
-      method: 'POST',
-      body: form
-    });
-  }
+  const data = await requestJson<unknown>('/update_blog_page_data/', {
+    method: 'POST',
+    body: form
+  });
 
   const record = (data && typeof data === 'object') ? data as Record<string, unknown> : {};
   return normalizeBlogPage(record);

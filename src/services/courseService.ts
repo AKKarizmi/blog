@@ -58,7 +58,7 @@ export async function getCourses(): Promise<Course[]> {
     });
   }
 
-  const data = await requestJson<CoursesResponse>('/v1/courses/');
+  const data = await requestJson<CoursesResponse>('/d1/courses/');
   return data.courses || [];
 }
 
@@ -119,7 +119,7 @@ export async function createCourse(payload: CreateCoursePayload & { thumbnailFil
     form.append('thumbnail', payload.thumbnailFile);
   }
 
-  return requestJson<Course>('/v1/create_course/', {
+  return requestJson<Course>('/d1/create_course/', {
     method: 'POST',
     body: form
   });
@@ -154,7 +154,7 @@ export async function updateCourse(id: number, payload: Partial<CreateCoursePayl
     form.append('thumbnail', payload.thumbnailFile);
   }
 
-  return requestJson<Course>(`/v1/courses/update_course/${id}/`, {
+  return requestJson<Course>(`/d1/courses/update_course/${id}/`, {
     method: 'POST',
     body: form
   });
@@ -171,21 +171,26 @@ export async function deleteCourse(id: number): Promise<void> {
   }
 
   // TODO: Confirm DELETE vs POST method against actual backend
-  await requestJson<void>(`/v1/courses/delete_course/${id}/`, {
+  await requestJson<void>(`/d1/courses/delete_course/${id}/`, {
     method: 'POST'
   });
 }
 
 // Categories - TODO: endpoints not yet defined
 export async function getCourseCategories(): Promise<CourseCategory[]> {
-  // TODO: endpoint not yet defined - using mock data fallback
-  return new Promise((resolve) => {
-    setTimeout(() => resolve([...currentMockCategories]), 500);
-  });
+  if (USE_MOCK) return [...currentMockCategories];
+  const data = await requestJson<unknown>('/d1/courses/categories/');
+  return Array.isArray(data) ? data as CourseCategory[] : [];
 }
 
 export async function createCourseCategory(category: Omit<CourseCategory, 'id'>): Promise<CourseCategory> {
-  // TODO: endpoint not yet defined - mock implementation only
+  if (!USE_MOCK) {
+    return requestJson<CourseCategory>('/d1/courses/create_category/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(category)
+    });
+  }
   return new Promise((resolve) => {
     setTimeout(() => {
       const newCategory: CourseCategory = { id: Date.now(), ...category };
@@ -196,7 +201,13 @@ export async function createCourseCategory(category: Omit<CourseCategory, 'id'>)
 }
 
 export async function updateCourseCategory(id: number, category: Partial<CourseCategory>): Promise<CourseCategory> {
-  // TODO: endpoint not yet defined - mock implementation only
+  if (!USE_MOCK) {
+    return requestJson<CourseCategory>(`/d1/courses/update_category/${id}/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(category)
+    });
+  }
   return new Promise((resolve) => {
     setTimeout(() => {
       const index = currentMockCategories.findIndex((c) => c.id === id);
@@ -211,7 +222,10 @@ export async function updateCourseCategory(id: number, category: Partial<CourseC
 }
 
 export async function deleteCourseCategory(id: number): Promise<void> {
-  // TODO: endpoint not yet defined - mock implementation only
+  if (!USE_MOCK) {
+    await requestJson<void>(`/d1/courses/delete_category/${id}/`, { method: 'DELETE' });
+    return;
+  }
   return new Promise((resolve) => {
     setTimeout(() => {
       currentMockCategories = currentMockCategories.filter((c) => c.id !== id);
