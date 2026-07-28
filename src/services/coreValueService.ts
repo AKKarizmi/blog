@@ -1,5 +1,5 @@
 import { USE_MOCK, API_BASE } from '../config';
-import { getAuthHeaders } from '../utils/csrf';
+import { ensureCsrfCookie, getAuthHeaders, getCSRFToken } from '../utils/csrf';
 import type { CoreValue } from '../types/CoreValue';
 import { readJsonResponse } from '../utils/api';
 
@@ -9,10 +9,14 @@ let currentMockData: CoreValue[] = [
 ];
 
 async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
+  ensureCsrfCookie();
+  const csrfToken = getCSRFToken();
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
       ...getAuthHeaders(true),
+      ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {}),
+      Accept: 'application/json',
       ...(options?.headers ?? {})
     },
     ...options

@@ -73,6 +73,12 @@ export default defineConfig({
       '/core-values': {
         ...apiProxy,
       },
+      '/core_values': {
+        ...apiProxy,
+      },
+      '/update_core_values': {
+        ...apiProxy,
+      },
       // Catch-all for Django static/media files if needed
       '/static': {
         ...apiProxy,

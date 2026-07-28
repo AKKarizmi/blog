@@ -64,6 +64,7 @@ export function getAuthHeaders(includeCsrf = false): { [k: string]: string } {
   }
   
   if (includeCsrf) {
+    ensureCsrfCookie();
     const csrfToken = getCSRFToken();
     if (csrfToken) {
       headers['X-CSRFToken'] = csrfToken;
