@@ -1,12 +1,13 @@
 import { USE_MOCK, API_BASE } from '../config';
 import { mockConversations, mockMessages } from '../data/messages.mock';
 import type { Conversation, Message } from '../types/Message';
+import { readJsonResponse } from '../utils/api';
 
 export async function getConversations(): Promise<Conversation[]> {
   if (USE_MOCK) return mockConversations;
   const res = await fetch(`${API_BASE}/conversations`);
   if (!res.ok) throw new Error('Failed to fetch conversations');
-  return res.json();
+  return readJsonResponse<Conversation[]>(res);
 }
 
 export async function getMessages(conversationId: string): Promise<Message[]> {
@@ -16,7 +17,7 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
     `${API_BASE}/conversations/${conversationId}/messages`
   );
   if (!res.ok) throw new Error('Failed to fetch messages');
-  return res.json();
+  return readJsonResponse<Message[]>(res);
 }
 
 export async function sendMessage(
@@ -34,5 +35,5 @@ payload: Omit<Message, 'id' | 'timestamp'>)
     body: JSON.stringify(payload)
   });
   if (!res.ok) throw new Error('Failed to send message');
-  return res.json();
+  return readJsonResponse<Message>(res);
 }

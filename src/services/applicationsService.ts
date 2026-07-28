@@ -1,5 +1,6 @@
 import { API_BASE } from '../config';
 import { getAuthHeaders } from '../utils/csrf';
+import { readJsonResponse } from '../utils/api';
 
 export interface VolunteerApplication {
   id: string;
@@ -267,7 +268,7 @@ async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(errorText || `Request failed with status ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  return readJsonResponse<T>(response);
 }
 
 export async function getVolunteers(): Promise<VolunteerApplication[]> {

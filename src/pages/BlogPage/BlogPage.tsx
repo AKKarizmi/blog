@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as LucideIcons from 'lucide-react';
 import {
   Sparkles,
   Layout,
@@ -41,6 +42,7 @@ import {
 import type { Course, CourseCategory } from '../../types/Course';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { Badge } from '../../components/ui/Badge';
+import { Modal } from '../../components/ui/Modal';
 
 type FormTab = 'branding' | 'hero' | 'about' | 'mission' | 'cta' | 'contact' | 'footer' | 'core_values' | 'programs';
 type ProgramsSubTab = 'courses' | 'categories';
@@ -63,6 +65,32 @@ const PLATFORM_OPTIONS = [
   'github',
   'pinterest',
   'snapchat'
+] as const;
+
+const CORE_VALUE_ICON_OPTIONS = [
+  'Heart',
+  'Shield',
+  'Users',
+  'Handshake',
+  'Lightbulb',
+  'Leaf',
+  'Star',
+  'Award',
+  'Globe2',
+  'BookOpen',
+  'GraduationCap',
+  'Scale',
+  'Sparkles',
+  'Target',
+  'Compass',
+  'CircleCheck'
+] as const;
+
+const CORE_VALUE_COLOR_OPTIONS = [
+  '#1E40AF', '#2563EB', '#0891B2', '#0F766E',
+  '#059669', '#65A30D', '#CA8A04', '#EA580C',
+  '#DC2626', '#DB2777', '#9333EA', '#7C3AED',
+  '#475569', '#0F172A', '#78350F', '#BE123C'
 ] as const;
 
 export function BlogPage() {
@@ -736,7 +764,11 @@ export function BlogPage() {
                       <p className="text-xs text-gray-500">Manage your organization's core values displayed on the homepage.</p>
                     </div>
                     {!showCoreValueForm && (
-                      <Button onClick={() => { setEditingCoreValue(null); setShowCoreValueForm(true); }} size="sm">
+                      <Button
+                        type="button"
+                        onClick={() => { setEditingCoreValue(null); setShowCoreValueForm(true); }}
+                        size="sm"
+                      >
                         <Plus className="w-4 h-4 mr-2" />
                         Add Value
                       </Button>
@@ -851,23 +883,39 @@ export function BlogPage() {
                   </div>
 
                   {programsSubTab === 'courses' && (
-                    <CoursesList
-                      courses={courses}
-                      loading={coursesLoading}
-                      onEdit={(c) => { setEditingCourse(c); setShowCourseForm(true); }}
-                      onDelete={(c) => setToDeleteCourse(c)}
-                      onAdd={() => { setEditingCourse(null); setShowCourseForm(true); }}
-                    />
+                    showCourseForm ? (
+                      <CourseForm
+                        initial={editingCourse}
+                        onSave={handleSaveCourse}
+                        onCancel={() => { setShowCourseForm(false); setEditingCourse(null); }}
+                      />
+                    ) : (
+                      <CoursesList
+                        courses={courses}
+                        loading={coursesLoading}
+                        onEdit={(c) => { setEditingCourse(c); setShowCourseForm(true); }}
+                        onDelete={(c) => setToDeleteCourse(c)}
+                        onAdd={() => { setEditingCourse(null); setShowCourseForm(true); }}
+                      />
+                    )
                   )}
 
                   {programsSubTab === 'categories' && (
-                    <CategoriesList
-                      categories={categories}
-                      loading={categoriesLoading}
-                      onEdit={(c) => { setEditingCategory(c); setShowCategoryForm(true); }}
-                      onDelete={(c) => setToDeleteCategory(c)}
-                      onAdd={() => { setEditingCategory(null); setShowCategoryForm(true); }}
-                    />
+                    showCategoryForm ? (
+                      <CategoryForm
+                        initial={editingCategory}
+                        onSave={handleSaveCategory}
+                        onCancel={() => { setShowCategoryForm(false); setEditingCategory(null); }}
+                      />
+                    ) : (
+                      <CategoriesList
+                        categories={categories}
+                        loading={categoriesLoading}
+                        onEdit={(c) => { setEditingCategory(c); setShowCategoryForm(true); }}
+                        onDelete={(c) => setToDeleteCategory(c)}
+                        onAdd={() => { setEditingCategory(null); setShowCategoryForm(true); }}
+                      />
+                    )
                   )}
                 </div>
               )}
@@ -981,6 +1029,609 @@ export function BlogPage() {
             </form>
           </Card>
         </main>
+      </div>
+
+      <ConfirmDialog
+        isOpen={toDeleteCourse !== null}
+        onClose={() => setToDeleteCourse(null)}
+        onConfirm={handleDeleteCourse}
+        title="Delete Course"
+        message={toDeleteCourse ? `Are you sure you want to delete the course "${toDeleteCourse.name}"?` : ''}
+      />
+
+      <ConfirmDialog
+        isOpen={toDeleteCategory !== null}
+        onClose={() => setToDeleteCategory(null)}
+        onConfirm={handleDeleteCategory}
+        title="Delete Category"
+        message={toDeleteCategory ? `Are you sure you want to delete the category "${toDeleteCategory.title}"?` : ''}
+      />
+    </div>
+  );
+}
+
+// Subcomponents helper functions
+
+interface IconPreviewProps {
+  name: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+function IconPreview({ name, className, style }: IconPreviewProps) {
+  const IconComponent = (LucideIcons as any)[name] || (LucideIcons as any)[name.charAt(0).toUpperCase() + name.slice(1)];
+  if (!IconComponent) {
+    return <Sparkles className={className} style={style} />;
+  }
+  return <IconComponent className={className} style={style} />;
+}
+
+interface CoreValueFormProps {
+  initial: CoreValue | null;
+  onSave: (data: CoreValue) => void;
+  onCancel: () => void;
+}
+
+function CoreValueForm({ initial, onSave, onCancel }: CoreValueFormProps) {
+  const [title, setTitle] = useState(initial?.title || '');
+  const [description, setDescription] = useState(initial?.description || '');
+  const [icon, setIcon] = useState(initial?.icon || 'Heart');
+  const [color, setColor] = useState(initial?.color || '#1E40AF');
+  const [order, setOrder] = useState(initial?.order || 0);
+  const [error, setError] = useState('');
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+    onSave({
+      id: initial?.id,
+      title,
+      description,
+      icon,
+      color,
+      order: Number(order)
+    });
+  };
+
+  return (
+    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+      <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+        <h4 className="font-semibold text-slate-800">
+          {initial ? 'Edit Core Value' : 'Add Core Value'}
+        </h4>
+        <button type="button" onClick={onCancel} className="text-slate-400 hover:text-slate-600">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Title *</label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Integrity" />
+          {error && <p className="text-xs text-rose-500 mt-1">{error}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Description</label>
+          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Explain the value..." rows={3} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Icon</label>
+            <button
+              type="button"
+              onClick={() => setIsIconPickerOpen(true)}
+              className="flex w-full items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm hover:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded bg-slate-100">
+                <IconPreview name={icon} className="h-4 w-4 text-slate-700" />
+              </span>
+              <span>{icon}</span>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Color</label>
+            <button
+              type="button"
+              onClick={() => setIsColorPickerOpen(true)}
+              className="flex w-full items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm hover:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <span
+                className="h-7 w-7 rounded border border-slate-200"
+                style={{ backgroundColor: color }}
+              />
+              <span>{color}</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Order</label>
+          <Input type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} placeholder="0" />
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 pt-2">
+        <Button type="button" variant="outline" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="button" size="sm" onClick={handleSubmit}>
+          Save
+        </Button>
+      </div>
+
+      <Modal isOpen={isIconPickerOpen} onClose={() => setIsIconPickerOpen(false)} title="Choose an icon" size="md">
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+          {CORE_VALUE_ICON_OPTIONS.map((iconName) => (
+            <button
+              key={iconName}
+              type="button"
+              onClick={() => {
+                setIcon(iconName);
+                setIsIconPickerOpen(false);
+              }}
+              className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-xs transition-colors ${
+                icon === iconName
+                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                  : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
+              }`}
+            >
+              <IconPreview name={iconName} className="h-5 w-5" />
+              <span className="truncate w-full text-center">{iconName}</span>
+            </button>
+          ))}
+        </div>
+      </Modal>
+
+      <Modal isOpen={isColorPickerOpen} onClose={() => setIsColorPickerOpen(false)} title="Choose a color" size="sm">
+        <div className="space-y-5">
+          <div className="grid grid-cols-4 gap-3">
+            {CORE_VALUE_COLOR_OPTIONS.map((colorOption) => (
+              <button
+                key={colorOption}
+                type="button"
+                aria-label={`Use ${colorOption}`}
+                onClick={() => {
+                  setColor(colorOption);
+                  setIsColorPickerOpen(false);
+                }}
+                className={`h-10 rounded-lg border-2 ${
+                  color === colorOption ? 'border-slate-900 ring-2 ring-slate-300' : 'border-transparent'
+                }`}
+                style={{ backgroundColor: colorOption }}
+              />
+            ))}
+          </div>
+          <label className="flex items-center justify-between gap-3 text-sm font-medium text-slate-700">
+            Custom color
+            <input
+              type="color"
+              value={color}
+              onChange={(event) => setColor(event.target.value)}
+              className="h-10 w-14 cursor-pointer rounded border border-slate-300 bg-white p-1"
+            />
+          </label>
+          <div className="flex justify-end">
+            <Button type="button" size="sm" onClick={() => setIsColorPickerOpen(false)}>
+              Done
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+interface CoursesListProps {
+  courses: Course[];
+  loading: boolean;
+  onEdit: (course: Course) => void;
+  onDelete: (course: Course) => void;
+  onAdd: () => void;
+}
+
+function CoursesList({ courses, loading, onEdit, onDelete, onAdd }: CoursesListProps) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="h-20 bg-gray-50 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={onAdd} size="sm">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Course
+        </Button>
+      </div>
+
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4">
+          {courses.map((course) => (
+            <div key={course.id} className="flex gap-4 p-4 bg-white rounded-lg border border-gray-100 shadow-sm items-start">
+              {course.thumbnail ? (
+                <img
+                  src={course.thumbnail}
+                  alt={course.name}
+                  className="w-24 h-16 rounded object-cover border border-gray-100 flex-shrink-0"
+                />
+              ) : (
+                <div className="w-24 h-16 rounded bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-400">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold text-slate-900 truncate">{course.name}</h4>
+                  <Badge variant={course.published ? 'success' : 'neutral'}>
+                    {course.published ? 'Published' : 'Draft'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{course.description}</p>
+                <div className="flex gap-3 text-xs text-slate-400 mt-2">
+                  <span>Subject: {course.subject}</span>
+                  <span>Code: {course.code}</span>
+                  <span>Level: {course.level}</span>
+                  <span>Delivery: {course.delivery}</span>
+                </div>
+              </div>
+              <div className="flex gap-1 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onEdit(course)}
+                  className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-md"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(course)}
+                  className="p-2 text-rose-600 hover:bg-rose-50 rounded-md"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="border border-dashed border-gray-200 rounded-lg p-8 text-center bg-gray-50/50">
+          <BookOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">No courses configured yet.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface CourseFormProps {
+  initial: Course | null;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+}
+
+function CourseForm({ initial, onSave, onCancel }: CourseFormProps) {
+  const [name, setName] = useState(initial?.name || '');
+  const [description, setDescription] = useState(initial?.description || '');
+  const [subject, setSubject] = useState(initial?.subject || '');
+  const [code, setCode] = useState(initial?.code || '');
+  const [courseCode, setCourseCode] = useState(initial?.courseCode || '');
+  const [level, setLevel] = useState(initial?.level || '1');
+  const [section, setSection] = useState(initial?.section || '');
+  const [published, setPublished] = useState(initial?.published ?? true);
+  const [delivery, setDelivery] = useState(initial?.delivery || 'self_paced');
+  const [modules, setModules] = useState<string[]>(initial?.modules || []);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnail || '');
+  const [newModuleText, setNewModuleText] = useState('');
+  const [error, setError] = useState('');
+
+  const handleAddModule = () => {
+    if (newModuleText.trim()) {
+      setModules([...modules, newModuleText.trim()]);
+      setNewModuleText('');
+    }
+  };
+
+  const handleRemoveModule = (index: number) => {
+    setModules(modules.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError('Course name is required');
+      return;
+    }
+    onSave({
+      name,
+      description,
+      subject,
+      code,
+      courseCode: courseCode || code,
+      level,
+      section,
+      published,
+      delivery,
+      modules,
+      thumbnailFile
+    });
+  };
+
+  return (
+    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+      <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+        <h4 className="font-semibold text-slate-800">
+          {initial ? 'Edit Course' : 'Create Course'}
+        </h4>
+        <button type="button" onClick={onCancel} className="text-slate-400 hover:text-slate-600">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Course Name *</label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Introduction to Programming" />
+          {error && <p className="text-xs text-rose-500 mt-1">{error}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Description</label>
+          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Course description..." rows={3} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Subject</label>
+            <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Computer Science" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Code</label>
+              <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. CS101" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Course Code</label>
+              <Input value={courseCode} onChange={(e) => setCourseCode(e.target.value)} placeholder="e.g. CS101-A" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Level</label>
+            <Input value={level} onChange={(e) => setLevel(e.target.value)} placeholder="e.g. 1" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Section</label>
+            <Input value={section} onChange={(e) => setSection(e.target.value)} placeholder="e.g. A" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Delivery</label>
+            <select
+              value={delivery}
+              onChange={(e) => setDelivery(e.target.value)}
+              className="block w-full rounded-lg border-gray-300 border bg-white py-2 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="self_paced">Self-paced</option>
+              <option value="instructor_led">Instructor Led</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="published"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          />
+          <label htmlFor="published" className="text-xs font-medium text-slate-700">Published</label>
+        </div>
+
+        <div>
+          <FileImageUpload
+            label="Thumbnail Asset"
+            value={thumbnailUrl}
+            onChange={(file) => {
+              setThumbnailFile(file);
+              if (!file) setThumbnailUrl('');
+            }}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-slate-700">Course Modules</label>
+          <div className="flex gap-2">
+            <Input
+              value={newModuleText}
+              onChange={(e) => setNewModuleText(e.target.value)}
+              placeholder="e.g. Module 1: Basics"
+            />
+            <Button type="button" onClick={handleAddModule} size="sm" variant="outline">
+              Add
+            </Button>
+          </div>
+          {modules.length > 0 ? (
+            <ul className="divide-y divide-slate-100 border border-slate-200 bg-white rounded-lg max-h-40 overflow-y-auto">
+              {modules.map((mod, index) => (
+                <li key={index} className="flex justify-between items-center py-2 px-3 text-sm text-slate-700 font-medium">
+                  <span className="truncate">{mod}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveModule(index)}
+                    className="text-slate-400 hover:text-rose-600 p-1"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-slate-400 italic">No modules added yet.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <Button type="button" variant="outline" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="button" size="sm" onClick={handleSubmit}>
+          Save Course
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface CategoriesListProps {
+  categories: CourseCategory[];
+  loading: boolean;
+  onEdit: (cat: CourseCategory) => void;
+  onDelete: (cat: CourseCategory) => void;
+  onAdd: () => void;
+}
+
+function CategoriesList({ categories, loading, onEdit, onDelete, onAdd }: CategoriesListProps) {
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="h-20 bg-gray-50 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={onAdd} size="sm">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Category
+        </Button>
+      </div>
+
+      {categories.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3">
+          {categories.map((cat) => (
+            <div key={cat.id} className="flex gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm items-center">
+              <div className="w-10 h-10 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 font-bold uppercase">
+                {cat.icon_text?.substring(0, 2) || 'CA'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-slate-900">{cat.title}</h4>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-1">{cat.description}</p>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => onEdit(cat)}
+                  className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-md"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(cat)}
+                  className="p-2 text-rose-600 hover:bg-rose-50 rounded-md"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="border border-dashed border-gray-200 rounded-lg p-8 text-center bg-gray-50/50">
+          <BookOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">No categories configured yet.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface CategoryFormProps {
+  initial: CourseCategory | null;
+  onSave: (data: Omit<CourseCategory, 'id'>) => void;
+  onCancel: () => void;
+}
+
+function CategoryForm({ initial, onSave, onCancel }: CategoryFormProps) {
+  const [title, setTitle] = useState(initial?.title || '');
+  const [description, setDescription] = useState(initial?.description || '');
+  const [iconText, setIconText] = useState(initial?.icon_text || '');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+    onSave({
+      title,
+      description,
+      icon_text: iconText
+    });
+  };
+
+  return (
+    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+      <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+        <h4 className="font-semibold text-slate-800">
+          {initial ? 'Edit Category' : 'Add Category'}
+        </h4>
+        <button type="button" onClick={onCancel} className="text-slate-400 hover:text-slate-600">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Title *</label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Technology" />
+          {error && <p className="text-xs text-rose-500 mt-1">{error}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Description</label>
+          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Category description..." rows={3} />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Icon Label</label>
+          <Input value={iconText} onChange={(e) => setIconText(e.target.value)} placeholder="e.g. cpu" />
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 pt-2">
+        <Button type="button" variant="outline" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="button" size="sm" onClick={handleSubmit}>
+          Save Category
+        </Button>
       </div>
     </div>
   );

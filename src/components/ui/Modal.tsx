@@ -155,6 +155,7 @@ export function Modal({
                   {title}
                 </h2>
                 <button
+                type="button"
                 onClick={onClose}
                 data-modal-close="true"
                 aria-label="Close dialog"

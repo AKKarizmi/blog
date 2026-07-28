@@ -1,6 +1,7 @@
 import { USE_MOCK, API_BASE } from '../config';
 import { mockNotifications } from '../data/notifications.mock';
 import type { Notification } from '../types/Notification';
+import { readJsonResponse } from '../utils/api';
 
 export function normalizeNotifications(payload: unknown): Notification[] {
   if (Array.isArray(payload)) {
@@ -24,7 +25,7 @@ export async function getNotifications(): Promise<Notification[]> {
   if (USE_MOCK) return mockNotifications;
   const res = await fetch(`${API_BASE}/d1/get_notifications`);
   if (!res.ok) throw new Error('Failed to fetch notifications');
-  const data = await res.json();
+  const data = await readJsonResponse<unknown>(res);
   return normalizeNotifications(data);
 }
 

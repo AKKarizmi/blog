@@ -1,6 +1,7 @@
 import { API_BASE } from '../config';
 import { getAuthHeaders } from '../utils/csrf';
 import type { Collaboration } from '../types/Collaboration';
+import { readJsonResponse } from '../utils/api';
 
 function toArray(value: unknown): Record<string, unknown>[] {
   if (Array.isArray(value)) {
@@ -114,7 +115,7 @@ async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  return readJsonResponse<T>(response);
 }
 
 export async function getCollaborations(): Promise<Collaboration[]> {

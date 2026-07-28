@@ -16,6 +16,8 @@ import { useApp } from '../context/AppContext';
 import { API_BASE } from '../config';
 import { getVolunteers, type VolunteerApplication } from '../services/applicationsService';
 import { getEvents } from '../services/eventsService';
+import { readJsonResponse } from '../utils/api';
+import { getAuthHeaders } from '../utils/csrf';
 import type { Event } from '../types/Event';
 
 interface DashboardSummary {
@@ -46,12 +48,15 @@ export function DashboardPage() {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(DASHBOARD_ENDPOINT);
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
+        const response = await fetch(DASHBOARD_ENDPOINT, {
+          credentials: 'include',
+          headers: {
+            ...getAuthHeaders(false),
+            Accept: 'application/json'
+          }
+        });
 
-        const data = (await response.json()) as Partial<DashboardSummary>;
+        const data = await readJsonResponse<Partial<DashboardSummary>>(response);
         const [volunteers, events] = await Promise.all([getVolunteers(), getEvents()]);
 
         if (!isMounted) return;

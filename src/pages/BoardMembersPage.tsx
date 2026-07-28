@@ -126,11 +126,11 @@ export function BoardMembersPage() {
       setRoleInput('');
       setSocialFields(
         Object.entries(member.socials ?? {})
-          .filter(([, value]): value is [string, string] => typeof value === 'string' && value.trim().length > 0)
+          .filter((entry) => typeof entry[1] === 'string' && entry[1].trim().length > 0)
           .map(([platform, url], index) => ({
             id: `${platform}-${index}`,
             platform,
-            url
+            url: url as string
           }))
       );
     } else {
@@ -410,7 +410,7 @@ export function BoardMembersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2 flex-wrap">
                       {Object.entries(member.socials ?? {})
-                        .filter(([, value]): value is [string, string] => typeof value === 'string' && value.trim().length > 0)
+                        .filter((entry) => typeof entry[1] === 'string' && entry[1].trim().length > 0)
                         .map(([platform, url]) => {
                         const label = platform.toLowerCase();
                         const icon = label.includes('linkedin') ? (

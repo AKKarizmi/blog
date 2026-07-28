@@ -1,6 +1,7 @@
 import { API_BASE } from '../config';
 import type { User } from '../types/User';
 import { getAuthHeaders, getCSRFToken } from '../utils/csrf';
+import { readJsonResponse } from '../utils/api';
 
 function normalizeRole(value: unknown): User['role'] {
   const role = typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -121,7 +122,7 @@ export async function getUsers(): Promise<User[]> {
     headers: getAuthHeaders(false)
   });
   if (!res.ok) throw new Error('Failed to fetch users');
-  const data = await res.json();
+  const data = await readJsonResponse<unknown>(res);
   return toArray(data).map((item) => normalizeUser(item));
 }
 
@@ -146,7 +147,7 @@ export async function createUser(
     const txt = await res.text();
     throw new Error(`Failed to create user: ${txt}`);
   }
-  const data = await res.json();
+  const data = await readJsonResponse<unknown>(res);
   return normalizeUser(unwrapUserPayload(data) ?? {});
 }
 
@@ -163,7 +164,7 @@ export async function updateUser(
     const txt = await res.text();
     throw new Error(`Failed to update user: ${txt}`);
   }
-  const data = await res.json();
+  const data = await readJsonResponse<unknown>(res);
   return normalizeUser(unwrapUserPayload(data) ?? {});
 }
 

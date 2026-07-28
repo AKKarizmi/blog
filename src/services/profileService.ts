@@ -1,5 +1,6 @@
 import { USE_MOCK, API_BASE } from '../config';
 import type { Profile } from '../types/Profile';
+import { readJsonResponse } from '../utils/api';
 
 export async function updateProfile(
 payload: Partial<Profile>)
@@ -11,7 +12,7 @@ payload: Partial<Profile>)
     body: JSON.stringify(payload)
   });
   if (!res.ok) throw new Error('Failed to update profile');
-  return res.json();
+  return readJsonResponse<Profile>(res);
 }
 
 export async function changePassword(payload: {

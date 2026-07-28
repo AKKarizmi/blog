@@ -1,6 +1,7 @@
 import { USE_MOCK, API_BASE } from '../config';
 import { getAuthHeaders } from '../utils/csrf';
 import type { CoreValue } from '../types/CoreValue';
+import { readJsonResponse } from '../utils/api';
 
 let currentMockData: CoreValue[] = [
   { id: 1, title: 'Integrity', description: 'We act with honesty and transparency', icon: 'Shield', color: '#1E40AF', order: 0 },
@@ -26,7 +27,7 @@ async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  return readJsonResponse<T>(response);
 }
 
 export async function getCoreValues(): Promise<CoreValue[]> {

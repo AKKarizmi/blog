@@ -1,6 +1,7 @@
 import { USE_MOCK, API_BASE } from '../config';
 import { mockEmails } from '../data/emails.mock';
 import type { Email } from '../types/Email';
+import { readJsonResponse } from '../utils/api';
 
 const STORAGE_KEY = 'email-read-state';
 
@@ -111,7 +112,7 @@ export async function getEmails(): Promise<Email[]> {
   if (!res.ok) {
     throw new Error(await readErrorMessage(res));
   }
-  const data = await res.json();
+  const data = await readJsonResponse<unknown>(res);
   const emails = toArray(data);
   const merged = mergeReadState(emails);
   updateStoredReadState(merged);
@@ -163,5 +164,5 @@ payload: Omit<Email, 'id' | 'sentAt' | 'status' | 'folder'> & { files?: File[] }
   if (!res.ok) {
     throw new Error(await readErrorMessage(res));
   }
-  return res.json();
+  return readJsonResponse<Email>(res);
 }

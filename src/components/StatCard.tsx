@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Card } from './ui/Card';
-import { BoxIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: BoxIcon;
+  icon: LucideIcon;
   trend?: string;
   trendUp?: boolean;
   color: 'blue' | 'amber' | 'emerald' | 'purple';

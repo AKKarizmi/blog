@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState, createContext, useContext, ReactNode } from 'react';
+import { useCallback, useEffect, useState, createContext, useContext } from 'react';
 import { useToast, ToastType } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/Toast';
 import type { Profile } from '../types/Profile';
 import { API_BASE } from '../config';
-import { getAuthHeaders } from '../utils/csrf';
+import { readJsonResponse } from '../utils/api';
 
 interface LoginNotificationPayload {
   type?: ToastType;
@@ -86,7 +86,62 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { toasts, addToast, removeToast } = useToast();
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  /**
+   * Decode a JWT token payload (the middle base64url segment).
+   * Returns null if the token is malformed.
+   */
+  const decodeJwt = (token: string): Record<string, unknown> | null => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+      );
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  };
 
+  /**
+   * Fetch the current user's profile from /user/auth/user/.
+   * Falls back to data extracted from the JWT payload if the endpoint fails.
+   */
+  const fetchCurrentUser = useCallback(async (accessToken: string): Promise<Profile | null> => {
+    const payload = decodeJwt(accessToken);
+    console.log('[auth] JWT payload ->', payload);
+
+    try {
+      const res = await fetch(`${API_BASE}/user/auth/user/`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+
+      console.log('[auth] /user/auth/user/ response', res.status, res.headers.get('content-type'));
+
+      if (!res.ok) {
+        console.warn('[auth] /user/auth/user/ returned', res.status);
+        return null;
+      }
+
+      // Guard: only parse if the response is actually JSON.
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        console.warn('[auth] /user/auth/user/ returned non-JSON content-type:', contentType);
+        // Try reading as text for debug logging
+        const text = await res.text();
+        console.warn('[auth] response body (first 200 chars):', text.substring(0, 200));
+        return null;
+      }
+
+      const data = await readJsonResponse<unknown>(res);
+      return normalizeUserProfile(data as LoginResponsePayload['user']);
+    } catch (err) {
+      console.error('[auth] failed to fetch current user', err);
+      return null;
+    }
+  }, []);
+
+  // Restore session on mount if tokens exist in localStorage.
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -99,31 +154,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const url = `${API_BASE}/user/auth/user/`;
-      console.log('[auth] fetching current user ->', url);
-      try {
-        const res = await fetch(url, {
-          credentials: 'include',
-          headers: getAuthHeaders(false)
-        });
-        if (!mounted) return;
-        const txt = await res.text();
-        console.log('[auth] current user response', res.status, txt);
-        if (res.ok) {
-          try {
-            const user = txt ? JSON.parse(txt) : null;
-            setCurrentUser(normalizeUserProfile(user));
-          } catch (err) {
-            console.error('[auth] parse current user error', err);
-            setCurrentUser(null);
-          }
-        } else {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+      // Check if token is expired.
+      const payload = decodeJwt(accessToken);
+      const exp = payload?.exp as number | undefined;
+      if (exp && exp * 1000 < Date.now()) {
+        console.log('[auth] access token expired, clearing');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        if (mounted) {
           setCurrentUser(null);
+          setIsInitializing(false);
+        }
+        return;
+      }
+
+      console.log('[auth] restoring session from stored token');
+      try {
+        const user = await fetchCurrentUser(accessToken);
+        if (mounted) {
+          setCurrentUser(user);
         }
       } catch (err) {
-        console.error('[auth] current user error', err);
+        console.error('[auth] session restore error', err);
         if (mounted) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
@@ -136,79 +188,75 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [fetchCurrentUser]);
 
   const login = useCallback(
     async (username: string, password: string): Promise<boolean> => {
       try {
-        const url = `${API_BASE}/user/auth/login/`;
+        // Use DRF Simple JWT endpoint — CSRF-exempt, no cookie needed.
+        const url = `${API_BASE}/api/token/`;
         const body = JSON.stringify({ username, password });
-        console.log('[auth] login request ->', url, body);
-        const headers = { 'Content-Type': 'application/json', ...getAuthHeaders(true) };
+        console.log('[auth] login request ->', url);
         const res = await fetch(url, {
           method: 'POST',
-          headers,
+          headers: { 'Content-Type': 'application/json' },
           body,
-          credentials: 'include'
         });
         const responseText = await res.text();
         console.log('[auth] login response', res.status, responseText);
 
-        let data: LoginResponsePayload | null = null;
-        if (responseText) {
-          try {
-            data = JSON.parse(responseText) as LoginResponsePayload;
-          } catch {
-            data = null;
-          }
-        }
-
         if (!res.ok) {
-          const errorMessage = data?.message || data?.notifications?.[0]?.message || 'Invalid credentials';
+          let errorMessage = 'Invalid credentials';
+          try {
+            const errData = JSON.parse(responseText);
+            errorMessage = errData?.detail || errData?.message || errorMessage;
+          } catch { /* use default */ }
           addToast(errorMessage, 'error');
           return false;
         }
 
-        if (!data?.success) {
-          addToast(data?.message || 'Login failed', 'error');
+        let tokens: { access?: string; refresh?: string } = {};
+        try {
+          tokens = JSON.parse(responseText);
+        } catch {
+          addToast('Unexpected response from server', 'error');
           return false;
         }
 
-        const normalizedUser = normalizeUserProfile(data.user ?? null);
-        setCurrentUser(normalizedUser);
-
-        if (data.tokens?.access) {
-          localStorage.setItem('accessToken', data.tokens.access);
-        }
-        if (data.tokens?.refresh) {
-          localStorage.setItem('refreshToken', data.tokens.refresh);
+        if (!tokens.access) {
+          addToast('Login failed — no access token received', 'error');
+          return false;
         }
 
-        if (data.notifications?.length) {
-          data.notifications.forEach((notification) => {
-            addToast(notification.message, notification.type ?? 'info');
-          });
+        // Store tokens.
+        localStorage.setItem('accessToken', tokens.access);
+        if (tokens.refresh) {
+          localStorage.setItem('refreshToken', tokens.refresh);
         }
 
-        addToast(data.message || 'Successfully logged in', 'success');
+        // Fetch user profile from DRF endpoint (accepts JWT auth).
+        const user = await fetchCurrentUser(tokens.access);
+        if (user) {
+          setCurrentUser(user);
+        } else {
+          // Fallback: use the username from the login form.
+          console.warn('[auth] could not fetch full profile, using username');
+          setCurrentUser(normalizeUserProfile({ username }));
+        }
+
+        addToast('Successfully logged in', 'success');
         return true;
       } catch (err) {
+        console.error('[auth] login error', err);
         addToast('Login failed', 'error');
         return false;
       }
     },
-    [addToast]
+    [addToast, fetchCurrentUser]
   );
 
   const logout = useCallback(async () => {
-    try {
-      const url = `${API_BASE}/user/auth/logout/`;
-      // console.log('[auth] logout request ->', url);
-      const headers = getAuthHeaders(true);
-      await fetch(url, { method: 'POST', credentials: 'include', headers });
-    } catch (err) {
-      console.error('[auth] logout error', err);
-    }
+    // JWT is stateless — just clear tokens client-side.
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     setCurrentUser(null);

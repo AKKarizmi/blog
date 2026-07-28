@@ -2,6 +2,7 @@ import { USE_MOCK, API_BASE } from '../config';
 import { getAuthHeaders } from '../utils/csrf';
 import type { BlogPage } from '../types/BlogPage';
 import { mockBlogPageData } from '../data/blogPage.mock';
+import { readJsonResponse } from '../utils/api';
 
 // Session-level memory for mock persistence
 let currentMockData: BlogPage = { ...mockBlogPageData };
@@ -98,7 +99,7 @@ async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  return readJsonResponse<T>(response);
 }
 
 export async function getBlogPageData(): Promise<BlogPage> {

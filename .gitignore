@@ -1,3 +1,8 @@
 Nothing should be ignored in this case, as only a TypeScript React component file (.tsx) was added without any build artifacts, dependencies, or temporary files.
 
 Output: (empty)
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
