@@ -3,16 +3,12 @@ import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForozData } from '../context/ForozDataContext';
 import type { CollaborationData } from '../context/ForozDataContext';
-import type { SyntheticEvent } from 'react';
+import { FALLBACK_IMAGE, handleImageError } from '../utils/imageFallback';
 
 export function CollaborationSection() {
   const { collaborations } = useForozData();
   const [selectedItem, setSelectedItem] = useState<CollaborationData | null>(null);
   const hasCollaborations = collaborations.length > 0;
-
-  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src = '/static/fallback.webp';
-  };
 
   const handleLearnMore = (link?: string) => {
     if (link) {
@@ -47,7 +43,7 @@ export function CollaborationSection() {
                 className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-soft transition-all duration-300 group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={collaboration.image || '/static/fallback.webp'}
+                    src={collaboration.image || FALLBACK_IMAGE}
                     alt={collaboration.title}
                     onError={handleImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -3,7 +3,7 @@ import { CalendarIcon, MapPinIcon, ArrowRightIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForozData } from '../context/ForozDataContext';
 import type { EventData } from '../context/ForozDataContext';
-import type { SyntheticEvent } from 'react';
+import { FALLBACK_IMAGE, handleImageError } from '../utils/imageFallback';
 
 const formatEventDate = (isoDate: string): string => {
   if (!isoDate) {
@@ -26,10 +26,6 @@ export function EventsSection() {
   const { events } = useForozData();
   const [selectedItem, setSelectedItem] = useState<EventData | null>(null);
   const hasEvents = events.length > 0;
-
-  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src = '/static/fallback.webp';
-  };
 
   const handleRegister = (link?: string) => {
     const url = link || '/events';
@@ -69,7 +65,7 @@ export function EventsSection() {
                 className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-soft transition-all duration-300 group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={event.image || '/static/fallback.webp'}
+                    src={event.image || FALLBACK_IMAGE}
                     alt={event.title}
                     onError={handleImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

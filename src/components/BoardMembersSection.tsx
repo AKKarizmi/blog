@@ -11,7 +11,7 @@ import {
 import { useState } from 'react';
 import { useForozData } from '../context/ForozDataContext';
 import type { BoardMemberData } from '../context/ForozDataContext';
-import type { SyntheticEvent } from 'react';
+import { FALLBACK_IMAGE, handleImageError } from '../utils/imageFallback';
 
 const platformIcons: Record<string, LucideIcon> = {
   linkedin: Linkedin,
@@ -26,10 +26,6 @@ export function BoardMembersSection() {
   const { boardMembers } = useForozData();
   const [selectedItem, setSelectedItem] = useState<BoardMemberData | null>(null);
   const hasMembers = boardMembers.length > 0;
-
-  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src = '/static/fallback.webp';
-  };
 
   return (
     <section id="team" className="py-24 bg-foroz-bg">
@@ -60,7 +56,7 @@ export function BoardMembersSection() {
                 className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-soft transition-all duration-300 group flex flex-col items-center text-center">
                 <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden flex-shrink-0">
                   <img
-                    src={member.image || '/static/fallback.webp'}
+                    src={member.image || FALLBACK_IMAGE}
                     alt={member.title}
                     onError={handleImageError}
                     loading="lazy"
@@ -137,7 +133,7 @@ export function BoardMembersSection() {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                   <img 
-                    src={selectedItem.image || '/static/fallback.webp'} 
+                    src={selectedItem.image || FALLBACK_IMAGE}
                     alt={selectedItem.title}
                     onError={handleImageError}
                     className="w-full h-full object-cover"

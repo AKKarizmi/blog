@@ -28,6 +28,8 @@ import {
   type BoardMember,
   updateBoardMember
 } from '../services/boardMembersService';
+import { resolveAssetUrl } from '../services/api';
+import { handleImageError } from '../utils/imageFallback';
 
 type SocialField = {
   id: string;
@@ -383,8 +385,9 @@ export function BoardMembersPage() {
                     <div className="flex items-center">
                       {member.photo ? (
                         <img
-                          src={member.photo.startsWith('http') ? member.photo : `${import.meta.env.VITE_API_BASE_URL ?? 'https://foroz.vercel.app'}${member.photo}`}
+                          src={resolveAssetUrl(member.photo)}
                           alt={member.name}
+                          onError={handleImageError}
                           className="h-12 w-12 rounded-full object-cover mr-4 border border-gray-200"
                         />
                       ) : (
