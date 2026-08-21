@@ -383,7 +383,7 @@ export function BoardMembersPage() {
                     <div className="flex items-center">
                       {member.photo ? (
                         <img
-                          src={member.photo.startsWith('http') ? member.photo : `${import.meta.env.VITE_API_BASE_URL ?? 'https://foroz-974u.vercel.app'}${member.photo}`}
+                          src={member.photo.startsWith('http') ? member.photo : `${import.meta.env.VITE_API_BASE_URL ?? 'https://foroz.vercel.app'}${member.photo}`}
                           alt={member.name}
                           className="h-12 w-12 rounded-full object-cover mr-4 border border-gray-200"
                         />

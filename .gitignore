@@ -102,3 +102,4 @@ dist-ssr
 *.sw?
 .aider*
 >>>>>>> 6f9402af110afb46384c06ed602187bd9c7963c4
+.vercel

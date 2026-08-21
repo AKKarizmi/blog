@@ -7,8 +7,7 @@ const withLeadingSlash = (value: string) =>
   value.startsWith('/') ? value : `/${value}`;
 
 export const API_ORIGIN = trimTrailingSlash(
-  // import.meta.env.VITE_API_ORIGIN || 'https://foroz.me'
-  import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000'
+  import.meta.env.VITE_API_ORIGIN || 'https://foroz.vercel.app'
 );
 
 export const API_BASE_URL = trimTrailingSlash(
