@@ -69,7 +69,7 @@ export function Navbar() {
               )}
             </ul>
             <a
-              href="https://dashboard.foroz.me/login"
+              href="https://dashboard.foroz.me/"
               className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
 
               Login
