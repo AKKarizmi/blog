@@ -52,14 +52,27 @@ function parseSocials(value: unknown): Record<string, string> {
     return {};
   }
 
+  const parseSocialEntry = (item: unknown): [string, string][] => {
+    let entry = item;
+
+    if (typeof entry === 'string') {
+      try {
+        entry = JSON.parse(entry);
+      } catch {
+        return [];
+      }
+    }
+
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
+
+    const { platform, url } = entry as { platform?: unknown; url?: unknown };
+    return typeof platform === 'string' && typeof url === 'string'
+      ? [[platform, url]]
+      : [];
+  };
+
   const entries = Array.isArray(parsed)
-    ? parsed.flatMap((item): [string, string][] => {
-        if (!item || typeof item !== 'object') return [];
-        const { platform, url } = item as { platform?: unknown; url?: unknown };
-        return typeof platform === 'string' && typeof url === 'string'
-          ? [[platform, url]]
-          : [];
-      })
+    ? parsed.flatMap(parseSocialEntry)
     : (() => {
         const record = parsed as Record<string, unknown>;
         if (typeof record.platform === 'string' && typeof record.url === 'string') {
