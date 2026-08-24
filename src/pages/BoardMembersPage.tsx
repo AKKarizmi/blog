@@ -37,6 +37,46 @@ type SocialField = {
   url: string;
 };
 
+function parseSocials(value: unknown): Record<string, string> {
+  let parsed = value;
+
+  if (typeof value === 'string') {
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return {};
+    }
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    return {};
+  }
+
+  const entries = Array.isArray(parsed)
+    ? parsed.flatMap((item): [string, string][] => {
+        if (!item || typeof item !== 'object') return [];
+        const { platform, url } = item as { platform?: unknown; url?: unknown };
+        return typeof platform === 'string' && typeof url === 'string'
+          ? [[platform, url]]
+          : [];
+      })
+    : (() => {
+        const record = parsed as Record<string, unknown>;
+        if (typeof record.platform === 'string' && typeof record.url === 'string') {
+          return [[record.platform, record.url]] as [string, string][];
+        }
+        return Object.entries(record).filter(
+          (entry): entry is [string, string] => typeof entry[1] === 'string'
+        );
+      })();
+
+  return Object.fromEntries(
+    entries
+      .filter(([, url]) => url.trim().length > 0)
+      .map(([platform, url]) => [platform, url.trim()])
+  );
+}
+
 function parseRoles(value?: string): string[] {
   if (!value) return [];
   const trimmed = value.trim();
@@ -116,19 +156,17 @@ export function BoardMembersPage() {
   }, [addToast]);
   const handleOpenModal = (member?: BoardMember) => {
     if (member) {
+      const memberSocials = parseSocials(member.socials);
       setEditingMember(member);
       setFormData({
         ...member,
         email: member.email || '',
-        socials: {
-          ...member.socials
-        }
+        socials: memberSocials
       });
       setRoles(parseRoles(member.role));
       setRoleInput('');
       setSocialFields(
-        Object.entries(member.socials ?? {})
-          .filter((entry) => typeof entry[1] === 'string' && entry[1].trim().length > 0)
+        Object.entries(memberSocials)
           .map(([platform, url], index) => ({
             id: `${platform}-${index}`,
             platform,
@@ -412,8 +450,7 @@ export function BoardMembersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2 flex-wrap">
-                      {Object.entries(member.socials ?? {})
-                        .filter((entry) => typeof entry[1] === 'string' && entry[1].trim().length > 0)
+                      {Object.entries(parseSocials(member.socials))
                         .map(([platform, url]) => {
                         const label = platform.toLowerCase();
                         const icon = label.includes('linkedin') ? (
@@ -442,7 +479,7 @@ export function BoardMembersPage() {
                           </a>
                         );
                       })}
-                      {Object.keys(member.socials ?? {}).length === 0 && <span className="text-xs text-gray-400">None</span>}
+                      {Object.keys(parseSocials(member.socials)).length === 0 && <span className="text-xs text-gray-400">None</span>}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
