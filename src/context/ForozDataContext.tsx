@@ -605,8 +605,6 @@ const itemId = (
 ) => pickString(source, ['id', 'slug', 'key']) || fallback || index;
 
 const extractSocialLinks = (source: ApiRecord | undefined): SocialLinks => {
-  const socialSource =
-    pickRecord(source, ['socialLinks', 'social_links', 'socials']) || source;
   const links: SocialLinks = {};
 
   const platforms = [
@@ -620,8 +618,66 @@ const extractSocialLinks = (source: ApiRecord | undefined): SocialLinks => {
     'website',
   ];
 
+  const addSocialLink = (platform: unknown, url: unknown) => {
+    if (typeof platform !== 'string' || typeof url !== 'string') {
+      return;
+    }
+
+    const normalizedPlatform = platform.trim().toLowerCase();
+    const normalizedUrl = url.trim();
+    if (normalizedPlatform && normalizedUrl) {
+      links[normalizedPlatform] = normalizedUrl;
+    }
+  };
+
+  const parseSocialEntry = (entry: unknown) => {
+    let parsed = entry;
+
+    if (typeof parsed === 'string') {
+      try {
+        parsed = JSON.parse(parsed);
+      } catch {
+        return;
+      }
+    }
+
+    if (!isRecord(parsed)) {
+      return;
+    }
+
+    const platform = pickString(parsed, ['platform', 'name', 'type']);
+    const url = pickString(parsed, ['url', 'link', 'href']);
+    if (platform && url) {
+      addSocialLink(platform, url);
+      return;
+    }
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === 'string') {
+        addSocialLink(key, value);
+      }
+    }
+  };
+
+  const socialValue = source?.socialLinks ?? source?.social_links ?? source?.socials;
+  let parsedSocialValue = socialValue;
+
+  if (typeof parsedSocialValue === 'string') {
+    try {
+      parsedSocialValue = JSON.parse(parsedSocialValue);
+    } catch {
+      parsedSocialValue = undefined;
+    }
+  }
+
+  if (Array.isArray(parsedSocialValue)) {
+    parsedSocialValue.forEach(parseSocialEntry);
+  } else if (isRecord(parsedSocialValue)) {
+    parseSocialEntry(parsedSocialValue);
+  }
+
   for (const platform of platforms) {
-    const value = pickString(socialSource, [
+    const value = pickString(source, [
       platform,
       `${platform}_link`,
       `${platform}_url`,
