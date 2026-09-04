@@ -40,7 +40,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <a href="#home" className="flex items-center gap-2 mb-6">
               <img 
-                src={blogPage.logo || 'https://foroz.me/static/Logos/Footer-Logo.svg'} 
+                src="https://media.foroz.me/White%20Logo.svg" 
                 alt={blogPage.siteName || 'FOROZ Logo'} 
                 width={100} 
               />
