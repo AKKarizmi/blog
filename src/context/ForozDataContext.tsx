@@ -383,34 +383,35 @@ const defaultData: ForozStaticData = {
   boardMembers: [],
   announcements: [],
   impact: [
-  {
-    id: 'students',
-    end: 5000,
-    duration: 2000,
-    suffix: '+',
-    label: 'Students Supported'
-  },
-  {
-    id: 'programs',
-    end: 120,
-    duration: 2000,
-    suffix: '+',
-    label: 'Programs Delivered'
-  },
-  {
-    id: 'volunteers',
-    end: 300,
-    duration: 2000,
-    suffix: '+',
-    label: 'Active Volunteers'
-  },
-  {
-    id: 'opportunities',
-    end: 1000,
-    duration: 2000,
-    suffix: '+',
-    label: 'Opportunities Shared'
-  }],
+  // {
+  //   id: 'students',
+  //   end: 5000,
+  //   duration: 2000,
+  //   suffix: '+',
+  //   label: 'Students Supported'
+  // },
+  // {
+  //   id: 'programs',
+  //   end: 120,
+  //   duration: 2000,
+  //   suffix: '+',
+  //   label: 'Programs Delivered'
+  // },
+  // {
+  //   id: 'volunteers',
+  //   end: 300,
+  //   duration: 2000,
+  //   suffix: '+',
+  //   label: 'Active Volunteers'
+  // },
+  // {
+  //   id: 'opportunities',
+  //   end: 1000,
+  //   duration: 2000,
+  //   suffix: '+',
+  //   label: 'Opportunities Shared'
+  // }
+  ],
 
   cta: {
     title: 'Be Part of the Change',
