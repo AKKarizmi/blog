@@ -1,128 +1,144 @@
 import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRightIcon, MenuIcon, XIcon } from 'lucide-react';
 import { useForozData } from '../context/ForozDataContext';
+import { SpecularButton } from './ui/SpecularButton';
+
 const navLinks = [
-  {
-    name: 'Home',
-    href: '#home'
-  },
-  {
-    name: 'About',
-    href: '#about'
-  },
-  {
-    name: 'Services',
-    href: '#services'
-  },
-  {
-    name: 'Events',
-    href: '#events'
-  },
-  {
-    name: 'Board Members',
-    href: '#team'
-  },
-  {
-    name: 'Contact',
-    href: '#contact'
-  }];
+{ label: 'About', href: '#about' },
+{ label: 'Programs', href: '#services' },
+{ label: 'Opportunities', href: '#announcements' },
+{ label: 'Events', href: '#events' },
+{ label: 'Collaborations', href: '#collaborations' },
+{ label: 'Team', href: '#team' },
+{ label: 'Contact', href: '#contact' }];
+
 
 export function Navbar() {
   const { blogPage } = useForozData();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
+  const logo = blogPage.logo || 'https://media.foroz.me/Logo-H.svg';
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
+      <motion.nav
+        aria-label="Primary"
+        initial={false}
+        animate={{
+          backgroundColor: scrolled ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.5)',
+          boxShadow: scrolled ?
+          '0 18px 48px -28px rgba(8,13,28,0.35)' :
+          '0 0 0 rgba(0,0,0,0)',
+          borderColor: scrolled ? 'rgba(226,232,240,0.9)' : 'rgba(255,255,255,0.5)'
+        }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-2xl border px-4 py-2.5 backdrop-blur-xl sm:px-5">
+        
+        <a
+          href="#home"
+          className="flex shrink-0 items-center gap-2"
+          aria-label={`${blogPage.siteName} — home`}>
+          
+          <img
+            src={logo}
+            alt={blogPage.siteName}
+            className="h-8 w-auto sm:h-9"
+            loading="eager" />
+          
+        </a>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <a href="#home" className="flex items-center gap-2 z-50">
-            <img 
-              src="https://media.foroz.me/Logo-H.svg" 
-              alt={blogPage.siteName || 'FOROZ Logo'} 
-              width={100} 
-            />
-          </a>
+        <ul className="hidden items-center gap-1 lg:flex">
+          {navLinks.map((link) =>
+          <li key={link.href}>
+              <a
+              href={link.href}
+              className="group relative rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-foroz-ink">
+              
+                <span className="relative">
+                  {link.label}
+                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-foroz-blue to-foroz-violet transition-all duration-300 group-hover:w-full" />
+                </span>
+              </a>
+            </li>
+          )}
+        </ul>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <ul className="flex items-center gap-6">
-              {navLinks.map((link) =>
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+        <div className="flex items-center gap-2">
+          <SpecularButton
+            href="https://dashboard.foroz.me/"
+            size="md"
+            className="hidden sm:inline-flex">
+            
+            Login
+            <ArrowUpRightIcon className="h-4 w-4" />
+          </SpecularButton>
 
-                    {link.name}
-                  </a>
-                </li>
-              )}
-            </ul>
-            <a
-              href="https://dashboard.foroz.me/"
-              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
-
-              Login
-            </a>
-          </nav>
-
-          {/* Mobile Toggle */}
           <button
-            className="md:hidden z-50 p-2 text-slate-600"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu">
-
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 transition-colors hover:bg-white lg:hidden">
+            
+            {mobileOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
           </button>
         </div>
-      </div>
+      </motion.nav>
 
-      {/* Mobile Nav */}
       <AnimatePresence>
-        {isOpen &&
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: -20
-            }}
-            animate={{
-              opacity: 1,
-              y: 0
-            }}
-            exit={{
-              opacity: 0,
-              y: -20
-            }}
-            className="absolute top-full left-0 right-0 bg-white shadow-xl border-t border-slate-100 md:hidden">
-
-            <div className="px-4 py-6 flex flex-col gap-4">
+        {mobileOpen &&
+        <motion.div
+          id="mobile-navigation"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur-xl lg:hidden">
+          
+            <ul className="flex flex-col">
               {navLinks.map((link) =>
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-medium text-slate-700 hover:text-blue-600 py-2 border-b border-slate-50">
+            <li key={`mobile-${link.href}`}>
+                  <a
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-foroz-mist hover:text-foroz-ink">
+                
+                    {link.label}
+                    <ArrowUpRightIcon className="h-4 w-4 text-slate-400" />
+                  </a>
+                </li>
+            )}
+            </ul>
 
-                  {link.name}
-                </a>
-              )}
-              <a
-                href="#contact"
-                onClick={() => setIsOpen(false)}
-                className="mt-4 text-center px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-md">
-
+            <div className="mt-3 grid grid-cols-1 gap-2 border-t border-slate-100 pt-3">
+              <SpecularButton
+              href="#contact"
+              variant="secondary"
+              onClick={() => setMobileOpen(false)}>
+              
                 Join Us
-              </a>
+              </SpecularButton>
+              <SpecularButton href="https://dashboard.foroz.me/">
+                Login
+                <ArrowUpRightIcon className="h-4 w-4" />
+              </SpecularButton>
             </div>
           </motion.div>
         }

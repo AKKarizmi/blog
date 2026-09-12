@@ -1,196 +1,211 @@
-import { motion } from 'framer-motion';
-import {
-  Linkedin,
-  Facebook,
-  Instagram,
-  Youtube,
-  Twitter,
-  Globe,
-  type LucideIcon,
-} from 'lucide-react';
 import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  ArrowUpRightIcon,
+  FacebookIcon,
+  GlobeIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  MessageCircleIcon,
+  SendIcon,
+  TwitterIcon,
+  UserIcon,
+  YoutubeIcon } from
+'lucide-react';
+import type { ComponentType } from 'react';
 import { useForozData } from '../context/ForozDataContext';
 import type { BoardMemberData } from '../context/ForozDataContext';
-import { FALLBACK_IMAGE, handleImageError } from '../utils/imageFallback';
+import { Modal } from './ui/Modal';
+import { Reveal } from './ui/Reveal';
+import { SectionHeading } from './ui/SectionHeading';
+import { handleImageError } from '../utils/imageFallback';
+import { truncate } from '../utils/format';
 
-const platformIcons: Record<string, LucideIcon> = {
-  linkedin: Linkedin,
-  facebook: Facebook,
-  instagram: Instagram,
-  youtube: Youtube,
-  twitter: Twitter,
-  website: Globe,
+const socialIcons: Record<string, ComponentType<{className?: string;}>> = {
+  linkedin: LinkedinIcon,
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  youtube: YoutubeIcon,
+  twitter: TwitterIcon,
+  whatsapp: MessageCircleIcon,
+  telegram: SendIcon,
+  website: GlobeIcon
 };
 
+const socialLabel = (platform: string) =>
+platform.charAt(0).toUpperCase() + platform.slice(1);
+
 export function BoardMembersSection() {
-  const { boardMembers } = useForozData();
-  const [selectedItem, setSelectedItem] = useState<BoardMemberData | null>(null);
-  const hasMembers = boardMembers.length > 0;
+  const { boardMembers, loading } = useForozData();
+  const [active, setActive] = useState<BoardMemberData | null>(null);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <section id="team" className="py-24 bg-foroz-bg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            Our <span className="text-gradient">Team</span>
-          </h2>
-          <p className="font-body text-lg text-slate-600">
-            Meet the dedicated experts and board members driving our mission
-            forward.
-          </p>
+    <section id="team" className="relative overflow-hidden bg-foroz-bg py-24 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Our Team"
+          title={
+          <>
+              The people guiding <span className="text-gradient">FOROZ</span> forward
+            </>
+          }
+          description="Educators, professionals and organizers who make the programs, mentorship and opportunities possible." />
+        
+
+        <div className="mt-16">
+          {loading && boardMembers.length === 0 ?
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, index) =>
+            <div
+              key={`member-skeleton-${index}`}
+              className="h-96 animate-pulse rounded-3xl border border-slate-200/70 bg-white" />
+
+            )}
+            </div> :
+          boardMembers.length === 0 ?
+          <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 text-slate-600">
+              Team members coming soon.
+            </div> :
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {boardMembers.map((member, index) => {
+              const socials = Object.entries(member.socials || {}).filter(
+                ([, url]) => Boolean(url)
+              );
+
+              return (
+                <Reveal key={member.id} delay={Math.min(index, 5) * 0.06} y={24}>
+                    <motion.article
+                    whileHover={reduceMotion ? undefined : { y: -8 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-shadow duration-500 hover:shadow-lift">
+                    
+                      <div className="relative aspect-[4/5] w-full overflow-hidden bg-foroz-mist">
+                        {member.image ?
+                      <img
+                        src={member.image}
+                        alt={member.title}
+                        onError={handleImageError}
+                        loading="lazy"
+                        className="h-full w-full object-cover object-top transition-transform duration-[900ms] ease-premium group-hover:scale-[1.06]" /> :
+
+
+                      <div className="flex h-full w-full items-center justify-center">
+                            <UserIcon className="h-10 w-10 text-slate-300" />
+                          </div>
+                      }
+
+                        <div
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-gradient-to-t from-navy-900/80 via-navy-900/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
+                      
+
+                        {socials.length > 0 &&
+                      <ul className="absolute inset-x-4 bottom-4 flex flex-wrap gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-focus-within:opacity-100">
+                            {socials.map(([platform, url]) => {
+                          const Icon = socialIcons[platform] || GlobeIcon;
+
+                          return (
+                            <li key={`${member.id}-${platform}`}>
+                                  <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={`${member.title} on ${socialLabel(platform)}`}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/15 text-white backdrop-blur transition-colors hover:bg-white hover:text-navy-900">
+                                
+                                    <Icon className="h-4 w-4" />
+                                  </a>
+                                </li>);
+
+                        })}
+                          </ul>
+                      }
+                      </div>
+
+                      <div className="flex flex-1 flex-col p-6">
+                        <h3 className="font-heading text-lg font-bold tracking-tight text-foroz-ink">
+                          {member.title}
+                        </h3>
+                        {member.role &&
+                      <p className="mt-1 text-sm font-semibold text-foroz-indigo">
+                            {member.role}
+                          </p>
+                      }
+                        <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                          {truncate(member.short_description, 110)}
+                        </p>
+
+                        <button
+                        type="button"
+                        onClick={() => setActive(member)}
+                        className="mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-foroz-blue transition-colors hover:text-foroz-violet">
+                        
+                          View Full Bio
+                          <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </motion.article>
+                  </Reveal>);
+
+            })}
+            </div>
+          }
         </div>
-
-        {!hasMembers ? (
-          <div className="text-center py-12">
-            <p className="text-slate-500">Team members coming soon.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {boardMembers.map((member, index) => (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-soft transition-all duration-300 group flex flex-col items-center text-center">
-                <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden flex-shrink-0">
-                  <img
-                    src={member.image || FALLBACK_IMAGE}
-                    alt={member.title}
-                    onError={handleImageError}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-foroz-blue/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
-                <h3 className="font-heading text-xl font-bold text-slate-900 mb-1">
-                  {member.title}
-                </h3>
-                {member.role && (
-                  <p className="font-body text-sm font-medium text-foroz-blue mb-4">
-                    {member.role}
-                  </p>
-                )}
-                
-                {/* Limited Height Bio with bottom fade effect */}
-                {member.short_description && (
-                  <div className="relative mb-4 w-full">
-                    <div className={(member.short_description || '').length > 100 ? 'max-h-20 overflow-hidden' : ''}>
-                      <p className="font-body text-sm text-slate-600">
-                        {member.short_description}
-                      </p>
-                      {(member.short_description || '').length > 100 && (
-                        <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-white/0 pointer-events-none" />
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => setSelectedItem(member)}
-                  className="text-foroz-blue font-medium text-xs hover:underline transition-all block mb-6 self-center">
-                  View Full Bio
-                </button>
-
-                <div className="flex items-center justify-center gap-3 mt-auto">
-                  {Object.entries(member.socials).map(([platform, url]) => {
-                    const Icon = platformIcons[platform.toLowerCase()];
-                    if (!Icon) {
-                      return null;
-                    }
-
-                    return (
-                      <a
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-foroz-blue hover:text-white transition-colors"
-                        aria-label={`${platform} profile`}>
-                        <Icon size={16} />
-                      </a>
-                    );
-                  })}
-
-                  {Object.keys(member.socials).length === 0 && (
-                    <span className="text-slate-300 text-xs">No links</span>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Profile Details Modal */}
-      {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col border border-slate-100 animate-scale-up">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                  <img 
-                    src={selectedItem.image || FALLBACK_IMAGE}
-                    alt={selectedItem.title}
-                    onError={handleImageError}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-heading text-2xl font-bold text-slate-900 leading-tight">
-                    {selectedItem.title}
-                  </h3>
-                  <p className="font-body text-sm font-semibold text-foroz-blue">
-                    {selectedItem.role}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedItem(null)}
-                className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors flex items-center justify-center font-bold text-lg"
-              >
-                ✕
-              </button>
+      <Modal
+        open={Boolean(active)}
+        onClose={() => setActive(null)}
+        eyebrow={active?.role || 'Team'}
+        title={active?.title || ''}>
+        
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-[160px_1fr]">
+          {active?.image ?
+          <img
+            src={active.image}
+            alt={active.title}
+            onError={handleImageError}
+            className="aspect-[4/5] w-full rounded-2xl object-cover object-top" /> :
+
+
+          <div className="flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-foroz-mist">
+              <UserIcon className="h-8 w-8 text-slate-300" />
             </div>
-            
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1">
-              <p className="font-body text-slate-600 leading-relaxed text-base whitespace-pre-line">
-                {selectedItem.short_description}
-              </p>
-            </div>
-            
-            {/* Modal Footer (Social Links) */}
-            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-center gap-3">
-              {Object.entries(selectedItem.socials).map(([platform, url]) => {
-                const Icon = platformIcons[platform.toLowerCase()];
-                if (!Icon) {
-                  return null;
-                }
+          }
+
+          <div>
+            <p className="whitespace-pre-line text-base leading-relaxed text-slate-600">
+              {active?.short_description}
+            </p>
+
+            {active && Object.entries(active.socials || {}).filter(([, url]) => url).length > 0 &&
+            <ul className="mt-6 flex flex-wrap gap-2">
+                {Object.entries(active.socials || {}).
+              filter(([, url]) => Boolean(url)).
+              map(([platform, url]) => {
+                const Icon = socialIcons[platform] || GlobeIcon;
 
                 return (
-                  <a
-                    key={platform}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:bg-foroz-blue hover:text-white transition-colors"
-                    aria-label={`${platform} profile`}>
-                    <Icon size={18} />
-                  </a>
-                );
+                  <li key={`modal-${platform}`}>
+                        <a
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${active.title} on ${socialLabel(platform)}`}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-colors hover:border-foroz-blue hover:text-foroz-blue">
+                      
+                          <Icon className="h-4 w-4" />
+                        </a>
+                      </li>);
+
               })}
-              {Object.keys(selectedItem.socials).length === 0 && (
-                <span className="text-slate-400 text-sm">No social profiles linked</span>
-              )}
-            </div>
+              </ul>
+            }
           </div>
         </div>
-      )}
-    </section>
-  );
-}
+      </Modal>
+    </section>);
 
+}

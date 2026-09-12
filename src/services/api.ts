@@ -4,15 +4,16 @@ export type ApiRecord = Record<string, unknown>;
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '');
 const withLeadingSlash = (value: string) =>
-  value.startsWith('/') ? value : `/${value}`;
+value.startsWith('/') ? value : `/${value}`;
+
+const env =
+(import.meta as unknown as {env?: Record<string, string | undefined>;}).env || {};
 
 export const API_ORIGIN = trimTrailingSlash(
-  import.meta.env.VITE_API_ORIGIN || 'https://foroz.vercel.app'
+  env.VITE_API_ORIGIN || 'https://foroz.vercel.app'
 );
 
-export const API_BASE_URL = trimTrailingSlash(
-  import.meta.env.VITE_API_BASE_URL || '/'
-);
+export const API_BASE_URL = trimTrailingSlash(env.VITE_API_BASE_URL || '/');
 
 export const buildApiUrl = (path: string) => {
   if (/^https?:\/\//i.test(path)) {
@@ -23,15 +24,15 @@ export const buildApiUrl = (path: string) => {
 };
 
 export const isRecord = (value: unknown): value is ApiRecord =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+typeof value === 'object' && value !== null && !Array.isArray(value);
 
-export const fetchJson = async <T>(path: string, init?: RequestInit): Promise<T> => {
+export const fetchJson = async <T,>(path: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(buildApiUrl(path), {
     ...init,
     headers: {
       Accept: 'application/json',
-      ...init?.headers,
-    },
+      ...init?.headers
+    }
   });
 
   if (!response.ok) {
@@ -59,20 +60,20 @@ export const fetchFirstJson = async (paths: string[]) => {
   return null;
 };
 
-export const postJson = async <T>(
-  path: string,
-  body: unknown,
-  init?: RequestInit
-): Promise<T | null> => {
+export const postJson = async <T,>(
+path: string,
+body: unknown,
+init?: RequestInit)
+: Promise<T | null> => {
   const response = await fetch(buildApiUrl(path), {
     method: 'POST',
     ...init,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      ...init?.headers,
+      ...init?.headers
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   });
 
   if (!response.ok) {
@@ -87,7 +88,7 @@ export const postJson = async <T>(
   return response.json() as Promise<T>;
 };
 
-export const extractArray = <T>(payload: unknown): T[] => {
+export const extractArray = <T,>(payload: unknown): T[] => {
   if (Array.isArray(payload)) {
     return payload as T[];
   }
@@ -97,21 +98,21 @@ export const extractArray = <T>(payload: unknown): T[] => {
   }
 
   const arrayKeys = [
-    'results',
-    'data',
-    'items',
-    'events',
-    'collaborations',
-    'announcements',
-    'members',
-    'experts',
-    'services',
-    'programs',
-    'values',
-    'core_values',
-    'stats',
-    'impact',
-  ];
+  'results',
+  'data',
+  'items',
+  'events',
+  'collaborations',
+  'announcements',
+  'members',
+  'experts',
+  'services',
+  'programs',
+  'values',
+  'core_values',
+  'stats',
+  'impact'];
+
 
   for (const key of arrayKeys) {
     const value = payload[key];
@@ -121,7 +122,7 @@ export const extractArray = <T>(payload: unknown): T[] => {
   }
 
   const firstArray = Object.values(payload).find(Array.isArray);
-  return firstArray ? (firstArray as T[]) : [];
+  return firstArray ? firstArray as T[] : [];
 };
 
 export const extractRecord = (payload: unknown): ApiRecord | undefined => {
@@ -147,9 +148,9 @@ export const extractRecord = (payload: unknown): ApiRecord | undefined => {
 };
 
 export const pickRecord = (
-  source: ApiRecord | undefined,
-  keys: string[]
-): ApiRecord | undefined => {
+source: ApiRecord | undefined,
+keys: string[])
+: ApiRecord | undefined => {
   if (!source) {
     return undefined;
   }
@@ -165,9 +166,9 @@ export const pickRecord = (
 };
 
 export const pickString = (
-  source: ApiRecord | undefined,
-  keys: string[]
-): string | undefined => {
+source: ApiRecord | undefined,
+keys: string[])
+: string | undefined => {
   if (!source) {
     return undefined;
   }
@@ -187,9 +188,9 @@ export const pickString = (
 };
 
 export const pickNumber = (
-  source: ApiRecord | undefined,
-  keys: string[]
-): number | undefined => {
+source: ApiRecord | undefined,
+keys: string[])
+: number | undefined => {
   if (!source) {
     return undefined;
   }
@@ -211,10 +212,10 @@ export const pickNumber = (
   return undefined;
 };
 
-export const pickArray = <T>(
-  source: ApiRecord | undefined,
-  keys: string[]
-): T[] | undefined => {
+export const pickArray = <T,>(
+source: ApiRecord | undefined,
+keys: string[])
+: T[] | undefined => {
   if (!source) {
     return undefined;
   }
@@ -230,18 +231,18 @@ export const pickArray = <T>(
 };
 
 export const pickStringArray = (
-  source: ApiRecord | undefined,
-  keys: string[]
-): string[] | undefined => {
+source: ApiRecord | undefined,
+keys: string[])
+: string[] | undefined => {
   const values = pickArray<unknown>(source, keys);
   if (!values) {
     return undefined;
   }
 
-  const strings = values
-    .filter((value): value is string => typeof value === 'string')
-    .map((value) => value.trim())
-    .filter(Boolean);
+  const strings = values.
+  filter((value): value is string => typeof value === 'string').
+  map((value) => value.trim()).
+  filter(Boolean);
 
   return strings.length > 0 ? strings : undefined;
 };
@@ -255,9 +256,9 @@ export const resolveAssetUrl = (value: string | undefined) => {
     return value;
   }
 
-  return value.startsWith('/')
-    ? `${API_ORIGIN}${value}`
-    : `${API_ORIGIN}/${value}`;
+  return value.startsWith('/') ?
+  `${API_ORIGIN}${value}` :
+  `${API_ORIGIN}/${value}`;
 };
 
 export async function fetchBlogPageData(): Promise<BlogPageData | null> {
@@ -303,7 +304,7 @@ export async function fetchBlogPageData(): Promise<BlogPageData | null> {
       footerDescription: pickString(record, ['footerDescription', 'footer_description']) ?? '',
       copyrightText: pickString(record, ['copyrightText', 'copyright_text']) ?? '',
       socialLinks,
-      updatedAt: pickString(record, ['updatedAt', 'updated_at']) ?? '',
+      updatedAt: pickString(record, ['updatedAt', 'updated_at']) ?? ''
     };
   } catch (error) {
     console.warn(`Unable to fetch ${endpoint}`, error);

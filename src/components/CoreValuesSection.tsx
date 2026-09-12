@@ -1,19 +1,21 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import {
-  Award,
-  BookOpen,
-  Handshake,
-  Heart,
-  Leaf,
-  Lightbulb,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Users,
-} from 'lucide-react';
+  AwardIcon,
+  BookOpenIcon,
+  HandshakeIcon,
+  HeartIcon,
+  LeafIcon,
+  LightbulbIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  StarIcon,
+  UsersIcon } from
+'lucide-react';
 import type { ComponentType, CSSProperties } from 'react';
 import { fetchJson } from '../services/api';
+import { SectionHeading } from './ui/SectionHeading';
+import { Reveal } from './ui/Reveal';
 
 type ValueIconProps = {
   className?: string;
@@ -21,18 +23,18 @@ type ValueIconProps = {
 };
 
 const valueIcons: Record<string, ComponentType<ValueIconProps>> = {
-  heart: Heart,
-  star: Star,
-  shield: ShieldCheck,
-  shieldcheck: ShieldCheck,
-  users: Users,
-  lightbulb: Lightbulb,
-  handshake: Handshake,
-  leaf: Leaf,
-  sparkles: Sparkles,
-  bookopen: BookOpen,
-  book_open: BookOpen,
-  award: Award,
+  heart: HeartIcon,
+  star: StarIcon,
+  shield: ShieldCheckIcon,
+  shieldcheck: ShieldCheckIcon,
+  users: UsersIcon,
+  lightbulb: LightbulbIcon,
+  handshake: HandshakeIcon,
+  leaf: LeafIcon,
+  sparkles: SparklesIcon,
+  bookopen: BookOpenIcon,
+  book_open: BookOpenIcon,
+  award: AwardIcon
 };
 
 type CoreValueCategory = {
@@ -65,6 +67,7 @@ export function CoreValuesSection() {
   const [coreValues, setCoreValues] = useState<CoreValueCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     let isActive = true;
@@ -109,107 +112,101 @@ export function CoreValuesSection() {
   }, []);
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-4xl font-bold text-slate-900 mb-6">
-            Our Core Values
-          </h2>
-          <p className="text-lg text-slate-600">
-            These guiding principles shape our culture, drive our decisions, and
-            define how we interact with the youth we serve and the partners we
-            collaborate with.
-          </p>
-        </div>
+    <section className="relative overflow-hidden bg-white py-24 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Core Values"
+          title={
+          <>
+              The principles behind every{' '}
+              <span className="text-gradient">decision</span> we make
+            </>
+          }
+          description="These guiding principles shape our culture, drive our decisions, and define how we interact with the youth we serve and the partners we collaborate with." />
+        
 
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={`core-value-skeleton-${index}`}
-                className="rounded-2xl bg-slate-50 border border-slate-100 p-8 animate-pulse">
-                <div className="w-14 h-14 rounded-xl bg-slate-100 mb-6" />
-                <div className="h-6 w-3/4 bg-slate-100 rounded mb-3" />
-                <div className="space-y-3">
-                  <div className="h-4 bg-slate-100 rounded" />
-                  <div className="h-4 bg-slate-100 rounded w-11/12" />
+        <div className="mt-16">
+          {loading ?
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) =>
+            <div
+              key={`core-value-skeleton-${index}`}
+              className="animate-pulse rounded-2xl border border-slate-100 bg-foroz-bg p-8">
+              
+                  <div className="mb-6 h-12 w-12 rounded-xl bg-slate-200/70" />
+                  <div className="mb-3 h-5 w-3/4 rounded bg-slate-200/70" />
+                  <div className="space-y-3">
+                    <div className="h-3.5 rounded bg-slate-200/60" />
+                    <div className="h-3.5 w-11/12 rounded bg-slate-200/60" />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-5 text-rose-700">
-            {error}
-          </div>
-        ) : coreValues.length > 0 ? (
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{
-              once: true,
-              margin: '-100px',
-            }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {coreValues.map((value, index) => {
-              const normalizedIcon = value.icon
-                .toLowerCase()
-                .replace(/[^a-z0-9]/g, '');
-              const Icon = valueIcons[normalizedIcon] || Heart;
-              const accentColor = value.color || '#0F172A';
-              const tint = hexToRgba(accentColor, 0.08);
+            )}
+            </div> :
+          error ?
+          <div
+            role="alert"
+            className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-5 text-rose-700">
+            
+              {error}
+            </div> :
+          coreValues.length > 0 ?
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {coreValues.map((value, index) => {
+              const normalizedIcon = value.icon.
+              toLowerCase().
+              replace(/[^a-z0-9]/g, '');
+              const Icon = valueIcons[normalizedIcon] || HeartIcon;
+              const accentColor = value.color || '#3155FF';
+              const tint = hexToRgba(accentColor, 0.09);
+              const glow = hexToRgba(accentColor, 0.14);
 
               return (
-                <motion.div
-                  key={value.id}
-                  variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 20,
-                    },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.5,
-                        delay: index * 0.08,
-                      },
-                    },
-                  }}
-                  whileHover={{
-                    y: -5,
-                    transition: {
-                      duration: 0.2,
-                    },
-                  }}
-                  className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-                  <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
-                    style={{
-                      backgroundColor: tint || 'rgb(248 250 252)',
-                    }}>
-                    <Icon
-                      className="w-7 h-7"
+                <Reveal key={value.id} delay={index * 0.06} y={22}>
+                    <motion.div
+                    whileHover={reduceMotion ? undefined : { y: -7 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="group relative h-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-8 transition-shadow duration-500 hover:shadow-lift">
+                    
+                      <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
                       style={{
-                        color: accentColor,
-                      }}
-                    />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">
-                    {value.title}
-                  </h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    {value.description}
-                  </p>
-                </motion.div>
-              );
+                        background: `linear-gradient(90deg, ${accentColor}, rgba(124,58,237,0.5), transparent)`
+                      }} />
+                    
+                      <span
+                      aria-hidden="true"
+                      className="absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      style={{
+                        background: `radial-gradient(circle, ${glow || 'rgba(49,85,255,0.12)'}, transparent 70%)`
+                      }} />
+                    
+
+                      <span
+                      className="relative inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-3"
+                      style={{ backgroundColor: tint || 'rgb(248 250 252)' }}>
+                      
+                        <Icon className="h-6 w-6" style={{ color: accentColor }} />
+                      </span>
+
+                      <h3 className="relative mt-6 font-heading text-lg font-bold tracking-tight text-foroz-ink">
+                        {value.title}
+                      </h3>
+                      <p className="relative mt-3 text-sm leading-relaxed text-slate-600">
+                        {value.description}
+                      </p>
+                    </motion.div>
+                  </Reveal>);
+
             })}
-          </motion.div>
-        ) : (
+            </div> :
+
           <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 text-slate-600">
-            No core values are available right now.
-          </div>
-        )}
+              No core values are available right now.
+            </div>
+          }
+        </div>
       </div>
-    </section>
-  );
+    </section>);
+
 }

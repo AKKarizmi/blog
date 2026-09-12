@@ -1,58 +1,58 @@
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRightIcon } from 'lucide-react';
 import { useForozData } from '../context/ForozDataContext';
+import { GhostFibers } from './effects/GhostFibers';
+import { GradualBlur } from './effects/GradualBlur';
+import { MagicRings } from './effects/MagicRings';
+import { Strands } from './effects/Strands';
+import { Reveal } from './ui/Reveal';
+import { SpecularButton } from './ui/SpecularButton';
 
 export function CTASection() {
   const { cta, blogPage } = useForozData();
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-slate-900" />
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/50 via-indigo-900/50 to-purple-900/50" />
+    <section className="relative isolate overflow-hidden bg-navy-900 py-28 sm:py-36">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(75%_65%_at_50%_0%,#1A2350_0%,#0D1430_50%,#080D1C_100%)]" />
+      
+      <MagicRings tone="light" rings={5} className="-z-10 opacity-80" />
+      <GhostFibers tone="light" count={14} opacity={0.5} className="-z-10" />
+      <Strands tone="light" count={5} opacity={0.35} className="-z-10" />
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 -z-10 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.32),transparent_65%)] blur-2xl" />
+      
 
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full opacity-30 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500 rounded-full blur-[100px]" />
-      </div>
+      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <Reveal>
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-200 backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-foroz-cyan" />
+            Join the community
+          </span>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <motion.div
-          initial={{
-            opacity: 0,
-            scale: 0.95,
-          }}
-          whileInView={{
-            opacity: 1,
-            scale: 1,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            duration: 0.6,
-          }}>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            {blogPage.ctaTitle}
+          <h2 className="mt-7 font-heading text-4xl font-extrabold leading-[1.04] tracking-tighter2 text-white sm:text-5xl lg:text-6xl">
+            {blogPage.ctaTitle || cta.title}
           </h2>
-          <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            {blogPage.ctaSubtitle}
+
+          <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-slate-300/90">
+            {blogPage.ctaSubtitle || cta.description}
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <a
-              href={blogPage.ctaButtonLink}
-              className="inline-flex justify-center items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 transition-all w-full sm:w-auto">
-              {blogPage.ctaButtonText}
-              <ArrowRight size={20} />
-            </a>
-            <a
-              href={cta.secondaryHref}
-              className="inline-flex justify-center items-center px-8 py-4 rounded-full bg-white/10 text-white font-semibold text-lg border border-white/20 hover:bg-white/20 transition-all w-full sm:w-auto backdrop-blur-sm">
+          <div className="mt-11 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <SpecularButton href={blogPage.ctaButtonLink || cta.primaryHref}>
+              {blogPage.ctaButtonText || cta.primaryLabel}
+              <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </SpecularButton>
+            <SpecularButton href={cta.secondaryHref} variant="secondaryDark">
               {cta.secondaryLabel}
-            </a>
+            </SpecularButton>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
-    </section>
-  );
+
+      <GradualBlur position="top" heightClassName="h-20 md:h-28" maxBlur={10} />
+      <GradualBlur position="bottom" heightClassName="h-20 md:h-28" maxBlur={10} />
+    </section>);
+
 }

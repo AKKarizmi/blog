@@ -1,149 +1,150 @@
-import { motion } from 'framer-motion';
-import { BookOpen, Users, Globe2, Target, X } from 'lucide-react';
-import { useForozData } from '../context/ForozDataContext';
-import type { FeatureCardData } from '../context/ForozDataContext';
-import type { ComponentType } from 'react';
 import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  BookOpenIcon,
+  CompassIcon,
+  GlobeIcon,
+  GraduationCapIcon,
+  HeartIcon,
+  LightbulbIcon,
+  TargetIcon,
+  UsersIcon } from
+'lucide-react';
+import type { ComponentType } from 'react';
+import { useForozData } from '../context/ForozDataContext';
+import { Strands } from './effects/Strands';
+import { Modal } from './ui/Modal';
+import { Reveal } from './ui/Reveal';
+import { SpecularButton } from './ui/SpecularButton';
+import { splitParagraphs } from '../utils/format';
 
-const featureIcons: Record<string, ComponentType<{ className?: string }>> = {
-  book: BookOpen,
-  education: BookOpen,
-  globe: Globe2,
-  global: Globe2,
-  target: Target,
-  skills: Target,
-  users: Users,
-  mentorship: Users,
+const featureIcons: Record<string, ComponentType<{className?: string;}>> = {
+  book: BookOpenIcon,
+  bookopen: BookOpenIcon,
+  book_open: BookOpenIcon,
+  globe: GlobeIcon,
+  target: TargetIcon,
+  users: UsersIcon,
+  graduation: GraduationCapIcon,
+  compass: CompassIcon,
+  lightbulb: LightbulbIcon,
+  heart: HeartIcon
 };
 
 export function AboutSection() {
   const { about, blogPage } = useForozData();
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const { aboutSectionSummarize, aboutSection } = blogPage;
-  const midpoint = Math.ceil(about.featureCards.length / 2);
-  const featureColumns = [
-    about.featureCards.slice(0, midpoint),
-    about.featureCards.slice(midpoint),
-  ].filter((column) => column.length > 0);
+  const [storyOpen, setStoryOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
 
-  const paragraphs = aboutSectionSummarize
-    ? aboutSectionSummarize.split(/\n{2,}|\r\n{2,}/).map((p) => p.trim()).filter(Boolean)
-    : about.paragraphs;
+  const summaryParagraphs =
+  splitParagraphs(blogPage.aboutSectionSummarize).length > 0 ?
+  splitParagraphs(blogPage.aboutSectionSummarize) :
+  about.paragraphs;
 
-  const historyParagraphs = aboutSection
-    ? aboutSection.split(/\n{2,}|\r\n{2,}/).map((p) => p.trim()).filter(Boolean)
-    : ['About Long Description Content'];
+  const storyParagraphs =
+  splitParagraphs(blogPage.aboutSection).length > 0 ?
+  splitParagraphs(blogPage.aboutSection) :
+  ['About Long Description Content'];
 
   return (
-    <section id="about" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: -30
-            }}
-            whileInView={{
-              opacity: 1,
-              x: 0
-            }}
-            viewport={{
-              once: true
-            }}
-            transition={{
-              duration: 0.6
-            }}>
-            
-            <h2 className="text-4xl font-bold text-slate-900 mb-6">
+    <section
+      id="about"
+      className="relative overflow-hidden border-y border-slate-100 bg-white py-24 sm:py-28">
+      
+      <Strands tone="dark" count={3} opacity={0.22} className="-z-0" />
+
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-14 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-8">
+        {/* Editorial column */}
+        <div>
+          <Reveal>
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-foroz-bg px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foroz-indigo">
+              <span className="h-1.5 w-1.5 rounded-full bg-foroz-blue" />
               {about.title}
+            </span>
+
+            <h2 className="mt-6 font-heading text-3xl font-extrabold leading-[1.08] tracking-tighter2 text-foroz-ink sm:text-4xl lg:text-[2.9rem]">
+              An organization built so ambition never runs out of{' '}
+              <span className="text-gradient">access</span>.
             </h2>
-            <div className="w-20 h-1.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-8" />
+          </Reveal>
 
-            <div className="space-y-6 text-lg text-slate-600">
-              {paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
+          <div className="mt-8 space-y-5">
+            {summaryParagraphs.map((paragraph, index) =>
+            <Reveal key={`about-p-${index}`} delay={0.06 * index}>
+                <p className="max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                  {paragraph}
+                </p>
+              </Reveal>
+            )}
+          </div>
 
-            <button
-              type="button"
-              onClick={() => setIsHistoryModalOpen(true)}
-              className="inline-flex mt-8 px-6 py-3 rounded-full bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors">
+          <Reveal delay={0.18} className="mt-10">
+            <SpecularButton variant="secondary" onClick={() => setStoryOpen(true)}>
               {about.buttonLabel}
-            </button>
-          </motion.div>
+            </SpecularButton>
+          </Reveal>
+        </div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: 30
-            }}
-            whileInView={{
-              opacity: 1,
-              x: 0
-            }}
-            viewport={{
-              once: true
-            }}
-            transition={{
-              duration: 0.6,
-              delay: 0.2
-            }}
-            className="grid grid-cols-2 gap-4">
-            
-            {featureColumns.map((column, columnIndex) => (
-              <div
-                key={columnIndex}
-                className={`space-y-4 ${columnIndex === 0 ? 'pt-8' : ''}`}>
-                {column.map((card) => (
-                  <FeatureCard key={card.id} card={card} />
-                ))}
-              </div>
-            ))}
-          </motion.div>
+        {/* Impact / pillar cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {about.featureCards.map((card, index) => {
+            const normalized = String(card.icon || '').
+            toLowerCase().
+            replace(/[^a-z0-9]/g, '');
+            const Icon = featureIcons[normalized] || BookOpenIcon;
+
+            return (
+              <Reveal key={card.id} delay={0.08 * index} y={20}>
+                <motion.div
+                  whileHover={reduceMotion ? undefined : { y: -6 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative h-full overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-6 transition-shadow duration-300 hover:shadow-lift">
+                  
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foroz-blue/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  
+                  <span
+                    aria-hidden="true"
+                    className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(49,85,255,0.16),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  
+
+                  <span
+                    className={`relative inline-flex h-11 w-11 items-center justify-center rounded-xl ${card.bg} ${card.color} transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105`}>
+                    
+                    <Icon className="h-5 w-5" />
+                  </span>
+
+                  <h3 className="relative mt-5 font-heading text-lg font-bold tracking-tight text-foroz-ink">
+                    {card.title}
+                  </h3>
+                  <p className="relative mt-2 text-sm leading-relaxed text-slate-600">
+                    {card.description}
+                  </p>
+                </motion.div>
+              </Reveal>);
+
+          })}
         </div>
       </div>
 
-      {isHistoryModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
-          onClick={() => setIsHistoryModalOpen(false)}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="about-history-title"
-            className="relative w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl"
-            onClick={(event) => event.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setIsHistoryModalOpen(false)}
-              className="absolute right-4 top-4 rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              aria-label="Close about history dialog">
-              <X className="h-5 w-5" />
-            </button>
-            <h3 id="about-history-title" className="pr-8 text-2xl font-bold text-slate-900">
-              Our history
-            </h3>
-            <div className="mt-4 space-y-4 text-lg text-slate-700">
-              {historyParagraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
-          </div>
+      <Modal
+        open={storyOpen}
+        onClose={() => setStoryOpen(false)}
+        eyebrow={about.title}
+        title="Our history">
+        
+        <div className="space-y-5">
+          {storyParagraphs.map((paragraph, index) =>
+          <p
+            key={`story-${index}`}
+            className="text-base leading-relaxed text-slate-600">
+            
+              {paragraph}
+            </p>
+          )}
         </div>
-      )}
+      </Modal>
     </section>);
 
-}
-
-function FeatureCard({ card }: { card: FeatureCardData }) {
-  const Icon = featureIcons[card.icon.toLowerCase()] || BookOpen;
-
-  return (
-    <div className={`${card.bg} p-6 rounded-2xl border border-slate-100`}>
-      <Icon className={`w-10 h-10 ${card.color} mb-4`} />
-      <h3 className="font-bold text-slate-900 mb-2">{card.title}</h3>
-      <p className="text-sm text-slate-600">{card.description}</p>
-    </div>
-  );
 }
