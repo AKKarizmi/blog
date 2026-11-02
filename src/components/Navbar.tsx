@@ -33,7 +33,7 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  const logo = blogPage.logo || 'https://media.foroz.me/Logo-H.svg';
+  const logo = '/assets/Logo-H.svg';
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
@@ -41,9 +41,9 @@ export function Navbar() {
         aria-label="Primary"
         initial={false}
         animate={{
-          backgroundColor: scrolled ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.5)',
+          backgroundColor: scrolled ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.96)',
           boxShadow: scrolled ?
-          '0 18px 48px -28px rgba(8,13,28,0.35)' :
+          'var(--shadow-soft)' :
           '0 0 0 rgba(0,0,0,0)',
           borderColor: scrolled ? 'rgba(226,232,240,0.9)' : 'rgba(255,255,255,0.5)'
         }}
@@ -58,12 +58,14 @@ export function Navbar() {
           <img
             src={logo}
             alt={blogPage.siteName}
-            className="h-8 w-auto sm:h-9"
+            width={508.8}
+            height={183.21}
+            className="h-10 w-auto sm:h-11"
             loading="eager" />
           
         </a>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        <ul className="hidden items-center gap-1 xl:flex">
           {navLinks.map((link) =>
           <li key={link.href}>
               <a
@@ -72,7 +74,7 @@ export function Navbar() {
               
                 <span className="relative">
                   {link.label}
-                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-gradient-to-r from-foroz-blue to-foroz-violet transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-foroz-blue transition-all duration-300 group-hover:w-full" />
                 </span>
               </a>
             </li>
@@ -95,7 +97,7 @@ export function Navbar() {
             aria-expanded={mobileOpen}
             aria-controls="mobile-navigation"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 transition-colors hover:bg-white lg:hidden">
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 transition-colors hover:bg-white xl:hidden">
             
             {mobileOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
           </button>
@@ -110,7 +112,7 @@ export function Navbar() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur-xl lg:hidden">
+          className="mx-auto mt-2 max-w-7xl max-h-[calc(100dvh-6.5rem)] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur-xl xl:hidden">
           
             <ul className="flex flex-col">
               {navLinks.map((link) =>

@@ -8,53 +8,102 @@
 
 /* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
 
+/* Native SVG fill: #090B63. Other brand values mix this color with white or black. */
+:root {
+  --brand-rgb: 9 11 99;
+  --navy-950-rgb: 4 5 45;
+  --navy-900-rgb: 5 7 59;
+  --navy-800-rgb: 6 8 69;
+  --navy-700-rgb: 7 9 79;
+  --brand-light-rgb: 181 182 208;
+  --surface-rgb: 248 248 252;
+  --mist-rgb: 240 240 247;
+  --ink-rgb: 20 21 38;
+  --shadow-soft: 0 2px 8px rgb(var(--brand-rgb) / 0.04), 0 12px 28px -16px rgb(var(--brand-rgb) / 0.12);
+  --shadow-lift: 0 8px 24px -12px rgb(var(--brand-rgb) / 0.18);
+  --section-space: 3.5rem;
+  --title-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.5rem);
+  --hero-size: clamp(2.25rem, 1.4rem + 2.7vw, 3.5rem);
+  --card-radius: 1rem;
+}
 html {
   scroll-behavior: smooth;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  scroll-padding-top: 6rem;
+  scroll-padding-top: 7rem;
 }
 body {
-  @apply bg-white text-slate-900 antialiased;
-  overflow-x: hidden;
+  @apply bg-white text-foroz-ink antialiased;
+  font-size: 1rem;
+  line-height: 1.65;
 }
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
   font-family: 'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, sans-serif;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+main .grid > *, footer .grid > * { min-width: 0; }
+p, a, button, dd {
+  overflow-wrap: anywhere;
 }
 :focus-visible {
-  outline: 2px solid #3155ff;
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px white;
 }
-/* Preserved legacy utility used across FOROZ sections */
-.text-gradient {
-  background-image: linear-gradient(90deg, #3155ff, #4f46e5, #7c3aed);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+::selection {
+  background: rgb(var(--brand-rgb) / 0.15);
 }
-.text-gradient-light {
-  background-image: linear-gradient(90deg, #8ab4ff, #a5b4fc, #c4b5fd);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Keep existing emphasis hooks while removing unrelated gradient colors. */
+.text-gradient { color: rgb(var(--brand-rgb)); }
+.text-gradient-light { color: rgb(var(--brand-light-rgb)); }
+.gradient-border { border: 1px solid rgb(var(--brand-rgb) / 0.12); }
+.section-space { padding-block: var(--section-space); }
+.hero-space { padding-top: 8rem; padding-bottom: var(--section-space); }
+.hero-title, .section-title {
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
 }
-.gradient-border {
-  position: relative;
+.hero-title { font-size: var(--hero-size); }
+.section-title { font-size: var(--title-size); }
+/* Flex wrapping centers partial final rows while maintaining bounded card widths. */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  align-content: start;
 }
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(140deg, rgba(49, 85, 255, 0.5), rgba(124, 58, 237, 0.35), rgba(56, 189, 248, 0.25));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+.card-grid > * { flex: 0 1 100%; min-width: 0; max-width: 26rem; }
+.card-grid-pillars > * { max-width: none; }
+@media (max-width: 639px) {
+  .card-grid-pillars > * { max-width: 26rem; }
+}
+.card-grid article, .card-grid > * > .group { border-radius: var(--card-radius); }
+.event-card { width: 86%; min-width: 0; }
+.announcement-single > * { min-width: 0; }
+.announcement-single article { width: 100%; }
+/* Keep dark primary actions distinguishable on navy surfaces. */
+.bg-navy-900 .button-primary { border-color: rgb(var(--brand-light-rgb) / 0.6); }
+@media (min-width: 640px) {
+  .card-grid > * { flex-basis: calc((100% - 1.5rem) / 2); }
+  .event-card { width: calc((100% - 1.5rem) / 2); }
+  .event-track:has(> :only-child) { justify-content: center; }
+}
+@media (min-width: 768px) {
+  :root { --section-space: 4.5rem; }
+  .hero-space { padding-top: 9rem; }
+  .announcement-single article { display: grid; grid-template-columns: 1fr 1fr; }
+  .announcement-single article > :first-child { height: 100%; min-height: 20rem; aspect-ratio: auto; }
+}
+@media (min-width: 1024px) {
+  :root { --section-space: 5.5rem; }
+  .hero-space { padding-top: 10rem; }
+  .card-grid > * { flex-basis: calc((100% - 3rem) / 3); }
+  .card-grid-pillars > * { flex-basis: calc((100% - 1.5rem) / 2); }
+  .card-grid-team > * { flex-basis: calc((100% - 4.5rem) / 4); }
+  .event-card { width: calc((100% - 3rem) / 3); }
+  .event-track:not(:has(> :nth-child(4))) { justify-content: center; }
 }
 .no-scrollbar {
   -ms-overflow-style: none;

@@ -74,23 +74,23 @@ export function ContactSection() {
   );
 
   const fieldClasses =
-  'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-foroz-ink placeholder:text-slate-400 transition-all duration-300 focus:border-foroz-blue focus:outline-none focus:ring-4 focus:ring-foroz-blue/12';
+  'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-foroz-ink placeholder:text-slate-600 transition-all duration-300 focus:border-foroz-blue focus:outline-none focus:ring-4 focus:ring-foroz-blue/20';
 
   return (
     <section
       id="contact"
-      className="relative overflow-hidden border-t border-slate-100 bg-white py-24 sm:py-28">
+      className="relative overflow-hidden border-t border-slate-100 bg-white section-space">
       
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20 lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8 lg:px-8">
         {/* Left: get in touch */}
         <div>
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-foroz-bg px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foroz-indigo">
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-foroz-bg px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-foroz-blue">
               <span className="h-1.5 w-1.5 rounded-full bg-foroz-blue" />
               Contact
             </span>
 
-            <h2 className="mt-6 font-heading text-3xl font-extrabold leading-[1.08] tracking-tighter2 text-foroz-ink sm:text-4xl lg:text-[2.9rem]">
+            <h2 className="mt-6 font-heading section-title text-foroz-ink">
               {contact.title}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -103,14 +103,14 @@ export function ContactSection() {
               href={`mailto:${email}`}
               className="group flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 transition-all duration-300 hover:border-foroz-blue/40 hover:shadow-soft">
               
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-foroz-mist text-foroz-blue">
+              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-foroz-mist text-foroz-blue">
                 <MailIcon className="h-5 w-5" />
               </span>
-              <span>
-                <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                   Email
                 </span>
-                <span className="block font-medium text-foroz-ink">{email}</span>
+                <span className="block break-words font-medium text-foroz-ink">{email}</span>
               </span>
             </a>
 
@@ -119,28 +119,28 @@ export function ContactSection() {
               href={`tel:${phone}`}
               className="group flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 transition-all duration-300 hover:border-foroz-blue/40 hover:shadow-soft">
               
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-foroz-mist text-foroz-indigo">
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-foroz-mist text-foroz-blue">
                   <PhoneIcon className="h-5 w-5" />
                 </span>
-                <span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                     Phone
                   </span>
-                  <span className="block font-medium text-foroz-ink">{phone}</span>
+                  <span className="block break-words font-medium text-foroz-ink">{phone}</span>
                 </span>
               </a>
             }
 
             {address &&
             <div className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-foroz-mist text-foroz-violet">
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-foroz-mist text-foroz-blue">
                   <MapPinIcon className="h-5 w-5" />
                 </span>
-                <span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                     Address
                   </span>
-                  <span className="block font-medium text-foroz-ink">{address}</span>
+                  <span className="block break-words font-medium text-foroz-ink">{address}</span>
                 </span>
               </div>
             }
@@ -148,7 +148,7 @@ export function ContactSection() {
 
           {socials.length > 0 &&
           <Reveal delay={0.16} className="mt-8">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                 Follow FOROZ
               </p>
               <ul className="mt-3 flex flex-wrap gap-2">
@@ -162,7 +162,7 @@ export function ContactSection() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={platform}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-foroz-blue hover:text-foroz-blue">
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-foroz-blue hover:text-foroz-blue">
                       
                         <Icon className="h-4 w-4" />
                       </a>
@@ -176,7 +176,7 @@ export function ContactSection() {
 
         {/* Right: form */}
         <Reveal delay={0.08} y={30}>
-          <div className="gradient-border relative overflow-hidden rounded-3xl bg-foroz-bg p-7 sm:p-10">
+          <div className="gradient-border relative overflow-hidden rounded-2xl bg-foroz-bg p-6 sm:p-8">
             <form onSubmit={handleSubmit} noValidate={false} className="relative">
               <h3 className="font-heading text-xl font-bold tracking-tight text-foroz-ink">
                 Send us a message

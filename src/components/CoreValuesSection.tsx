@@ -50,19 +50,6 @@ type CoreValuesResponse = {
   core_values?: CoreValueCategory[];
 };
 
-const hexToRgba = (hex: string, alpha: number) => {
-  const normalized = hex.trim().replace('#', '');
-  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
-    return undefined;
-  }
-
-  const red = Number.parseInt(normalized.slice(0, 2), 16);
-  const green = Number.parseInt(normalized.slice(2, 4), 16);
-  const blue = Number.parseInt(normalized.slice(4, 6), 16);
-
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-};
-
 export function CoreValuesSection() {
   const [coreValues, setCoreValues] = useState<CoreValueCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +99,7 @@ export function CoreValuesSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white py-24 sm:py-28">
+    <section className="relative overflow-hidden bg-white section-space">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Core Values"
@@ -125,9 +112,9 @@ export function CoreValuesSection() {
           description="These guiding principles shape our culture, drive our decisions, and define how we interact with the youth we serve and the partners we collaborate with." />
         
 
-        <div className="mt-16">
+        <div className="mt-8">
           {loading ?
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid">
               {Array.from({ length: 6 }).map((_, index) =>
             <div
               key={`core-value-skeleton-${index}`}
@@ -150,41 +137,33 @@ export function CoreValuesSection() {
               {error}
             </div> :
           coreValues.length > 0 ?
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid">
               {coreValues.map((value, index) => {
               const normalizedIcon = value.icon.
               toLowerCase().
               replace(/[^a-z0-9]/g, '');
               const Icon = valueIcons[normalizedIcon] || HeartIcon;
-              const accentColor = value.color || '#3155FF';
-              const tint = hexToRgba(accentColor, 0.09);
-              const glow = hexToRgba(accentColor, 0.14);
+              const accentColor = 'rgb(var(--brand-rgb))';
+              const tint = 'rgb(var(--brand-rgb) / 0.06)';
 
               return (
                 <Reveal key={value.id} delay={index * 0.06} y={22}>
                     <motion.div
-                    whileHover={reduceMotion ? undefined : { y: -7 }}
+                    whileHover={reduceMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="group relative h-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-8 transition-shadow duration-500 hover:shadow-lift">
+                    className="group relative h-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 transition-shadow duration-500 hover:shadow-lift">
                     
                       <span
                       aria-hidden="true"
                       className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
                       style={{
-                        background: `linear-gradient(90deg, ${accentColor}, rgba(124,58,237,0.5), transparent)`
-                      }} />
-                    
-                      <span
-                      aria-hidden="true"
-                      className="absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{
-                        background: `radial-gradient(circle, ${glow || 'rgba(49,85,255,0.12)'}, transparent 70%)`
+                        background: `linear-gradient(90deg, ${accentColor}, rgb(var(--brand-rgb) / 0.5), transparent)`
                       }} />
                     
 
                       <span
                       className="relative inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-3"
-                      style={{ backgroundColor: tint || 'rgb(248 250 252)' }}>
+                      style={{ backgroundColor: tint }}>
                       
                         <Icon className="h-6 w-6" style={{ color: accentColor }} />
                       </span>
@@ -192,7 +171,7 @@ export function CoreValuesSection() {
                       <h3 className="relative mt-6 font-heading text-lg font-bold tracking-tight text-foroz-ink">
                         {value.title}
                       </h3>
-                      <p className="relative mt-3 text-sm leading-relaxed text-slate-600">
+                      <p className="relative mt-3 text-base leading-relaxed text-slate-600">
                         {value.description}
                       </p>
                     </motion.div>

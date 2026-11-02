@@ -56,12 +56,12 @@ export function Modal({ open, onClose, title, eyebrow, children, footer }: Modal
         ref={panelRef}
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
-        className="animate-scale-up relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border border-slate-200/80 bg-white shadow-[0_40px_120px_-40px_rgba(8,13,28,0.6)] focus:outline-none sm:rounded-3xl">
+        className="animate-scale-up relative max-h-[92dvh] w-full max-w-3xl overflow-y-auto rounded-t-2xl border border-slate-200/80 bg-white shadow-soft focus:outline-none sm:rounded-2xl">
         
         <div className="sticky top-0 z-10 flex items-start justify-between gap-6 border-b border-slate-100 bg-white/90 px-6 py-5 backdrop-blur-xl sm:px-8">
           <div>
             {eyebrow &&
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-foroz-indigo">
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-foroz-blue">
                 {eyebrow}
               </p>
             }
@@ -73,7 +73,7 @@ export function Modal({ open, onClose, title, eyebrow, children, footer }: Modal
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="shrink-0 rounded-full border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900">
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
             
             <XIcon className="h-4 w-4" />
           </button>

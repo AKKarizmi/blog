@@ -41,7 +41,7 @@ export function BoardMembersSection() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section id="team" className="relative overflow-hidden bg-foroz-bg py-24 sm:py-28">
+    <section id="team" className="relative overflow-hidden bg-foroz-bg section-space">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Our Team"
@@ -53,13 +53,13 @@ export function BoardMembersSection() {
           description="Educators, professionals and organizers who make the programs, mentorship and opportunities possible." />
         
 
-        <div className="mt-16">
+        <div className="mt-8">
           {loading && boardMembers.length === 0 ?
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="card-grid card-grid-team">
               {Array.from({ length: 4 }).map((_, index) =>
             <div
               key={`member-skeleton-${index}`}
-              className="h-96 animate-pulse rounded-3xl border border-slate-200/70 bg-white" />
+              className="h-96 animate-pulse rounded-2xl border border-slate-200/70 bg-white" />
 
             )}
             </div> :
@@ -68,7 +68,7 @@ export function BoardMembersSection() {
               Team members coming soon.
             </div> :
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="card-grid card-grid-team">
               {boardMembers.map((member, index) => {
               const socials = Object.entries(member.socials || {}).filter(
                 ([, url]) => Boolean(url)
@@ -77,9 +77,9 @@ export function BoardMembersSection() {
               return (
                 <Reveal key={member.id} delay={Math.min(index, 5) * 0.06} y={24}>
                     <motion.article
-                    whileHover={reduceMotion ? undefined : { y: -8 }}
+                    whileHover={reduceMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white transition-shadow duration-500 hover:shadow-lift">
+                    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-shadow duration-500 hover:shadow-lift">
                     
                       <div className="relative aspect-[4/5] w-full overflow-hidden bg-foroz-mist">
                         {member.image ?
@@ -102,7 +102,7 @@ export function BoardMembersSection() {
                       
 
                         {socials.length > 0 &&
-                      <ul className="absolute inset-x-4 bottom-4 flex flex-wrap gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-focus-within:opacity-100">
+                      <ul className="absolute inset-x-4 bottom-4 flex flex-wrap gap-2 opacity-100 sm:opacity-0 transition-all duration-500 group-hover:opacity-100 group-focus-within:opacity-100">
                             {socials.map(([platform, url]) => {
                           const Icon = socialIcons[platform] || GlobeIcon;
 
@@ -129,18 +129,18 @@ export function BoardMembersSection() {
                           {member.title}
                         </h3>
                         {member.role &&
-                      <p className="mt-1 text-sm font-semibold text-foroz-indigo">
+                      <p className="mt-1 text-sm font-semibold text-foroz-blue">
                             {member.role}
                           </p>
                       }
-                        <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                        <p className="mt-3 flex-1 text-base leading-relaxed text-slate-600">
                           {truncate(member.short_description, 110)}
                         </p>
 
                         <button
                         type="button"
                         onClick={() => setActive(member)}
-                        className="mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-foroz-blue transition-colors hover:text-foroz-violet">
+                        className="mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-foroz-blue transition-colors hover:text-foroz-blue">
                         
                           View Full Bio
                           <ArrowUpRightIcon className="h-3.5 w-3.5" />

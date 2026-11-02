@@ -49,19 +49,6 @@ type CategoriesResponse = {
   categories?: ServiceCategory[];
 };
 
-const hexToRgba = (hex: string, alpha: number) => {
-  const normalized = hex.trim().replace('#', '');
-  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
-    return undefined;
-  }
-
-  const red = Number.parseInt(normalized.slice(0, 2), 16);
-  const green = Number.parseInt(normalized.slice(2, 4), 16);
-  const blue = Number.parseInt(normalized.slice(4, 6), 16);
-
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-};
-
 export function ServicesSection() {
   const [services, setServices] = useState<ServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +91,7 @@ export function ServicesSection() {
   }, []);
 
   return (
-    <section id="services" className="relative overflow-hidden bg-foroz-bg py-24 sm:py-28">
+    <section id="services" className="relative overflow-hidden bg-foroz-bg section-space">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/70 to-transparent" />
@@ -129,13 +116,13 @@ export function ServicesSection() {
           } />
         
 
-        <div className="mt-16">
+        <div className="mt-8">
           {loading ?
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid">
               {Array.from({ length: 3 }).map((_, index) =>
             <div
               key={`service-skeleton-${index}`}
-              className="animate-pulse rounded-3xl border border-slate-200/70 bg-white p-8">
+              className="animate-pulse rounded-2xl border border-slate-200/70 bg-white p-6 sm:p-8">
               
                   <div className="mb-6 h-14 w-14 rounded-2xl bg-slate-200/70" />
                   <div className="mb-4 h-6 w-3/4 rounded bg-slate-200/70" />
@@ -155,53 +142,43 @@ export function ServicesSection() {
               {error}
             </div> :
           services.length > 0 ?
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid">
               {services.map((service, index) => {
               const normalizedIcon = service.icon_text.
               toLowerCase().
               replace(/[^a-z0-9]/g, '');
               const Icon = serviceIcons[normalizedIcon] || BookOpenIcon;
-              const accentColor = service.color || '#3155FF';
-              const tint = hexToRgba(accentColor, 0.09);
-              const isFeatured = index === 0;
+              const accentColor = 'rgb(var(--brand-rgb))';
+              const tint = 'rgb(var(--brand-rgb) / 0.06)';
 
               return (
                 <Reveal
                   key={service.id}
                   delay={index * 0.07}
                   y={24}
-                  className={isFeatured ? 'md:col-span-2 lg:col-span-1' : ''}>
+                  className="min-w-0">
                   
                     <motion.article
-                    whileHover={reduceMotion ? undefined : { y: -8 }}
+                    whileHover={reduceMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 transition-shadow duration-500 hover:shadow-lift">
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 transition-shadow duration-500 hover:shadow-lift">
                     
                       <span
                       aria-hidden="true"
                       className="absolute inset-x-0 top-0 h-1"
                       style={{
-                        background: `linear-gradient(90deg, ${accentColor}, rgba(124,58,237,0.55))`
-                      }} />
-                    
-                      <span
-                      aria-hidden="true"
-                      className="absolute -bottom-20 -right-16 h-52 w-52 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{
-                        background: `radial-gradient(circle, ${
-                        hexToRgba(accentColor, 0.14) || 'rgba(49,85,255,0.12)'}, transparent 70%)`
-
+                        background: `linear-gradient(90deg, ${accentColor}, rgb(var(--brand-rgb) / 0.55))`
                       }} />
                     
 
                       <div className="relative flex items-center justify-between">
                         <span
                         className="inline-flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:-translate-y-1"
-                        style={{ backgroundColor: tint || 'rgb(248 250 252)' }}>
+                        style={{ backgroundColor: tint }}>
                         
                           <Icon className="h-7 w-7" style={{ color: accentColor }} />
                         </span>
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                        <span className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                           Program
                         </span>
                       </div>
@@ -209,11 +186,11 @@ export function ServicesSection() {
                       <h3 className="relative mt-7 font-heading text-xl font-bold tracking-tight text-foroz-ink">
                         {service.title}
                       </h3>
-                      <p className="relative mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                      <p className="relative mt-3 flex-1 text-base leading-relaxed text-slate-600">
                         {service.description}
                       </p>
 
-                      <div className="relative mt-8 flex items-center text-sm font-semibold text-foroz-blue opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 translate-y-2">
+                      <div className="relative mt-8 flex items-center text-sm font-semibold text-foroz-blue transition-colors duration-200">
                         Learn more
                         <ArrowRightIcon className="ml-2 h-4 w-4" />
                       </div>

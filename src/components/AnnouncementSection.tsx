@@ -21,7 +21,7 @@ export function AnnouncementSection() {
   return (
     <section
       id="announcements"
-      className="relative overflow-hidden border-y border-slate-100 bg-white py-24 sm:py-28">
+      className="relative overflow-hidden border-y border-slate-100 bg-white section-space">
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
@@ -35,10 +35,10 @@ export function AnnouncementSection() {
           description="Opportunities, openings and updates from across the organization — published as they happen." />
         
 
-        <div className="mt-16">
+        <div className="mt-8">
           {loading && announcements.length === 0 ?
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-              <div className="h-[26rem] animate-pulse rounded-3xl border border-slate-200/70 bg-foroz-bg" />
+              <div className="h-[26rem] animate-pulse rounded-2xl border border-slate-200/70 bg-foroz-bg" />
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, index) =>
               <div
@@ -53,13 +53,13 @@ export function AnnouncementSection() {
               No announcements are available right now.
             </div> :
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className={secondary.length ? "grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr]" : "announcement-single"}>
               {/* Featured announcement */}
               <Reveal y={28}>
                 <motion.article
-                whileHover={reduceMotion ? undefined : { y: -6 }}
+                whileHover={reduceMotion ? undefined : { y: -3 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-navy-900 shadow-[0_30px_90px_-45px_rgba(8,13,28,0.7)]">
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-navy-900 shadow-soft">
                 
                   <div className="relative aspect-[16/10] w-full overflow-hidden">
                     {featured.image ?
@@ -72,19 +72,19 @@ export function AnnouncementSection() {
 
 
                   <div className="flex h-full w-full items-center justify-center bg-navy-800">
-                        <MegaphoneIcon className="h-10 w-10 text-foroz-cyan/70" />
+                        <MegaphoneIcon className="h-10 w-10 text-foroz-light/70" />
                       </div>
                   }
                     <div
                     aria-hidden="true"
                     className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/30 to-transparent" />
                   
-                    <span className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-navy-900/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+                    <span className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-navy-900/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-white backdrop-blur">
                       Featured
                     </span>
                   </div>
 
-                  <div className="flex flex-1 flex-col p-7 sm:p-9">
+                  <div className="flex flex-1 flex-col p-6 sm:p-8">
                     <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-400">
                       {featured.date &&
                     <span className="inline-flex items-center gap-1.5">
@@ -122,7 +122,7 @@ export function AnnouncementSection() {
               </Reveal>
 
               {/* Secondary announcements */}
-              <ul className="flex flex-col gap-4">
+              <ul className="flex flex-col gap-4 empty:hidden">
                 {secondary.map((announcement, index) =>
               <Reveal
                 key={announcement.id}
@@ -155,16 +155,16 @@ export function AnnouncementSection() {
                       </span>
 
                       <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        <span className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
                           {announcement.date && <span>{formatDate(announcement.date)}</span>}
                           {announcement.posted_by &&
-                      <span className="text-foroz-indigo">{announcement.posted_by}</span>
+                      <span className="text-foroz-blue">{announcement.posted_by}</span>
                       }
                         </span>
                         <span className="mt-2 block font-heading text-base font-bold leading-snug text-foroz-ink">
                           {announcement.title}
                         </span>
-                        <span className="mt-1.5 block text-sm leading-relaxed text-slate-600">
+                        <span className="mt-1.5 block text-base leading-relaxed text-slate-600">
                           {truncate(
                         announcement.description || announcement.short_description || '',
                         96
@@ -207,7 +207,7 @@ export function AnnouncementSection() {
 
         }
         {active?.posted_by &&
-        <p className="mb-4 text-sm font-semibold text-foroz-indigo">
+        <p className="mb-4 text-sm font-semibold text-foroz-blue">
             Posted by {active.posted_by}
           </p>
         }

@@ -12,8 +12,6 @@ import {
 'lucide-react';
 import type { ComponentType } from 'react';
 import { useForozData } from '../context/ForozDataContext';
-import { GhostFibers } from './effects/GhostFibers';
-import { Strands } from './effects/Strands';
 
 const socialIcons: Record<string, ComponentType<{className?: string;}>> = {
   linkedin: LinkedinIcon,
@@ -42,23 +40,21 @@ export function Footer() {
 
   return (
     <footer className="relative isolate overflow-hidden bg-navy-950 text-slate-300">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_15%_0%,#101A3C_0%,#080D1C_55%,#060A16_100%)]" />
       
-      <GhostFibers tone="light" count={9} opacity={0.3} className="-z-10" />
-      <Strands tone="light" count={3} opacity={0.22} className="-z-10" />
-
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 section-space sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_2fr]">
           <div>
+            <div className="inline-flex rounded-xl bg-white px-4 py-3">
             <img
-              src="https://media.foroz.me/White%20Logo.svg"
+              src="/assets/Logo-H.svg"
               alt={blogPage.siteName}
-              className="h-10 w-auto"
+              width={508.8}
+              height={183.21}
+              className="h-12 w-auto"
               loading="lazy" />
+            </div>
             
-            <p className="mt-6 max-w-sm text-sm leading-relaxed text-slate-400">
+            <p className="mt-6 max-w-sm text-base leading-relaxed text-slate-300">
               {blogPage.footerDescription || footer.description}
             </p>
 
@@ -85,10 +81,10 @@ export function Footer() {
             }
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 xl:grid-cols-4">
             {columns.map((column) =>
             <nav key={column.title} aria-label={column.title}>
-                <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-white">
                   {column.title}
                 </h2>
                 <ul className="mt-5 space-y-3">
@@ -96,7 +92,7 @@ export function Footer() {
                 <li key={`${column.title}-${link.label}`}>
                       <a
                     href={link.href}
-                    className="text-sm text-slate-400 transition-colors hover:text-white">
+                    className="text-sm text-slate-300 transition-colors hover:text-white">
                     
                         {link.label}
                       </a>
@@ -107,7 +103,7 @@ export function Footer() {
             )}
 
             <div>
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-white">
                 Contact
               </h2>
               <ul className="mt-5 space-y-3">
@@ -115,7 +111,7 @@ export function Footer() {
                 <li>
                     <a
                     href={`mailto:${email}`}
-                    className="inline-flex items-start gap-2 text-sm text-slate-400 transition-colors hover:text-white">
+                    className="inline-flex items-start gap-2 text-sm text-slate-300 transition-colors hover:text-white">
                     
                       <MailIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <span className="break-all">{email}</span>
@@ -126,7 +122,7 @@ export function Footer() {
                 <li>
                     <a
                     href={`tel:${phone}`}
-                    className="inline-flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-white">
+                    className="inline-flex items-center gap-2 text-sm text-slate-300 transition-colors hover:text-white">
                     
                       <PhoneIcon className="h-3.5 w-3.5 shrink-0" />
                       {phone}
@@ -136,7 +132,7 @@ export function Footer() {
                 <li>
                   <a
                     href="#contact"
-                    className="text-sm text-slate-400 transition-colors hover:text-white">
+                    className="text-sm text-slate-300 transition-colors hover:text-white">
                     
                     Get in touch
                   </a>
@@ -146,12 +142,12 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
-          <p className="text-xs text-slate-500">
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
+          <p className="text-xs text-slate-300">
             © {blogPage.copyrightText || footer.copyright}
           </p>
-          <p className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-            <HeartIcon className="h-3.5 w-3.5 text-foroz-purple" />
+          <p className="inline-flex items-center gap-1.5 text-xs text-slate-300">
+            <HeartIcon className="h-3.5 w-3.5 text-foroz-light" />
             {footer.madeWith}
           </p>
         </div>
