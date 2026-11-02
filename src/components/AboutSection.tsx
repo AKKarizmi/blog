@@ -1,3 +1,4 @@
+import { Strands } from './effects/Strands';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -48,7 +49,8 @@ export function AboutSection() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden border-y border-slate-100 bg-white section-space">
+      className="relative isolate overflow-hidden border-y border-slate-100 bg-white section-space">
+      <Strands tone="dark" count={3} opacity={0.22} className="-z-10" />
       
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-8 lg:px-8">
         {/* Editorial column */}

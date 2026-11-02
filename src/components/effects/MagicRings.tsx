@@ -62,9 +62,9 @@ export function MagicRings({
   }, [interactive, pointerX, pointerY, reduceMotion]);
 
   const borderColor =
-  tone === 'light' ? 'rgba(148, 176, 255, 0.22)' : 'rgba(49, 85, 255, 0.16)';
+  tone === 'light' ? 'rgb(var(--brand-light-rgb) / 0.22)' : 'rgb(var(--brand-rgb) / 0.16)';
   const accentColor =
-  tone === 'light' ? 'rgba(124, 58, 237, 0.16)' : 'rgba(124, 58, 237, 0.1)';
+  tone === 'light' ? 'rgb(var(--brand-light-rgb) / 0.16)' : 'rgb(var(--brand-rgb) / 0.1)';
 
   return (
     <div
@@ -90,7 +90,7 @@ export function MagicRings({
                 border: `1px solid ${index % 2 === 0 ? borderColor : accentColor}`,
                 boxShadow:
                 index === 1 ?
-                `0 0 120px -40px ${tone === 'light' ? 'rgba(49,85,255,0.55)' : 'rgba(49,85,255,0.28)'}` :
+                `0 0 120px -40px ${tone === 'light' ? 'rgb(var(--brand-light-rgb) / 0.3)' : 'rgb(var(--brand-rgb) / 0.28)'}` :
                 undefined
               }}
               animate={
@@ -114,10 +114,10 @@ export function MagicRings({
                 className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
                 style={{
                   background:
-                  index % 2 === 0 ?
-                  'rgba(56, 189, 248, 0.85)' :
-                  'rgba(167, 139, 250, 0.8)',
-                  boxShadow: '0 0 12px rgba(56,189,248,0.7)'
+                  tone === 'light' ?
+                  'rgb(var(--brand-light-rgb) / 0.85)' :
+                  'rgb(var(--brand-rgb) / 0.65)',
+                  boxShadow: '0 0 12px rgb(var(--brand-light-rgb) / 0.7)'
                 }} />
               
             </motion.div>);

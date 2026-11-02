@@ -1,3 +1,6 @@
+import { MagicRings } from './effects/MagicRings';
+import { GhostFibers } from './effects/GhostFibers';
+import { Strands } from './effects/Strands';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRightIcon,
@@ -22,6 +25,9 @@ export function HeroSection() {
     <section
       id="home"
       className="relative isolate overflow-hidden bg-white hero-space">
+      <MagicRings tone="dark" rings={5} className="-z-10 opacity-70" />
+      <GhostFibers tone="dark" count={10} opacity={0.45} className="-z-10" />
+      <Strands tone="dark" count={4} opacity={0.32} className="-z-10" />
       
       
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:px-8">
@@ -120,6 +126,8 @@ export function HeroSection() {
               </div> :
 
             <div className="relative min-h-[26rem] w-full">
+                <MagicRings tone="light" rings={4} interactive={false} />
+                <GhostFibers tone="light" count={10} opacity={0.4} />
                 <div className="relative flex min-h-[26rem] flex-col justify-between gap-8 p-6 sm:p-8">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-slate-200 backdrop-blur">
@@ -172,6 +180,8 @@ export function HeroSection() {
 
           {/* Floating metadata cards */}
           <motion.div
+            animate={reduceMotion ? { y: 0 } : { y: [0, -10, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -left-3 bottom-10 hidden w-52 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-soft backdrop-blur-xl sm:block">
             
             <div className="flex items-center gap-3">
@@ -192,6 +202,8 @@ export function HeroSection() {
           </motion.div>
 
           <motion.div
+            animate={reduceMotion ? { y: 0 } : { y: [0, 12, 0] }}
+            transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -right-2 top-8 hidden rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-soft backdrop-blur-xl md:block">
             
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
@@ -199,6 +211,22 @@ export function HeroSection() {
             </p>
             <p className="font-heading text-base font-bold text-foroz-ink">2025</p>
           </motion.div>
+
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            {[
+              { top: '12%', left: '-3%', size: 6 },
+              { top: '62%', left: '99%', size: 4 },
+              { top: '92%', left: '18%', size: 5 }
+            ].map((dot, index) => (
+              <motion.span
+                key={`particle-${index}`}
+                className="absolute rounded-full bg-foroz-blue"
+                style={{ top: dot.top, left: dot.left, width: dot.size, height: dot.size }}
+                animate={reduceMotion ? { opacity: 0.35 } : { opacity: [0.25, 0.9, 0.25] }}
+                transition={{ duration: 5 + index * 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            ))}
+          </div>
 
         </motion.div>
       </div>

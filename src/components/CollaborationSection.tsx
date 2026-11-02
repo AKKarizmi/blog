@@ -1,3 +1,5 @@
+import { GhostFibers } from './effects/GhostFibers';
+import { Strands } from './effects/Strands';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRightIcon, Building2Icon, LinkIcon } from 'lucide-react';
@@ -18,7 +20,9 @@ export function CollaborationSection() {
   return (
     <section
       id="collaborations"
-      className="relative overflow-hidden border-y border-slate-100 bg-white section-space">
+      className="relative isolate overflow-hidden border-y border-slate-100 bg-white section-space">
+      <Strands tone="dark" count={4} opacity={0.2} className="-z-10" />
+      <GhostFibers tone="dark" count={8} opacity={0.3} className="-z-10" />
       
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading

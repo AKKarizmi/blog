@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 type GhostFibersProps = {
@@ -26,6 +26,7 @@ export function GhostFibers({
   className = ''
 }: GhostFibersProps) {
   const reduceMotion = useReducedMotion();
+  const gradientId = useId();
 
   const fibers = useMemo(() => {
     return Array.from({ length: count }).map((_, index) => {
@@ -54,7 +55,7 @@ export function GhostFibers({
     });
   }, [count]);
 
-  const stroke = tone === 'light' ? 'url(#fiberLight)' : 'url(#fiberDark)';
+  const stroke = `url(#${gradientId}-${tone})`;
 
   return (
     <div
@@ -69,17 +70,17 @@ export function GhostFibers({
         fill="none">
         
         <defs>
-          <linearGradient id="fiberLight" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0" />
-            <stop offset="35%" stopColor="#8AB4FF" stopOpacity="0.7" />
-            <stop offset="70%" stopColor="#A78BFA" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
+          <linearGradient id={`${gradientId}-light`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="rgb(var(--brand-light-rgb))" stopOpacity="0" />
+            <stop offset="35%" stopColor="rgb(var(--brand-light-rgb))" stopOpacity="0.7" />
+            <stop offset="70%" stopColor="rgb(var(--brand-light-rgb))" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="rgb(var(--brand-light-rgb))" stopOpacity="0" />
           </linearGradient>
-          <linearGradient id="fiberDark" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#3155FF" stopOpacity="0" />
-            <stop offset="40%" stopColor="#3155FF" stopOpacity="0.35" />
-            <stop offset="75%" stopColor="#7C3AED" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
+          <linearGradient id={`${gradientId}-dark`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="rgb(var(--brand-rgb))" stopOpacity="0" />
+            <stop offset="40%" stopColor="rgb(var(--brand-rgb))" stopOpacity="0.35" />
+            <stop offset="75%" stopColor="rgb(var(--brand-rgb))" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="rgb(var(--brand-rgb))" stopOpacity="0" />
           </linearGradient>
         </defs>
 

@@ -1,3 +1,5 @@
+import { GhostFibers } from './effects/GhostFibers';
+import { Strands } from './effects/Strands';
 import {
   FacebookIcon,
   GlobeIcon,
@@ -40,6 +42,8 @@ export function Footer() {
 
   return (
     <footer className="relative isolate overflow-hidden bg-navy-950 text-slate-300">
+      <GhostFibers tone="light" count={9} opacity={0.3} className="-z-10" />
+      <Strands tone="light" count={3} opacity={0.22} className="-z-10" />
       
       <div className="relative mx-auto max-w-7xl px-4 section-space sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_2fr]">

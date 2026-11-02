@@ -7,7 +7,7 @@ Implemented locally on November 2, 2026. No deployment was performed.
 - Anchored the public design in the supplied SVG fill, `#090B63`, with derived navy shades, light tints, white, and neutral surfaces. Semantic error colors remain intact.
 - Preserved Inter body text and Plus Jakarta Sans headings; added responsive heading sizes, consistent section spacing, readable captions, and quieter card styling.
 - Copied both official SVGs unchanged. The horizontal mark now appears locally in the header and on a white inset in the footer, with intrinsic dimensions reserved.
-- Removed ambient rings, fibers, strands, blur overlays, particles, and button shine from the rendered homepage. Retained restrained reveals and reduced-motion support.
+- Restored animated rings, fibers, strands, floating hero cards, particles, scroll reveals, and pointer-following button highlights after feedback. Effects use the native navy palette and respect reduced-motion preferences. Layout and typography refinements remain intact.
 - Centered incomplete card rows and short event collections; retained event scrolling. A single announcement now occupies the available row with a two-column image/content layout on wider screens.
 - Moved desktop navigation to 1280px and above; constrained the mobile menu to the available viewport height. Improved contact text wrapping, modal presentation, focus styling, and small-text contrast.
 - Removed two pre-existing unused React imports so the TypeScript check passes.
@@ -19,6 +19,7 @@ Implemented locally on November 2, 2026. No deployment was performed.
 | Tokens and typography | `src/index.css`, `tailwind.config.js` |
 | Navigation and footer | `src/components/Navbar.tsx`, `src/components/Footer.tsx` |
 | Homepage sections | `src/components/HeroSection.tsx`, `AboutSection.tsx`, `MissionVisionSection.tsx`, `CoreValuesSection.tsx`, `ServicesSection.tsx`, `AnnouncementSection.tsx`, `EventsSection.tsx`, `CollaborationSection.tsx`, `BoardMembersSection.tsx`, `CTASection.tsx`, `ContactSection.tsx` (all under `src/components/`) |
+| Animated effects | `src/components/effects/MagicRings.tsx`, `GhostFibers.tsx`, `Strands.tsx` (all under `src/components/effects/`) |
 | Shared presentation | `src/components/ui/SpecularButton.tsx`, `SectionHeading.tsx`, `Reveal.tsx`, `Modal.tsx` (all under `src/components/ui/`) |
 | Unused imports | `src/App.tsx`, `src/index.tsx` |
 | New assets | `public/assets/Logo-H.svg`, `public/assets/Logo-V.svg` |

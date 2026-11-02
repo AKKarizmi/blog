@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 type StrandsProps = {
@@ -19,6 +19,7 @@ export function Strands({
   className = ''
 }: StrandsProps) {
   const reduceMotion = useReducedMotion();
+  const gradientId = useId();
 
   const strands = useMemo(
     () =>
@@ -52,25 +53,25 @@ export function Strands({
         fill="none">
         
         <defs>
-          <linearGradient id={`strandGrad-${tone}`} x1="0" y1="0" x2="1" y2="0">
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
             <stop
               offset="0%"
-              stopColor={tone === 'light' ? '#38BDF8' : '#3155FF'}
+              stopColor={tone === 'light' ? 'rgb(var(--brand-light-rgb))' : 'rgb(var(--brand-rgb))'}
               stopOpacity="0" />
             
             <stop
               offset="30%"
-              stopColor={tone === 'light' ? '#60A5FA' : '#3155FF'}
+              stopColor={tone === 'light' ? 'rgb(var(--brand-light-rgb))' : 'rgb(var(--brand-rgb))'}
               stopOpacity={tone === 'light' ? 0.65 : 0.3} />
             
             <stop
               offset="65%"
-              stopColor={tone === 'light' ? '#A78BFA' : '#7C3AED'}
+              stopColor={tone === 'light' ? 'rgb(var(--brand-light-rgb))' : 'rgb(var(--brand-rgb))'}
               stopOpacity={tone === 'light' ? 0.5 : 0.24} />
             
             <stop
               offset="100%"
-              stopColor={tone === 'light' ? '#38BDF8' : '#38BDF8'}
+              stopColor={tone === 'light' ? 'rgb(var(--brand-light-rgb))' : 'rgb(var(--brand-rgb))'}
               stopOpacity="0" />
             
           </linearGradient>
@@ -80,7 +81,7 @@ export function Strands({
         <path
           key={strand.id}
           d={strand.d}
-          stroke={`url(#strandGrad-${tone})`}
+          stroke={`url(#${gradientId})`}
           strokeWidth={strand.width}
           strokeLinecap="round"
           strokeDasharray="420 900"

@@ -1,3 +1,6 @@
+import { MagicRings } from './effects/MagicRings';
+import { GhostFibers } from './effects/GhostFibers';
+import { Strands } from './effects/Strands';
 import { ArrowRightIcon } from 'lucide-react';
 import { useForozData } from '../context/ForozDataContext';
 import { Reveal } from './ui/Reveal';
@@ -8,6 +11,9 @@ export function CTASection() {
 
   return (
     <section className="relative isolate overflow-hidden bg-navy-900 section-space">
+      <MagicRings tone="light" rings={5} className="-z-10 opacity-80" />
+      <GhostFibers tone="light" count={14} opacity={0.5} className="-z-10" />
+      <Strands tone="light" count={5} opacity={0.35} className="-z-10" />
       
 
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">

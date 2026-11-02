@@ -1,3 +1,4 @@
+import { GhostFibers } from './effects/GhostFibers';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CompassIcon, EyeIcon } from 'lucide-react';
 import { useForozData } from '../context/ForozDataContext';
@@ -28,6 +29,7 @@ export function MissionVisionSection() {
 
   return (
     <section className="relative isolate overflow-hidden bg-navy-900 section-space">
+      <GhostFibers tone="light" count={12} opacity={0.4} className="-z-10" />
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal className="max-w-2xl">
