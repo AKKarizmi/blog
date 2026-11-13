@@ -1,3 +1,4 @@
+import { AppLink } from './ui/AppLink';
 import { GhostFibers } from './effects/GhostFibers';
 import { Strands } from './effects/Strands';
 import {
@@ -34,7 +35,7 @@ export function Footer() {
   const columns = [
   { title: 'Quick Links', links: footer.quickLinks },
   { title: 'Resources', links: footer.resourceLinks },
-  { title: 'Legal', links: footer.legalLinks }];
+  { title: 'Legal', links: footer.legalLinks }].filter(column => column.links.length > 0);
 
 
   const email = blogPage.contactEmail || '';
@@ -69,7 +70,7 @@ export function Footer() {
 
                 return (
                   <li key={`footer-${platform}`}>
-                      <a
+                      <AppLink
                       href={url}
                       target="_blank"
                       rel="noreferrer"
@@ -77,7 +78,7 @@ export function Footer() {
                       className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:text-white">
                       
                         <Icon className="h-4 w-4" />
-                      </a>
+                      </AppLink>
                     </li>);
 
               })}
@@ -94,12 +95,12 @@ export function Footer() {
                 <ul className="mt-5 space-y-3">
                   {column.links.map((link) =>
                 <li key={`${column.title}-${link.label}`}>
-                      <a
+                      <AppLink
                     href={link.href}
                     className="text-sm text-slate-300 transition-colors hover:text-white">
                     
                         {link.label}
-                      </a>
+                      </AppLink>
                     </li>
                 )}
                 </ul>
@@ -113,33 +114,33 @@ export function Footer() {
               <ul className="mt-5 space-y-3">
                 {email &&
                 <li>
-                    <a
+                    <AppLink
                     href={`mailto:${email}`}
                     className="inline-flex items-start gap-2 text-sm text-slate-300 transition-colors hover:text-white">
                     
                       <MailIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <span className="break-all">{email}</span>
-                    </a>
+                    </AppLink>
                   </li>
                 }
                 {phone &&
                 <li>
-                    <a
+                    <AppLink
                     href={`tel:${phone}`}
                     className="inline-flex items-center gap-2 text-sm text-slate-300 transition-colors hover:text-white">
                     
                       <PhoneIcon className="h-3.5 w-3.5 shrink-0" />
                       {phone}
-                    </a>
+                    </AppLink>
                   </li>
                 }
                 <li>
-                  <a
+                  <AppLink
                     href="#contact"
                     className="text-sm text-slate-300 transition-colors hover:text-white">
                     
                     Get in touch
-                  </a>
+                  </AppLink>
                 </li>
               </ul>
             </div>

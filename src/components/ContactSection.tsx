@@ -1,3 +1,4 @@
+import { AppLink } from './ui/AppLink';
 import { useState } from 'react';
 import type { ChangeEvent, ComponentType, FormEvent } from 'react';
 import {
@@ -99,7 +100,7 @@ export function ContactSection() {
           </Reveal>
 
           <Reveal delay={0.1} className="mt-10 space-y-3">
-            <a
+            <AppLink
               href={`mailto:${email}`}
               className="group flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 transition-all duration-300 hover:border-foroz-blue/40 hover:shadow-soft">
               
@@ -112,10 +113,10 @@ export function ContactSection() {
                 </span>
                 <span className="block break-words font-medium text-foroz-ink">{email}</span>
               </span>
-            </a>
+            </AppLink>
 
             {phone &&
-            <a
+            <AppLink
               href={`tel:${phone}`}
               className="group flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 transition-all duration-300 hover:border-foroz-blue/40 hover:shadow-soft">
               
@@ -128,7 +129,7 @@ export function ContactSection() {
                   </span>
                   <span className="block break-words font-medium text-foroz-ink">{phone}</span>
                 </span>
-              </a>
+              </AppLink>
             }
 
             {address &&
@@ -157,7 +158,7 @@ export function ContactSection() {
 
                 return (
                   <li key={`contact-${platform}`}>
-                      <a
+                      <AppLink
                       href={url}
                       target="_blank"
                       rel="noreferrer"
@@ -165,7 +166,7 @@ export function ContactSection() {
                       className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-foroz-blue hover:text-foroz-blue">
                       
                         <Icon className="h-4 w-4" />
-                      </a>
+                      </AppLink>
                     </li>);
 
               })}

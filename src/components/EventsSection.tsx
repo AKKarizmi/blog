@@ -1,3 +1,4 @@
+import { safeLink } from '../utils/links';
 import { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -18,7 +19,7 @@ import { handleImageError } from '../utils/imageFallback';
 import { formatDate, formatDateParts, truncate } from '../utils/format';
 
 export function EventsSection() {
-  const { events, loading } = useForozData();
+  const { events, loading, errors } = useForozData();
   const [active, setActive] = useState<EventData | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const reduceMotion = useReducedMotion();
@@ -87,7 +88,7 @@ export function EventsSection() {
             </div> :
           events.length === 0 ?
           <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 text-slate-600">
-              No upcoming events at the moment.
+              {errors.some(error => error.startsWith("Events")) ? "Events could not be loaded. Please try again later." : "No upcoming events at the moment."}
             </div> :
 
           <div
@@ -199,12 +200,13 @@ export function EventsSection() {
         title={active?.title || ''}
         footer={
         <SpecularButton
-          href={active?.registration_link || '/events'}
+          href={safeLink(active?.registration_link)}
+          disabled={!safeLink(active?.registration_link)}
           size="md"
-          target={active?.registration_link ? '_blank' : undefined}
+          target={safeLink(active?.registration_link)?.startsWith('http') ? '_blank' : undefined}
           rel={active?.registration_link ? 'noreferrer' : undefined}>
           
-            Register Now
+            {safeLink(active?.registration_link) ? 'Register Now' : 'Registration unavailable'}
             <ArrowUpRightIcon className="h-4 w-4" />
           </SpecularButton>
         }>

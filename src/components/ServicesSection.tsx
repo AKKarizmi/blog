@@ -49,7 +49,7 @@ type CategoriesResponse = {
   categories?: ServiceCategory[];
 };
 
-export function ServicesSection() {
+export function ServicesSection({ dedicated = false }: { dedicated?: boolean }) {
   const [services, setServices] = useState<ServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +109,7 @@ export function ServicesSection() {
           }
           description="Comprehensive programs designed to equip youth with the knowledge, skills, and opportunities needed to thrive in today's world."
           action={
-          <SpecularButton href="/programs" variant="secondary">
+          !dedicated && <SpecularButton href="/programs" variant="secondary">
               View All Programs
               <ArrowUpRightIcon className="h-4 w-4" />
             </SpecularButton>
@@ -144,7 +144,7 @@ export function ServicesSection() {
           services.length > 0 ?
           <div className="card-grid">
               {services.map((service, index) => {
-              const normalizedIcon = service.icon_text.
+              const normalizedIcon = (service.icon_text || '').
               toLowerCase().
               replace(/[^a-z0-9]/g, '');
               const Icon = serviceIcons[normalizedIcon] || BookOpenIcon;
@@ -159,6 +159,7 @@ export function ServicesSection() {
                   className="min-w-0">
                   
                     <motion.article
+                    id={`category-${service.id}`}
                     whileHover={reduceMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                     className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 transition-shadow duration-500 hover:shadow-lift">
@@ -191,8 +192,7 @@ export function ServicesSection() {
                       </p>
 
                       <div className="relative mt-8 flex items-center text-sm font-semibold text-foroz-blue transition-colors duration-200">
-                        Learn more
-                        <ArrowRightIcon className="ml-2 h-4 w-4" />
+                        <SpecularButton href={`/programs#category-${service.id}`} size="md" variant="secondary">Explore program category <ArrowRightIcon className="h-4 w-4" /></SpecularButton>
                       </div>
                     </motion.article>
                   </Reveal>);

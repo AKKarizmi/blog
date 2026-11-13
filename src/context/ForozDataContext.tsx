@@ -418,7 +418,7 @@ const defaultData: ForozStaticData = {
     description:
     "Join the FOROZ community today. Whether you're a student seeking opportunities, a professional wanting to mentor, or a partner looking to collaborate, your impact starts here.",
     primaryLabel: 'Join FOROZ Today',
-    primaryHref: '/volunteer_form/',
+    primaryHref: 'https://volunteer.foroz.me/',
     secondaryLabel: 'Learn More',
     secondaryHref: '#about'
   },
@@ -451,16 +451,11 @@ const defaultData: ForozStaticData = {
     { label: 'Events', href: '#events' }],
 
     resourceLinks: [
-    { label: 'Blog', href: '#' },
-    { label: 'Annual Reports', href: '#' },
-    { label: 'Volunteer Guide', href: '#' },
-    { label: 'Partner with Us', href: '#' }],
-
-    legalLinks: [
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
-    { label: 'Cookie Policy', href: '#' },
-    { label: 'Accessibility', href: '#' }]
+      { label: 'Programs & Opportunities', href: '/programs' },
+      { label: 'Events', href: '/events' },
+      { label: 'Partner with Us', href: '/#contact' }
+    ],
+    legalLinks: []
 
   },
   blogPage: {
@@ -765,7 +760,7 @@ items.map((item, index) => {
     termination_date:
     pickString(source, ['termination_date', 'end_date']) || undefined,
     registration_link:
-    pickString(source, ['registration_link', 'register_link', 'link', 'url']) ||
+    pickString(source, ['registration_link']) ||
     undefined
   };
 });
@@ -1160,7 +1155,7 @@ export function ForozDataProvider({ children }: {children: ReactNode;}) {
       }
 
       setData(next);
-      setErrors([]);
+      setErrors([...(eventsPayload === null ? ["Events could not be loaded."] : []), ...(announcementsPayload === null ? ["Announcements could not be loaded."] : [])]);
     } catch (error) {
       setErrors([
       error instanceof Error ? error.message : 'Unable to load site data.']

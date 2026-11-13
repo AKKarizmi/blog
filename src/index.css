@@ -173,3 +173,6 @@ p, a, button, dd {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Prevent decorative content from creating horizontal page scrolling. */
+body { overflow-x: clip; }

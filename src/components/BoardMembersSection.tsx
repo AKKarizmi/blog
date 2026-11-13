@@ -1,3 +1,4 @@
+import { AppLink } from './ui/AppLink';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -108,7 +109,7 @@ export function BoardMembersSection() {
 
                           return (
                             <li key={`${member.id}-${platform}`}>
-                                  <a
+                                  <AppLink
                                 href={url}
                                 target="_blank"
                                 rel="noreferrer"
@@ -116,7 +117,7 @@ export function BoardMembersSection() {
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/15 text-white backdrop-blur transition-colors hover:bg-white hover:text-navy-900">
                                 
                                     <Icon className="h-4 w-4" />
-                                  </a>
+                                  </AppLink>
                                 </li>);
 
                         })}
@@ -189,7 +190,7 @@ export function BoardMembersSection() {
 
                 return (
                   <li key={`modal-${platform}`}>
-                        <a
+                        <AppLink
                       href={url}
                       target="_blank"
                       rel="noreferrer"
@@ -197,7 +198,7 @@ export function BoardMembersSection() {
                       className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition-colors hover:border-foroz-blue hover:text-foroz-blue">
                       
                           <Icon className="h-4 w-4" />
-                        </a>
+                        </AppLink>
                       </li>);
 
               })}

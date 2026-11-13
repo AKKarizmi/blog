@@ -1,3 +1,4 @@
+import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
@@ -6,8 +7,8 @@ import { ForozDataProvider } from "./context/ForozDataContext";
 const rootEl = document.getElementById("root");
 if (rootEl) {
   ReactDOM.createRoot(rootEl).render(
-    <ForozDataProvider>
+    <BrowserRouter><ForozDataProvider>
       <App />
-    </ForozDataProvider>
+    </ForozDataProvider></BrowserRouter>
   );
 }

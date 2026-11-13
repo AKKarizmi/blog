@@ -1,3 +1,6 @@
+import { useLocation } from 'react-router-dom';
+import { AppLink } from './ui/AppLink';
+import { lockScroll } from '../utils/scrollLock';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRightIcon, MenuIcon, XIcon } from 'lucide-react';
@@ -6,9 +9,9 @@ import { SpecularButton } from './ui/SpecularButton';
 
 const navLinks = [
 { label: 'About', href: '#about' },
-{ label: 'Programs', href: '#services' },
+{ label: 'Programs', href: '/programs' },
 { label: 'Opportunities', href: '#announcements' },
-{ label: 'Events', href: '#events' },
+{ label: 'Events', href: '/events' },
 { label: 'Collaborations', href: '#collaborations' },
 { label: 'Team', href: '#team' },
 { label: 'Contact', href: '#contact' }];
@@ -26,11 +29,16 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const location = useLocation();
+  useEffect(() => { setMobileOpen(false); }, [location.key]);
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!mobileOpen) return;
+    const release = lockScroll();
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setMobileOpen(false); };
+    const resize = () => { if (window.innerWidth >= 1280) setMobileOpen(false); };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('resize', resize);
+    return () => { release(); window.removeEventListener('keydown', onKey); window.removeEventListener('resize', resize); };
   }, [mobileOpen]);
 
   const logo = '/assets/Logo-H.svg';
@@ -50,7 +58,7 @@ export function Navbar() {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-2xl border px-4 py-2.5 backdrop-blur-xl sm:px-5">
         
-        <a
+        <AppLink
           href="#home"
           className="flex shrink-0 items-center gap-2"
           aria-label={`${blogPage.siteName} — home`}>
@@ -63,12 +71,12 @@ export function Navbar() {
             className="h-10 w-auto sm:h-11"
             loading="eager" />
           
-        </a>
+        </AppLink>
 
         <ul className="hidden items-center gap-1 xl:flex">
           {navLinks.map((link) =>
           <li key={link.href}>
-              <a
+              <AppLink
               href={link.href}
               className="group relative rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-foroz-ink">
               
@@ -76,7 +84,7 @@ export function Navbar() {
                   {link.label}
                   <span className="absolute -bottom-1 left-0 h-px w-0 bg-foroz-blue transition-all duration-300 group-hover:w-full" />
                 </span>
-              </a>
+              </AppLink>
             </li>
           )}
         </ul>
@@ -117,14 +125,14 @@ export function Navbar() {
             <ul className="flex flex-col">
               {navLinks.map((link) =>
             <li key={`mobile-${link.href}`}>
-                  <a
+                  <AppLink
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-foroz-mist hover:text-foroz-ink">
                 
                     {link.label}
                     <ArrowUpRightIcon className="h-4 w-4 text-slate-400" />
-                  </a>
+                  </AppLink>
                 </li>
             )}
             </ul>

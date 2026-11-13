@@ -1,3 +1,5 @@
+import { AppLink } from './AppLink';
+import { safeLink } from '../../utils/links';
 import { useReducedMotion } from 'framer-motion';
 import type { MouseEvent, ReactNode } from 'react';
 
@@ -63,16 +65,16 @@ export function SpecularButton({
     <span className="relative inline-flex min-w-0 items-center justify-center gap-2 [&>svg]:shrink-0">{children}</span>
   </>;
 
-  if (href) {
+  if (href && !disabled && safeLink(href)) {
     return (
-      <a href={href} target={target} rel={rel} aria-label={ariaLabel} className={classes} onClick={onClick} onMouseMove={handleMove}>
+      <AppLink href={href} target={target} rel={rel} aria-label={ariaLabel} className={classes} onClick={onClick} onMouseMove={handleMove}>
         {content}
-      </a>
+      </AppLink>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} disabled={disabled} aria-label={ariaLabel} className={classes} onMouseMove={handleMove}>
+    <button type={type} onClick={onClick} disabled={disabled || Boolean(href && !safeLink(href))} aria-label={ariaLabel} className={classes} onMouseMove={handleMove}>
       {content}
     </button>
   );

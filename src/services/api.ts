@@ -10,7 +10,7 @@ const env =
 (import.meta as unknown as {env?: Record<string, string | undefined>;}).env || {};
 
 export const API_ORIGIN = trimTrailingSlash(
-  env.VITE_API_ORIGIN || 'https://foroz.vercel.app'
+  env.VITE_API_ORIGIN ?? (import.meta.env.DEV ? '' : 'https://foroz.vercel.app')
 );
 
 export const API_BASE_URL = trimTrailingSlash(env.VITE_API_BASE_URL || '/');
