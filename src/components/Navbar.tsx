@@ -1,3 +1,4 @@
+import { appUrls } from '../services/applicationUrls';
 import { useLocation } from 'react-router-dom';
 import { AppLink } from './ui/AppLink';
 import { lockScroll } from '../utils/scrollLock';
@@ -91,7 +92,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <SpecularButton
-            href="https://dashboard.foroz.me/"
+            href={appUrls.dashboard+'/'}
             size="md"
             className="hidden sm:inline-flex">
             
@@ -145,7 +146,7 @@ export function Navbar() {
               
                 Join Us
               </SpecularButton>
-              <SpecularButton href="https://dashboard.foroz.me/">
+              <SpecularButton href={appUrls.dashboard+'/'}>
                 Login
                 <ArrowUpRightIcon className="h-4 w-4" />
               </SpecularButton>

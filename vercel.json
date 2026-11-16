@@ -1,1 +1,16 @@
-{"rewrites":[{"source":"/((?!assets/).*)","destination":"/index.html"}]}
+{
+  "rewrites": [
+    {
+      "source": "/api/auth/:path(.*)",
+      "destination": "https://foroz.vercel.app/lms/v1/auth/:path"
+    },
+    {
+      "source": "/api/backend/:path(.*)",
+      "destination": "https://foroz.vercel.app/:path"
+    },
+    {
+      "source": "/((?!api/|assets/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

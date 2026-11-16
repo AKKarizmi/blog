@@ -504,12 +504,12 @@ const defaultData: ForozStaticData = {
 const dataEndpoints = {
   content: [] as string[],
   coreValues: [] as string[],
-  services: ['/v1/courses/', '/d1/get_services/', '/services/', '/programs/'],
-  events: ['/d1/get_events/', '/events/'],
-  collaborations: ['/d1/get_collaborations/', '/collaborations/', '/collaboration/'],
-  boardMembers: ['/d1/get_members/', '/experts/', '/board-members/', '/team/'],
+  services: ['/d1/get_services/'],
+  events: ['/d1/get_events/'],
+  collaborations: ['/d1/get_collaborations/'],
+  boardMembers: ['/d1/get_members/'],
   impact: [] as string[],
-  announcements: ['/d1/get_announcements/', '/announcements/']
+  announcements: ['/d1/get_announcements/']
 };
 
 const ForozDataContext = createContext<ForozDataContextValue | undefined>(

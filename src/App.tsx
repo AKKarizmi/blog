@@ -1,4 +1,5 @@
-import { Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
+import { AdmissionForm, CredentialVerifier } from './features/EducationPublic';
+import { Routes, Route, useLocation, useNavigationType, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { ProgramsPage, CoursePage } from './pages/ProgramsPage';
 import { AppLink } from './components/ui/AppLink';
@@ -86,9 +87,12 @@ function NavigationScroll() {
   return null;
 }
 
+function AdmissionPage(){const value=Number(new URLSearchParams(useLocation().search).get('class'));return <main className="px-4 pb-16 pt-32"><AdmissionForm initialClass={value||undefined}/></main>;}
+function VerifyPage(){const {code}=useParams();const navigate=useNavigate();return <main className="px-4 pb-16 pt-32"><CredentialVerifier code={code} onVerify={value=>navigate('/verify-credential/'+encodeURIComponent(value))}/></main>;}
 export function App() {
   return <><NavigationScroll /><Navbar /><Routes>
     <Route path="/" element={<Homepage />} />
+    <Route path="/apply" element={<AdmissionPage/>}/><Route path="/verify-credential" element={<VerifyPage/>}/><Route path="/verify-credential/:code" element={<VerifyPage/>}/>
     <Route path="/programs" element={<ProgramsPage />} />
     <Route path="/courses/:id" element={<CoursePage />} />
     <Route path="/events" element={<main tabIndex={-1} className="pt-28"><h1 className="mx-auto max-w-7xl px-6 text-3xl font-bold">Events & Workshops</h1><EventsSection /></main>} />

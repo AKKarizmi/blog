@@ -1,3 +1,4 @@
+import { appUrls } from '../services/applicationUrls';
 import { AppLink } from './ui/AppLink';
 import { GhostFibers } from './effects/GhostFibers';
 import { Strands } from './effects/Strands';
@@ -147,7 +148,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
+        <nav aria-label="Education links" className="mt-8 flex flex-wrap gap-5 text-sm text-slate-200"><AppLink href="/programs">Educational programs</AppLink><AppLink href="/apply">Student admission</AppLink><AppLink href="/verify-credential">Verify certificates and awards</AppLink><AppLink href={appUrls.lms+'/'}>Student and teacher portal</AppLink></nav><div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
           <p className="text-xs text-slate-300">
             © {blogPage.copyrightText || footer.copyright}
           </p>
